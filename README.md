@@ -1,6 +1,6 @@
-# Claude OS
+# Claude Code Memory System
 
-A layered context and automated learning loop for Claude Code. Roll out in three phases.
+A layered context and learning loop system for Claude Code. Roll out in three phases.
 
 ## Architecture
 
@@ -98,7 +98,7 @@ Set up the four core files that give Claude persistent context across sessions.
    - Environment constraints (missing CLI tools, API endpoints)
    - Behavior rules (no unsolicited edits, which config file to use for what)
 
-3. **Settings**:`/.claude/settings.local.json` accumulates automatically as you approve tool calls. You can also edit it directly:
+3. **Settings** - `/.claude/settings.local.json` accumulates automatically as you approve tool calls. You can also edit it directly:
    ```json
    {
      "permissions": {
@@ -139,7 +139,7 @@ End of week         →  Promote stable MEMORY.md patterns to .claude/CLAUDE.md
 
 ### Setup
 
-1. **Add log.md**:create `~/.claude/projects/{project}/memory/log.md`:
+1. **Add log.md** - create `~/.claude/projects/{project}/memory/log.md`:
    ```markdown
    # Session Log
 
@@ -157,14 +157,14 @@ End of week         →  Promote stable MEMORY.md patterns to .claude/CLAUDE.md
    - Update `MEMORY.md` topics only when stable new patterns are confirmed.
    ```
 
-3. **Distill (daily)**:at the end of each day, tell Claude:
+3. **Distill (daily)** - at the end of each day, tell Claude:
    ```
    Read memory/log.md and memory/MEMORY.md.
    Distill any new patterns from today's logs into MEMORY.md.
    Do not duplicate existing entries.
    ```
 
-4. **Promote (weekly)**:at the end of each week, tell Claude:
+4. **Promote (weekly)** - at the end of each week, tell Claude:
    ```
    Read memory/MEMORY.md and .claude/CLAUDE.md.
    If any pattern in MEMORY.md appeared 3+ times and is not yet a rule,
@@ -271,9 +271,9 @@ client = anthropic.Anthropic()
 ```
 
 **Suggested platforms:**
-- **Bitbucket Pipelines**:scheduled pipelines, already in your toolchain
-- **AWS Lambda + EventBridge**:serverless, pay-per-invocation
-- **GitHub Actions**:cron schedules, free tier available
+- **Bitbucket Pipelines** - scheduled pipelines, already in your toolchain
+- **AWS Lambda + EventBridge** - serverless, pay-per-invocation
+- **GitHub Actions** - cron schedules, free tier available
 
 ---
 
