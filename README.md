@@ -9,11 +9,17 @@ A layered context and learning loop system for Claude Code. Roll out in three ph
 Four files loaded into every Claude Code session automatically.
 
 ```mermaid
-flowchart LR
-    A["CLAUDE.md\nTeam Rules"] --> S["Claude Code\nSession"]
-    B[".claude/CLAUDE.md\nPersonal Rules"] --> S
-    C["settings.local.json\nPermissions"] --> S
-    D["MEMORY.md\nLearned Patterns"] --> S
+flowchart TD
+    A["📄 CLAUDE.md - Team Rules"]
+    B["📄 .claude/CLAUDE.md - Personal Rules"]
+    C["⚙️ settings.local.json - Permissions"]
+    D["🧠 MEMORY.md - Learned Patterns"]
+    S["🤖 Claude Code Session"]
+
+    A --> S
+    B --> S
+    C --> S
+    D --> S
 
     style A fill:#4CAF50,color:#fff,stroke:#2E7D32,stroke-width:2px
     style B fill:#5C6BC0,color:#fff,stroke:#303F9F,stroke-width:2px
@@ -27,11 +33,16 @@ flowchart LR
 Session data flows through three stages: log, distill, promote.
 
 ```mermaid
-flowchart LR
-    S["Session"] -- "every 1h" --> L["log.md\nRaw History"]
-    L -- "every 24h" --> D["MEMORY.md\nPatterns"]
-    D -- "every 7d" --> R[".claude/CLAUDE.md\nRules"]
-    R -. "next session" .-> S
+flowchart TD
+    S["🤖 Session"]
+    L["📝 log.md - Raw Session History"]
+    D["🧠 MEMORY.md - Distilled Patterns"]
+    R["📄 .claude/CLAUDE.md - Promoted Rules"]
+
+    S -- "every 1 hour" --> L
+    L -- "every 24 hours" --> D
+    D -- "every 7 days" --> R
+    R -. "loaded into next session" .-> S
 
     style S fill:#212121,color:#fff,stroke:#424242,stroke-width:2px
     style L fill:#78909C,color:#fff,stroke:#455A64,stroke-width:2px
@@ -47,19 +58,19 @@ flowchart LR
 ### Automation Scripts
 
 ```mermaid
-flowchart LR
-    C["Scheduler\nlaunchd / cron"]
+flowchart TD
+    C["⏰ Scheduler - launchd or cloud cron"]
 
-    C -- triggers --> L1["1-log.sh\nevery 1h"]
-    C -- triggers --> L2["2-distill.sh\nevery 24h"]
-    C -- triggers --> L3["3-promote.sh\nevery 7d"]
+    C -- "triggers" --> L1["🔵 1-log.sh - every 1 hour"]
+    C -- "triggers" --> L2["🟡 2-distill.sh - every 24 hours"]
+    C -- "triggers" --> L3["🟣 3-promote.sh - every 7 days"]
 
-    L1 -- appends --> LOG["log.md"]
-    L2 -- updates --> MEM["MEMORY.md"]
-    L3 -- updates --> RUL[".claude/CLAUDE.md"]
+    L1 -- "appends to" --> LOG["📝 log.md"]
+    L2 -- "updates" --> MEM["🧠 MEMORY.md"]
+    L3 -- "updates" --> RUL["📄 .claude/CLAUDE.md"]
 
-    LOG -. reads .-> L2
-    MEM -. reads .-> L3
+    LOG -. "reads" .-> L2
+    MEM -. "reads" .-> L3
 
     style C fill:#FF8F00,color:#fff,stroke:#E65100,stroke-width:2px
     style L1 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
