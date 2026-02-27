@@ -16,7 +16,7 @@ jobs:
         run: mkdir -p output
 
       - name: Make scripts executable
-        run: chmod +x *.sh
+        run: chmod +x scripts/*.sh tests/*.sh
 
       - name: Run tests
-        run: bash test.sh
+        run: bash tests/test.sh

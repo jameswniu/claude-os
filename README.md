@@ -4,17 +4,19 @@ A layered context and learning loop system for Claude Code. Roll out in three ph
 
 ## Architecture
 
-### Phase 1: Static Context
+### Phase 1 - Static Context
 
 Four files loaded into every Claude Code session automatically.
 
 ```mermaid
-flowchart TD
-    A["CLAUDE.md\nTeam Rules"]
-    B[".claude/CLAUDE.md\nPersonal Rules"]
-    C["settings.local.json\nPermissions"]
-    D["MEMORY.md\nLearned Patterns"]
-    S["Claude Code Session"]
+block-beta
+    columns 4
+    A["CLAUDE.md\nTeam Rules"]:1
+    B[".claude/CLAUDE.md\nPersonal Rules"]:1
+    C["settings.local.json\nPermissions"]:1
+    D["MEMORY.md\nLearned Patterns"]:1
+    space:4
+    S["Claude Code Session"]:4
 
     A --> S
     B --> S
@@ -28,41 +30,42 @@ flowchart TD
     style S fill:#212121,color:#fff,stroke:#424242
 ```
 
-### Phase 2 and 3: Learning Loop
+### Phase 2 & 3 - Learning Loop
 
-Data flows in a cycle: sessions produce logs, logs get distilled into patterns, patterns get promoted into rules, rules feed back into the next session.
+Session data flows through three stages: log, distill, promote.
 
 ```mermaid
-flowchart TD
-    S["Session"] -->|every 1h| L["log.md"]
-    L -->|every 24h| M["MEMORY.md"]
-    M -->|every 7d| R[".claude/CLAUDE.md"]
-    R -.->|next session| S
+flowchart LR
+    S["Session"] -- "every 1h" --> L["log.md\nRaw History"]
+    L -- "every 24h" --> D["MEMORY.md\nPatterns"]
+    D -- "every 7d" --> R["CLAUDE.md\nRules"]
+    R -. "loaded next session" .-> S
 
     style S fill:#212121,color:#fff,stroke:#424242
     style L fill:#78909C,color:#fff,stroke:#455A64
-    style M fill:#EF5350,color:#fff,stroke:#C62828
+    style D fill:#EF5350,color:#fff,stroke:#C62828
     style R fill:#5C6BC0,color:#fff,stroke:#303F9F
+
+    linkStyle 0 stroke:#78909C,stroke-width:2px
+    linkStyle 1 stroke:#EF5350,stroke-width:2px
+    linkStyle 2 stroke:#5C6BC0,stroke-width:2px
+    linkStyle 3 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
 ```
 
-### Automation (Phase 3)
-
-A scheduler triggers three scripts that run headless Claude Code.
+### Automation Scripts
 
 ```mermaid
-flowchart TD
-    C["Scheduler\nlaunchd or cloud cron"]
+flowchart LR
+    C["launchd\ncloud cron"] -- triggers --> L1["1-log.sh\nevery 1h"]
+    C -- triggers --> L2["2-distill.sh\nevery 24h"]
+    C -- triggers --> L3["3-promote.sh\nevery 7d"]
 
-    C --> L1["1-log.sh\nevery 1h"]
-    C --> L2["2-distill.sh\nevery 24h"]
-    C --> L3["3-promote.sh\nevery 7d"]
+    L1 -- appends --> LOG["log.md"]
+    L2 -- updates --> MEM["MEMORY.md"]
+    L3 -- updates --> RUL["CLAUDE.md"]
 
-    L1 --> LOG["log.md"]
-    L2 --> MEM["MEMORY.md"]
-    L3 --> RUL[".claude/CLAUDE.md"]
-
-    LOG -.-> L2
-    MEM -.-> L3
+    LOG -. reads .-> L2
+    MEM -. reads .-> L3
 
     style C fill:#FF8F00,color:#fff,stroke:#E65100
     style L1 fill:#546E7A,color:#fff,stroke:#37474F
@@ -71,6 +74,10 @@ flowchart TD
     style LOG fill:#78909C,color:#fff,stroke:#455A64
     style MEM fill:#EF5350,color:#fff,stroke:#C62828
     style RUL fill:#5C6BC0,color:#fff,stroke:#303F9F
+
+    linkStyle 0,1,2 stroke:#FF8F00,stroke-width:2px
+    linkStyle 3,4,5 stroke:#4CAF50,stroke-width:2px
+    linkStyle 6,7 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
 ```
 
 ---
@@ -207,15 +214,15 @@ Best for individual use. Runs when your Mac is on, catches up on missed runs aft
 
 **Install:**
 ```bash
-# Copy scripts
-mkdir -p ~/scripts/claude-memory/output
-cp 1-log.sh 2-distill.sh 3-promote.sh ~/scripts/claude-memory/
-chmod +x ~/scripts/claude-memory/*.sh
+# Clone the repo
+git clone https://github.com/jameswniu/claude-os.git ~/scripts/claude-memory
+cd ~/scripts/claude-memory && mkdir -p output
+chmod +x scripts/*.sh
 
 # Edit scripts: update PROJECT_DIR and MEMORY_DIR paths for your project
 
 # Copy launchd plists
-cp com.claude.memory-*.plist ~/Library/LaunchAgents/
+cp launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
 
 # Load all three
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
@@ -279,6 +286,7 @@ client = anthropic.Anthropic()
 
 ## File Tree
 
+**Your repo (Phase 1 & 2):**
 ```
 /your-repo/
 ├── CLAUDE.md                          ← Team rules (git tracked)
@@ -293,13 +301,26 @@ client = anthropic.Anthropic()
 ├── log.md                             ← Session history (read on demand)
 └── archive/
     └── YYYY-MM.md                     ← Rolled-off old logs
+```
 
-~/scripts/claude-memory/               ← Automation scripts (Phase 3)
-├── 1-log.sh
-├── 2-distill.sh
-├── 3-promote.sh
+**This repo (Phase 3 automation):**
+```
+claude-os/
 ├── README.md
-└── output/                            ← Script execution logs
+├── scripts/
+│   ├── 1-log.sh                       ← Append new sessions to log.md
+│   ├── 2-distill.sh                   ← Distill log patterns into MEMORY.md
+│   └── 3-promote.sh                   ← Promote stable patterns to CLAUDE.md
+├── launchd/
+│   ├── com.claude.memory-log.plist    ← Every 1 hour
+│   ├── com.claude.memory-distill.plist← Every 24 hours
+│   └── com.claude.memory-promote.plist← Every 7 days
+├── tests/
+│   └── test.sh                        ← 37 validation checks
+├── .github/
+│   └── workflows/
+│       └── test.yml                   ← CI on push and PR
+└── output/                            ← Script execution logs (gitignored)
 ```
 
 ---

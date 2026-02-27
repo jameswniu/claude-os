@@ -4,7 +4,10 @@
 
 PASS=0
 FAIL=0
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$TEST_DIR/.." && pwd)"
+SCRIPT_DIR="$REPO_DIR/scripts"
+LAUNCHD_DIR="$REPO_DIR/launchd"
 
 pass() { echo "  PASS: $1"; PASS=$((PASS + 1)); }
 fail() { echo "  FAIL: $1"; FAIL=$((FAIL + 1)); }
@@ -68,16 +71,16 @@ echo "## Repo checks"
 # ----------------------------
 
 # Test: output directory exists
-[ -d "$SCRIPT_DIR/output" ] && pass "output directory exists" || fail "output directory missing"
+[ -d "$REPO_DIR/output" ] && pass "output directory exists" || fail "output directory missing"
 
 # Test: .gitignore excludes output
-grep -q "output/" "$SCRIPT_DIR/.gitignore" && pass ".gitignore excludes output/" || fail "output/ not in .gitignore"
+grep -q "output/" "$REPO_DIR/.gitignore" && pass ".gitignore excludes output/" || fail "output/ not in .gitignore"
 
 # Test: no em dashes in README
-grep -q "—" "$SCRIPT_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
+grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
 
 # Test: plist files are valid XML
-for PLIST in "$SCRIPT_DIR"/com.claude.memory-*.plist; do
+for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
   NAME=$(basename "$PLIST")
   xmllint --noout "$PLIST" 2>/dev/null && pass "$NAME is valid XML" || fail "$NAME is invalid XML"
 done
