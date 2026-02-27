@@ -34,15 +34,10 @@ Session data flows through three stages: log, distill, promote.
 
 ```mermaid
 flowchart TD
-    S["🤖 Session"]
-    L["📝 log.md - Raw Session History"]
-    D["🧠 MEMORY.md - Distilled Patterns"]
-    R["📄 .claude/CLAUDE.md - Promoted Rules"]
-
-    S -- "every 1 hour" --> L
-    L -- "every 24 hours" --> D
-    D -- "every 7 days" --> R
-    R -. "loaded into next session" .-> S
+    S["Session"] -- "every 1h" --> L["log.md"]
+    L -- "every 24h" --> D["MEMORY.md"]
+    D -- "every 7d" --> R[".claude/CLAUDE.md"]
+    R -. "next session" .-> S
 
     style S fill:#212121,color:#fff,stroke:#424242,stroke-width:2px
     style L fill:#78909C,color:#fff,stroke:#455A64,stroke-width:2px
@@ -59,18 +54,18 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    C["⏰ Scheduler - launchd or cloud cron"]
+    C["Scheduler"]
 
-    C -- "triggers" --> L1["🔵 1-log.sh - every 1 hour"]
-    C -- "triggers" --> L2["🟡 2-distill.sh - every 24 hours"]
-    C -- "triggers" --> L3["🟣 3-promote.sh - every 7 days"]
+    C -- triggers --> L1["1-log.sh\nevery 1h"]
+    C -- triggers --> L2["2-distill.sh\nevery 24h"]
+    C -- triggers --> L3["3-promote.sh\nevery 7d"]
 
-    L1 -- "appends to" --> LOG["📝 log.md"]
-    L2 -- "updates" --> MEM["🧠 MEMORY.md"]
-    L3 -- "updates" --> RUL["📄 .claude/CLAUDE.md"]
+    L1 -- appends --> LOG["log.md"]
+    L2 -- updates --> MEM["MEMORY.md"]
+    L3 -- updates --> RUL[".claude/CLAUDE.md"]
 
-    LOG -. "reads" .-> L2
-    MEM -. "reads" .-> L3
+    LOG -. reads .-> L2
+    MEM -. reads .-> L3
 
     style C fill:#FF8F00,color:#fff,stroke:#E65100,stroke-width:2px
     style L1 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
