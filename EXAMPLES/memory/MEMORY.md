@@ -62,11 +62,16 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 Reference docs in `topics/` subfolder. Zero tokens until read.
 
-- `topics/claudehub.md` — ClaudeHub main page: onboarding, quick links, key concepts, marketplace info, code examples
-- `topics/use-case-library.md` — Proven prompts for code generation, debugging, testing, documentation, code review
-- `topics/tips-bash-mode.md` — Tip: using `!` bash mode for efficient command execution
-- `topics/plugin-marketplace.md` — Plugin marketplace plan: repos, current plugins, status, architecture
-- Source: Confluence (BET space). Synced every 24h, may be slightly stale.
+- `topics/claudehub.md` — ClaudeHub main page (confluence:1597341723)
+- `topics/use-case-library.md` — AI dev tools use-case library (confluence:1559166979)
+- `topics/tips-bash-mode.md` — Tip: using bash mode (confluence:1588723799)
+- `topics/plugin-marketplace.md` — Plugin marketplace plan (confluence:1527939210)
+- `topics/ai-code-reviewer.md` — AI Code Reviewer Project (confluence:1583513725)
+- `topics/ai-updates-q4-2025.md` — Apps Engineering AI Updates Q4 2025 (confluence:1531248685)
+- `topics/ai-tools-quickstart.md` — AI Tools Quick Start Initiative (confluence:1530822736)
+- `topics/claude-code-pricing.md` — Claude Code Pricing Evaluation (confluence:1492484268)
+- `topics/ai-pr-summaries.md` — AI Generated PR Summaries (confluence:1425604970)
+- Synced every 24h. Scripts auto-discover relevant new pages and add them here.
 
 ## Claude OS Repo
 

@@ -59,7 +59,8 @@
       "Bash(sudo pmset:*)",
       "Bash(do:*)",
       "Bash(sed:*)",
-      "Bash(~/.local/bin/bootstrap:*)"
+      "Bash(~/.local/bin/bootstrap:*)",
+      "Bash(alias:*)"
     ]
   }
 }
