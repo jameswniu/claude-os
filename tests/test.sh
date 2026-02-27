@@ -96,7 +96,7 @@ grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass 
 
 # Test: EXAMPLES templates have no project-specific content
 EX="$REPO_DIR/EXAMPLES"
-grep -q "media-strategy-generator" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md is generic"
+grep -qi "media.strategy.generator\|orchestrator.*8000\|MCP.*8001\|uvicorn\|FastAPI\|LangGraph\|Supervisord" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md is generic"
 grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md is generic"
 grep -q "stash.centro.net" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific URLs" || pass "EXAMPLES/MEMORY.md is generic"
 grep -q "BP-29" "$EX/.claude/commands/review.md" && fail "EXAMPLES/review.md has project-specific tickets" || pass "EXAMPLES/review.md is generic"
