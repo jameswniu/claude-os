@@ -181,6 +181,29 @@
 - On machines without Notion key, bootstrap now correctly shows "SKIPPED Notion (NOTION_TOKEN not set)"
 - Committed and pushed to claude-os repo (c6bd2b3)
 
+### Templatizing EXAMPLES & Multi-Machine Fixes (session)
+- Bootstrap self-heals: auto-runs `install.sh` if aliases (bootstrap, checkpoint) not found
+- Skip messages now guide user: "SKIPPED Confluence (see README for setup)"
+- Bootstrap shows topic count after sync: "SYNCED Confluence (7 topics)"
+- Fixed sync scripts writing to wrong MEMORY.md on multi-project machines: bootstrap now passes `MEMORY_FILE` env var so sync scripts target the correct file. Falls back to auto-detect when run standalone (launchd).
+- Cleaned up duplicate MEMORY.md files on MacBook (only one remains)
+- Mac mini (hazelbolts) still had 3 MEMORY.md files, walked user through cleanup
+- EXAMPLES/MEMORY.md was copying project-specific content (Bitbucket URLs, branch patterns, architecture, topic entries). Templatized:
+  - Project-specific sections replaced with placeholder bullets: "(learned per project)"
+  - Topic file entries stripped (populated per-project by sync)
+  - Project-specific recurring mistakes stripped (Bitbucket-specific)
+  - Generic patterns preserved (PR types, tool usage, merge-base)
+- Checkpoint no longer overwrites template files (CLAUDE.md, .claude/CLAUDE.md, commands, settings). Only syncs MEMORY.md (filtered), logs.md, and topic files.
+- Templatized all EXAMPLES files:
+  - EXAMPLES/CLAUDE.md: generic skeleton with placeholder sections
+  - EXAMPLES/.claude/CLAUDE.md: generic PR review/behavior rules, project-specific URLs removed
+  - EXAMPLES/.claude/commands/review.md: replaced BP-29xxx with PROJ-123 placeholders
+  - EXAMPLES/.claude/settings.local.json: stripped to common permissions only
+  - EXAMPLES/memory/logs.md: kept as-is (raw reference, only used after distill)
+- Added 6 CI tests to catch project-specific content leaking into templates (media-strategy-generator, stash.centro.net, BP-29, confluence entries, secrets)
+- All tests passing: 53/53
+- Commits: c6bd2b3 through 8b55428
+
 ---
 
 ## Cumulative Friction Log
@@ -208,6 +231,10 @@
 | 02-27 | Dedup bug: same pages discovered by multiple queries | Re-read EXISTING_IDS inside loop |
 | 02-27 | Hardcoded search queries and relevance filters in sync scripts | Rewrote to derive dynamically from MEMORY.md + CLAUDE.md |
 | 02-27 | Stale topic files accumulate in EXAMPLES (copy-only, no delete) | Added rm before cp in checkpoint script |
+| 02-27 | EXAMPLES templates had project-specific content (URLs, tickets, architecture) | Templatized all EXAMPLES files with placeholders, added CI tests |
+| 02-27 | Checkpoint overwrote generic templates with project-specific files | Checkpoint now only syncs memory + topics, not config templates |
+| 02-27 | Sync scripts wrote to wrong MEMORY.md on multi-project machines | Bootstrap passes MEMORY_FILE env var to sync scripts |
+| 02-27 | Bootstrap aliases missing on new machines | Bootstrap auto-runs install.sh if aliases not found |
 
 ## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
 
