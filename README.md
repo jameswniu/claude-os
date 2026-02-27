@@ -33,7 +33,7 @@ flowchart TD
 Session data flows through three stages: log, distill, promote.
 
 ```mermaid
-flowchart TD
+flowchart LR
     S["Session"] -- "every 1h" --> L["log.md"]
     L -- "every 24h" --> D["MEMORY.md"]
     D -- "every 7d" --> R[".claude/CLAUDE.md"]
@@ -53,7 +53,7 @@ flowchart TD
 ### Automation Scripts
 
 ```mermaid
-flowchart TD
+flowchart LR
     C["Scheduler"]
 
     C -- triggers --> L1["1-log.sh\nevery 1h"]
