@@ -46,6 +46,29 @@ cd ~/new-repo
 bootstrap
 ```
 
+### What's built-in vs what this repo adds
+
+**Claude Code built-in** (official product features):
+
+| File | Location | Behavior |
+|------|----------|----------|
+| `CLAUDE.md` | Repo root | Auto-loaded at session start |
+| `.claude/CLAUDE.md` | Inside repo | Auto-loaded at session start |
+| `.claude/settings.local.json` | Inside repo | Auto-loaded, client-side only |
+| `.claude/commands/` | Inside repo | Indexed at session start |
+| `~/.claude/CLAUDE.md` | Home directory | Global, auto-loaded in every project |
+| `MEMORY.md` | `~/.claude/projects/{slug}/memory/` | Auto-loaded (first 200 lines) |
+
+**This repo adds** (custom layer on top):
+
+| Feature | What it does |
+|---------|-------------|
+| `logs.md` | Chronological session history (Claude Code only creates MEMORY.md) |
+| `topics/` | On-demand reference files synced from Confluence |
+| Learning loop | log (1h) -> distill (24h) -> promote (7d) automation scripts |
+| `checkpoint` | Push live workspace files to this repo |
+| `bootstrap` | Pull templates from this repo into a new project |
+
 ### Phase 1: Static Context
 
 Run the init script from any project directory. It copies template files only if they don't already exist.
