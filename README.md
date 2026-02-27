@@ -28,6 +28,11 @@ git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 bash ~/claude-os/install.sh
 ```
 
+`install.sh` sets up:
+- `checkpoint` and `bootstrap` shell commands
+- Pre-push git hook (runs tests before every push to this repo)
+- `~/.local/bin` on PATH
+
 ### Switching repos
 
 When you `cd` into a new repo and start Claude Code:
