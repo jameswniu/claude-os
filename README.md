@@ -21,6 +21,93 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 
 ---
 
+## Quickstart
+
+```bash
+git clone https://github.com/jameswniu/claude-os.git ~/claude-os
+cd ~/your-project
+```
+
+### Phase 1: Static Context
+
+Set up the four files that load into every Claude Code session.
+
+```bash
+# Team rules (skip if your repo already has one)
+[ ! -f CLAUDE.md ] && cp ~/claude-os/EXAMPLES/CLAUDE.md ./CLAUDE.md
+# Edit with your project's build commands, architecture, and test instructions
+
+# Personal rules
+mkdir -p .claude
+[ ! -f .claude/CLAUDE.md ] && cp ~/claude-os/EXAMPLES/.claude/CLAUDE.md .claude/CLAUDE.md
+# Edit with your own preferences (review style, behavior rules, etc.)
+# Add .claude/ to .gitignore if not already there
+
+# Memory
+PROJECT_SLUG=$(pwd | tr '/.' '-' | sed 's/^//')
+MEMORY_DIR="$HOME/.claude/projects/${PROJECT_SLUG}/memory"
+mkdir -p "$MEMORY_DIR/topics"
+[ ! -f "$MEMORY_DIR/MEMORY.md" ] && cp ~/claude-os/EXAMPLES/memory/MEMORY.md "$MEMORY_DIR/MEMORY.md"
+[ ! -f "$MEMORY_DIR/logs.md" ] && cp ~/claude-os/EXAMPLES/memory/logs.md "$MEMORY_DIR/logs.md"
+# Edit MEMORY.md with your project's architecture and patterns
+
+# Optional: pull shared topic files (Confluence docs, runbooks, etc.)
+cp ~/claude-os/EXAMPLES/memory/topics/*.md "$MEMORY_DIR/topics/" 2>/dev/null
+```
+
+Verify: start a new Claude Code session and ask "What do you know about this project?" Claude should reference content from CLAUDE.md and MEMORY.md.
+
+### Phase 2: Manual Learning Loop
+
+No setup needed. Just follow this rhythm as you work:
+
+```
+After each session  ->  Tell Claude: "Log what we did to logs.md"
+End of day          ->  Tell Claude: "Distill today's logs into MEMORY.md"
+End of week         ->  Tell Claude: "Promote stable patterns to .claude/CLAUDE.md"
+End of sprint       ->  Team promotes shared patterns to CLAUDE.md (git tracked)
+```
+
+### Phase 3: Automation
+
+Replace the manual loop with scheduled scripts.
+
+```bash
+# Edit each script: update PROJECT_DIR and MEMORY_DIR paths for your project
+nano ~/claude-os/scripts/1-log.sh      # session logger (every 1h)
+nano ~/claude-os/scripts/2-distill.sh  # pattern distiller (every 24h)
+nano ~/claude-os/scripts/3-promote.sh  # rule promoter (every 7d)
+
+# Install launchd agents (macOS)
+cp ~/claude-os/launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
+launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
+launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
+
+# Verify
+launchctl list | grep com.claude
+```
+
+**Confluence sync (optional):**
+
+```bash
+# Add credentials to ~/.zshrc
+echo 'export CONFLUENCE_EMAIL="your.email@basis.com"' >> ~/.zshrc
+echo 'export CONFLUENCE_TOKEN="your-api-token"' >> ~/.zshrc
+source ~/.zshrc
+
+# Edit the page registry to add your team's pages
+nano ~/claude-os/scripts/4-sync-confluence.sh
+
+# Install and test
+launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
+bash ~/claude-os/scripts/4-sync-confluence.sh
+```
+
+> **Deep dive:** See the Architecture and Phase sections below for how each file works and design rationale.
+
+---
+
 ## Architecture
 
 ### Phase 1 - Static Context
