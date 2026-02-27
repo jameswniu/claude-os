@@ -4,12 +4,9 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 ## Recurring Mistakes (Self-Corrections)
 
-- **Verdict in PR comments**: Rule exists in .claude/CLAUDE.md line 14. Violated twice (02-23, 02-26). Must check before posting.
 - **`gh` CLI**: Installed via Homebrew (02-26) for GitHub use (claude-os repo). Still use git + curl for Bitbucket PR reviews, never `gh`.
-- **Wrong branch**: Must always `git fetch origin` first and diff against remote refs (`origin/main...origin/branch`), never local checkout.
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
 - **Wrong config file**: Personal preferences go in `.claude/CLAUDE.md` (gitignored), never in root `CLAUDE.md` (shared).
-- **node_modules in scans**: Exclude `node_modules/`, `dist/`, `.next/` from all grep/regression scans to avoid timeouts and false positives.
 - **Session cut-offs on long reviews**: Recurring on 02-21 and 02-25. Rule added to output complete review in single response, but large PRs (20+ files) can still hit context/timeout limits. Consider chunking very large reviews.
 - **Stale files in copy-only sync**: When a script copies files to a target directory, always clean the target first if the source is the single source of truth. Copy-only accumulates stale files. Use delete-then-copy (or rsync --delete).
 
@@ -25,13 +22,6 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in `topics/` subfolder. Zero tokens until read.
-- `topics/scalable-applications-and-architecture.md` — Scalable Applications and Architecture (confluence:505544931)
-- `topics/tickets-branching-and-pull-requests-oh-my.md` — Tickets, Branching and Pull Requests Oh My! (confluence:35815828)
-- `topics/archived-git-branching-and-pull-request-guidelines.md` — Archived: Git Branching and Pull Request Guidelines (confluence:35815542)
-- `topics/claudehub.md` — ClaudeHub (confluence:1597341723)
-- `topics/ai-development-tools-use-case-library.md` — AI Development Tools: Use-Case Library (confluence:1559166979)
-- `topics/ai-code-reviewer-project.md` — AI Code Reviewer Project (confluence:1583513725)
-- `topics/informal-tech-mentorship.md` — Informal Tech Mentorship (confluence:35815632)
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
 
 ## Claude OS Repo
