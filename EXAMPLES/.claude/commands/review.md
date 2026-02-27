@@ -2,10 +2,10 @@ IMPORTANT: You MUST follow every step and the Output Format below EXACTLY. Do no
 
 ## Setup
 
-Format: /pr {ticket-number}
+Format: /review {ticket-number}
 Examples:
-  /pr BP-29421
-  /pr BP-29476
+  /review PROJ-123
+  /review PROJ-456
 
 ### Step 1: Fetch and find the branch
 Run: git fetch origin
