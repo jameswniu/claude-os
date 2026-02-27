@@ -37,3 +37,9 @@
 - Hybrid approach: `MEMORY.md` is organized by topic for quick lookup. `logs.md` is append-only chronological session history.
 - At the end of each session, append a dated entry to `logs.md` summarizing what was done and learned.
 - Update `MEMORY.md` topics only when stable new patterns or facts are confirmed.
+
+## Claude OS
+
+- Repo: `~/claude-os` (GitHub: `jameswniu/claude-os`)
+- Checkpoint command: run `checkpoint` from this project to snapshot config/memory to the repo.
+- Automation scripts run on launchd: log (1h), distill (24h), promote (7d), sync-confluence (24h).

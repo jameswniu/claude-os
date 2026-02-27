@@ -64,6 +64,16 @@ Reference docs in `topics/` subfolder. Zero tokens until read.
 - `topics/plugin-marketplace.md` — Plugin marketplace plan: repos, current plugins, status, architecture
 - Source: Confluence (BET space). Synced every 24h, may be slightly stale.
 
+## Claude OS Repo
+
+- Location: `~/claude-os` (GitHub: `jameswniu/claude-os`)
+- Documents the layered context + learning loop system for Claude Code
+- `EXAMPLES/` — Snapshots of live config/memory files (scrubbed of secrets)
+- `scripts/` — Automation: 1-log, 2-distill, 3-promote, 4-sync-confluence, 5-checkpoint
+- `launchd/` — macOS scheduler plists for scripts 1-4
+- `tests/test.sh` — 46 validation tests
+- Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo
+
 ## Claude Code File System
 
 - `/CLAUDE.md` — Team instructions, checked into git
