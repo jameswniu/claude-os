@@ -2,6 +2,24 @@
 
 A layered context and learning loop system for Claude Code. Execution rolled out in three phases. *Iterate on each phase before moving to the next.*
 
+## What Teams Are Asking
+
+| Department | Top 3 Pain Points |
+|------------|-------------------|
+| **Apps Engineering** | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this 200-line function" |
+| **DSP Backend** | "Generate a REST endpoint with validation and tests" / "Why is this API returning 500? Here's the stack trace" / "Write unit tests for this service" |
+| **Front End** | "Create a React component following our patterns" / "Why is this component re-rendering?" / "Add TypeScript types to these components" |
+| **App/Data Engineering** | "Debug this data pipeline failure" / "Refactor this ETL script" / "Generate tests for this transformation" |
+| **Auth** | "Add a new auth endpoint with proper validation" / "Review this change for security vulnerabilities" / "Trace this auth flow, where is the token dropped?" |
+| **Platform / CI/CD** | "Fix this CI pipeline failure" / "Generate Helm values for this service" / "Why is this deployment failing? Here are the logs" |
+| **QA** | "Generate comprehensive tests for this module" / "These tests are flaky, find the root cause" / "Run the suite and fix all failures" |
+| **Data Science** | "Document this analysis pipeline" / "Review this notebook for correctness" / "Generate tests for this data model" |
+| **Release Management** | "Write a commit message with Jira ticket format" / "Create a PR with a comprehensive description" / "What changed between these two releases?" |
+
+Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
+
+---
+
 ## Architecture
 
 ### Phase 1 - Static Context
@@ -59,10 +77,12 @@ flowchart TD
     C --> L1["1-log.sh"]
     C --> L2["2-distill.sh"]
     C --> L3["3-promote.sh"]
+    C --> L4["4-sync-confluence.sh"]
 
     L1 --> LOG["log.md"]
     L2 --> MEM["MEMORY.md"]
     L3 --> RUL[".claude/CLAUDE.md"]
+    L4 --> TOP["topic files"]
 
     LOG -. reads .-> L2
     MEM -. reads .-> L3
@@ -71,13 +91,15 @@ flowchart TD
     style L1 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style L2 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style L3 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
+    style L4 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style LOG fill:#78909C,color:#fff,stroke:#455A64,stroke-width:2px
     style MEM fill:#EF5350,color:#fff,stroke:#C62828,stroke-width:2px
     style RUL fill:#5C6BC0,color:#fff,stroke:#303F9F,stroke-width:2px
+    style TOP fill:#26A69A,color:#fff,stroke:#00796B,stroke-width:2px
 
-    linkStyle 0,1,2 stroke:#FF8F00,stroke-width:2px
-    linkStyle 3,4,5 stroke:#4CAF50,stroke-width:2px
-    linkStyle 6,7 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
+    linkStyle 0,1,2,3 stroke:#FF8F00,stroke-width:2px
+    linkStyle 4,5,6,7 stroke:#4CAF50,stroke-width:2px
+    linkStyle 8,9 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
 ```
 
 ---
@@ -134,7 +156,9 @@ Set up the four core files that give Claude persistent context across sessions.
 
 4. **Memory** - Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
 
-5. **Topic files** (optional) - Drop additional markdown files in the memory directory alongside `MEMORY.md`. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Use them for reference material that's too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides.
+5. **Topic files** (optional) - Drop additional markdown files in the memory directory alongside `MEMORY.md`. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Use them for reference material that's too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. Add one-line hints in `MEMORY.md` so Claude knows they exist and when to read them.
+
+   Topic files can be pulled from Confluence via API (`curl` with basic auth). Each team's Confluence space requires separate access, so topic files can cross-pull from other teams' spaces when given permission. This makes it easy to build a shared knowledge base across org boundaries without duplicating docs.
 
 ### Verify
 
@@ -217,9 +241,10 @@ Automate the loop so it runs without manual intervention.
 ### Architecture
 
 ```
-Every 1 hour   →  1-log.sh    →  Append new sessions to log.md
-Every 24 hours →  2-distill.sh →  Distill log.md patterns into MEMORY.md
-Every 7 days   →  3-promote.sh →  Promote stable patterns to .claude/CLAUDE.md
+Every 1 hour   →  1-log.sh             →  Append new sessions to log.md
+Every 24 hours →  2-distill.sh          →  Distill log.md patterns into MEMORY.md
+Every 24 hours →  4-sync-confluence.sh  →  Re-fetch Confluence pages into topic files
+Every 7 days   →  3-promote.sh          →  Promote stable patterns to .claude/CLAUDE.md
 ```
 
 Each script runs headless Claude Code (`claude -p`) to do the reading and writing.
@@ -244,6 +269,7 @@ cp launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
+launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 ```
 
 **Verify:**
@@ -267,6 +293,7 @@ launchctl unload ~/Library/LaunchAgents/com.claude.memory-*.plist
 |-------|--------------|-----------|
 | `com.claude.memory-log` | 3600 | Every 1 hour |
 | `com.claude.memory-distill` | 86400 | Every 24 hours |
+| `com.claude.memory-sync` | 86400 | Every 24 hours |
 | `com.claude.memory-promote` | 604800 | Every 7 days |
 
 For testing, use 3x speed: 1200 / 28800 / 198720 seconds.
@@ -343,10 +370,12 @@ claude-os/
     ├── com.claude.memory-distill.plist
     ├── com.claude.memory-log.plist
     ├── com.claude.memory-promote.plist
+    ├── com.claude.memory-sync.plist
 ├── scripts
     ├── 1-log.sh
     ├── 2-distill.sh
     ├── 3-promote.sh
+    ├── 4-sync-confluence.sh
     ├── update-readme.sh
 ├── tests
     ├── test.sh
