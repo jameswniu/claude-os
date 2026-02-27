@@ -531,30 +531,42 @@ Automate the loop so it runs without manual intervention.
 |-----------|--------|--------|
 | Every 1 hour | `1-log.sh` | Append new sessions to logs.md |
 | Every 24 hours | `2-distill.sh` | Distill logs.md patterns into MEMORY.md |
-| Every 24 hours | `4-sync-confluence.sh` | Re-fetch Confluence pages into topic files |
-| Every 24 hours | `5-sync-notion.sh` | Re-fetch Notion pages into topic files |
+| Every 24 hours | `4-sync-confluence.sh` | Auto-discover + sync Confluence pages to topic files |
+| Every 24 hours | `5-sync-notion.sh` | Sync Notion pages to topic files |
 | Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.md |
 
 Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Scripts 4-5 sync external pages directly via REST API (no LLM needed).
 
 ### Confluence Sync (4-sync-confluence.sh)
 
-Keeps topic files fresh by re-fetching registered Confluence pages every 24 hours.
+Auto-discovers new Confluence pages and keeps topic files fresh every 24 hours.
 
 **How it works:**
-1. Scans `MEMORY.md` for lines containing `(confluence:PAGE_ID)`
-2. Extracts the filename from `` `topics/filename.md` `` and the page ID from the tag
-3. Fetches each page via Confluence REST API with basic auth
-4. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
-5. Writes the result to `memory/topics/` as a topic file
-6. Logs results to `output/4-sync-confluence.log`
+1. **Discovery:** Searches Confluence using configured `SEARCH_QUERIES` (space:keyword pairs)
+2. Compares results against existing `(confluence:ID)` entries in MEMORY.md
+3. Auto-adds new pages to the Topic Files section of MEMORY.md
+4. **Sync:** Scans MEMORY.md for all `(confluence:PAGE_ID)` entries
+5. Fetches each page via Confluence REST API with basic auth
+6. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
+7. Writes the result to `memory/topics/` as a topic file
+8. Logs results to `output/4-sync-confluence.log`
 
-**To add a new page**, add a line to the Topic Files section of your `MEMORY.md`:
+**Search queries** are configured in the script:
+```bash
+SEARCH_QUERIES=(
+    "BET:claude"
+    "BET:claude code"
+    "BET:AI tools"
+)
+```
+Add more `"SPACE:keyword"` pairs to broaden discovery.
+
+**To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
 - `topics/my-page.md` — Description of the page (confluence:1597341723)
 ```
 
-The next scheduled run (or manual run) will pick it up and create the topic file. Existing topic files are refreshed, never deleted.
+Existing topic files are refreshed on every run, never deleted.
 
 **Setup:**
 

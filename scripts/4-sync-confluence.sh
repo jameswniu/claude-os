@@ -1,6 +1,7 @@
 #!/bin/bash
 # 4-sync-confluence.sh — Runs every 24 hours
-# Scans MEMORY.md for (confluence:ID) entries and syncs them to topic files
+# 1. Auto-discovers new relevant Confluence pages and adds them to MEMORY.md
+# 2. Syncs all (confluence:ID) entries from MEMORY.md to topic files
 
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
 LOG_DIR="/Users/james.niu/claude-os/output"
@@ -19,7 +20,78 @@ if [ ! -f "$MEMORY_FILE" ]; then
     exit 0
 fi
 
-# Parse MEMORY.md for lines matching: `topics/filename.md` — description (confluence:PAGE_ID)
+# --- Phase 1: Auto-discover new pages ---
+
+# Search queries to find relevant pages (space:keyword pairs)
+SEARCH_QUERIES=(
+    "BET:claude"
+    "BET:claude code"
+    "BET:AI tools"
+)
+
+# Collect already-synced page IDs from MEMORY.md
+EXISTING_IDS=$(grep 'confluence:' "$MEMORY_FILE" | sed -n 's/.*(confluence:\([^)]*\)).*/\1/p')
+
+DISCOVERED=0
+
+for QUERY in "${SEARCH_QUERIES[@]}"; do
+    IFS=':' read -r SPACE KEYWORD <<< "$QUERY"
+    ENCODED_KEYWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$KEYWORD'))")
+
+    SEARCH_RESULT=$(curl -s -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
+        "$CONFLUENCE_BASE/search?cql=type=page+AND+space=$SPACE+AND+text~%22$ENCODED_KEYWORD%22&limit=25" \
+        -H "Accept: application/json")
+
+    # Parse results and check for new pages
+    python3 -c "
+import sys, json, re
+
+data = json.loads('''$(echo "$SEARCH_RESULT" | sed "s/'/'\\''/g")''')
+existing = set('''$EXISTING_IDS'''.split())
+memory_file = '$MEMORY_FILE'
+
+# Read current MEMORY.md
+with open(memory_file) as f:
+    content = f.read()
+
+# Find the insertion point: last (confluence:...) line in Topic Files section
+lines = content.split('\n')
+last_confluence_idx = -1
+for i, line in enumerate(lines):
+    if '(confluence:' in line and '\`topics/' in line:
+        last_confluence_idx = i
+
+new_pages = []
+for r in data.get('results', []):
+    page_id = r['id']
+    title = r['title']
+    if page_id not in existing:
+        # Generate filename from title
+        filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
+        new_pages.append((page_id, filename, title))
+        existing.add(page_id)
+
+if new_pages and last_confluence_idx >= 0:
+    new_lines = []
+    for page_id, filename, title in new_pages:
+        new_lines.append(f'- \`topics/{filename}\` — {title} (confluence:{page_id})')
+    # Insert after the last confluence line
+    lines = lines[:last_confluence_idx + 1] + new_lines + lines[last_confluence_idx + 1:]
+    with open(memory_file, 'w') as f:
+        f.write('\n'.join(lines))
+
+print(len(new_pages))
+" 2>/dev/null
+
+    NEW_COUNT=$?
+done
+
+# Log discovery results
+TOTAL_NEW=$(grep -c 'confluence:' "$MEMORY_FILE")
+echo "$(date): Discovery complete. $TOTAL_NEW total confluence entries in MEMORY.md" >> "$LOG_DIR/4-sync-confluence.log"
+
+# --- Phase 2: Sync all entries ---
+
 SYNCED=0
 FAILED=0
 
