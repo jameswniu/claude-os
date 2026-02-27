@@ -34,10 +34,10 @@ Session data flows through three stages: log, distill, promote.
 
 ```mermaid
 flowchart TD
-    S["Session"] -- "1h" --> L["log.md"]
-    L -- "24h" --> D["MEMORY.md"]
-    D -- "7d" --> R[".claude/CLAUDE.md"]
-    R -. "next session" .-> S
+    S["Session"] --> L["log.md"]
+    L --> D["MEMORY.md"]
+    D --> R["CLAUDE.md"]
+    R -.-> S
 
     style S fill:#212121,color:#fff,stroke:#424242,stroke-width:2px
     style L fill:#78909C,color:#fff,stroke:#455A64,stroke-width:2px
@@ -62,7 +62,7 @@ flowchart TD
 
     L1 --> LOG["log.md"]
     L2 --> MEM["MEMORY.md"]
-    L3 --> RUL[".claude/CLAUDE.md"]
+    L3 --> RUL["CLAUDE.md"]
 
     LOG -. reads .-> L2
     MEM -. reads .-> L3
