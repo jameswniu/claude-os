@@ -29,18 +29,18 @@ git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 
 ### Switching repos
 
-All files persist on disk, but most are scoped per project directory. When you `cd` into a different repo, Claude Code loads that project's files only.
+When you `cd` into a new repo and start Claude Code:
 
-| File | Scoped per repo? | Needs setup? |
-|------|-------------------|--------------|
-| `CLAUDE.md` | Yes (in git) | No, comes with clone |
-| `.claude/CLAUDE.md` | Yes (gitignored) | Yes |
-| `.claude/settings.local.json` | Yes (gitignored) | Yes |
-| `.claude/commands/` | Yes (gitignored) | Yes |
-| `MEMORY.md`, `logs.md`, `topics/` | Yes (`~/.claude/projects/{slug}/memory/`) | Yes |
-| `~/.claude/CLAUDE.md` | No (global) | No, loads everywhere |
+| | Carries over? | Why |
+|---|---|---|
+| `~/.claude/CLAUDE.md` | Yes | Global file, loads in every project |
+| `CLAUDE.md` | Yes (if in git) | Comes with the clone |
+| `.claude/CLAUDE.md` | No | Gitignored, lives only in that repo |
+| `.claude/settings.local.json` | No | Gitignored, lives only in that repo |
+| `.claude/commands/` | No | Gitignored, lives only in that repo |
+| `MEMORY.md`, `logs.md`, `topics/` | No | Stored per project path, new repo = empty |
 
-When you clone a new repo:
+To bootstrap a new repo with your templates:
 ```bash
 cd ~/new-repo
 bash ~/claude-os/scripts/6-init.sh
