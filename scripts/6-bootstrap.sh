@@ -20,6 +20,15 @@ mkdir -p .claude "$MEM/topics"
 [ ! -f "$MEM/MEMORY.md" ] && cp "$EX/memory/MEMORY.md" "$MEM/MEMORY.md" && echo "  CREATED  MEMORY.md" || echo "  EXISTS   MEMORY.md"
 [ ! -f "$MEM/logs.md" ] && cp "$EX/memory/logs.md" "$MEM/logs.md" && echo "  CREATED  logs.md" || echo "  EXISTS   logs.md"
 
+# Slash commands (always overwrite with latest)
+for FILE in "$EX/.claude/commands"/*.md; do
+    [ -f "$FILE" ] || continue
+    mkdir -p .claude/commands
+    NAME=$(basename "$FILE")
+    cp "$FILE" ".claude/commands/$NAME"
+    echo "  SYNCED   commands/$NAME"
+done
+
 # Topic files (always overwrite with latest)
 for FILE in "$EX/memory/topics"/*.md; do
     [ -f "$FILE" ] || continue
