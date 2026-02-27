@@ -2,10 +2,11 @@
 # 3-promote.sh — Runs every ~2.3 days (test) / weekly (prod)
 # Reads MEMORY.md for stable patterns and promotes them to .claude/CLAUDE.md
 
-PROJECT_DIR="/Users/james.niu/media-strategy-generator"
-MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
+PROJECT_DIR="$HOME/media-strategy-generator"
+PROJECT_SLUG=$(echo "$PROJECT_DIR" | sed 's|/|-|g; s|\.|-|g')
+MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
 CLAUDE_MD="$PROJECT_DIR/.claude/CLAUDE.md"
-LOG_DIR="/Users/james.niu/claude-os/output"
+LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 

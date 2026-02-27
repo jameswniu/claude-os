@@ -2,9 +2,10 @@
 # 2-distill.sh — Runs every 8 hours (test) / daily (prod)
 # Reads recent log entries and distills patterns into MEMORY.md
 
-PROJECT_DIR="/Users/james.niu/media-strategy-generator"
-MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
-LOG_DIR="/Users/james.niu/claude-os/output"
+PROJECT_DIR="$HOME/media-strategy-generator"
+PROJECT_SLUG=$(echo "$PROJECT_DIR" | sed 's|/|-|g; s|\.|-|g')
+MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
+LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 

@@ -3,8 +3,10 @@
 # 1. Auto-discovers new relevant Confluence pages and adds them to MEMORY.md
 # 2. Syncs all (confluence:ID) entries from MEMORY.md to topic files
 
-MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
-LOG_DIR="/Users/james.niu/claude-os/output"
+PROJECT_PATH="$HOME/media-strategy-generator"
+PROJECT_SLUG=$(echo "$PROJECT_PATH" | sed 's|/|-|g; s|\.|-|g')
+MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
+LOG_DIR="$HOME/claude-os/output"
 CONFLUENCE_BASE="https://basis.atlassian.net/wiki/rest/api/content"
 MEMORY_FILE="$MEMORY_DIR/MEMORY.md"
 

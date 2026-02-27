@@ -2,11 +2,12 @@
 # 1-log.sh — Runs every 20 min (test) / 1 hour (prod)
 # Reads recent Claude Code session history and appends a summary to logs.md
 
-PROJECT_DIR="/Users/james.niu/media-strategy-generator"
-MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
-HISTORY="/Users/james.niu/.claude/history.jsonl"
+PROJECT_DIR="$HOME/media-strategy-generator"
+PROJECT_SLUG=$(echo "$PROJECT_DIR" | sed 's|/|-|g; s|\.|-|g')
+MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
+HISTORY="$HOME/.claude/history.jsonl"
 LAST_RUN_FILE="$MEMORY_DIR/.last-log-run"
-LOG_DIR="/Users/james.niu/claude-os/output"
+LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 
