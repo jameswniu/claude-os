@@ -100,34 +100,33 @@ End of sprint       ->  Team promotes shared patterns to CLAUDE.md (git tracked)
 
 Replace the manual loop with scheduled scripts.
 
-```bash
-# Edit each script: update PROJECT_DIR and MEMORY_DIR paths for your project
-nano ~/claude-os/scripts/1-log.sh      # session logger (every 1h)
-nano ~/claude-os/scripts/2-distill.sh  # pattern distiller (every 24h)
-nano ~/claude-os/scripts/3-promote.sh  # rule promoter (every 7d)
+Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project:
+- `~/claude-os/scripts/1-log.sh` — session logger (every 1h)
+- `~/claude-os/scripts/2-distill.sh` — pattern distiller (every 24h)
+- `~/claude-os/scripts/3-promote.sh` — rule promoter (every 7d)
 
-# Install launchd agents (macOS)
+Then install and verify:
+```bash
 cp ~/claude-os/launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
-
-# Verify
 launchctl list | grep com.claude
 ```
 
 **Confluence sync (optional):**
 
+Add credentials to `~/.zshrc`:
 ```bash
-# Add credentials to ~/.zshrc
-echo 'export CONFLUENCE_EMAIL="your.email@basis.com"' >> ~/.zshrc
-echo 'export CONFLUENCE_TOKEN="your-api-token"' >> ~/.zshrc
+echo 'export CONFLUENCE_EMAIL="<your.email@basis.com>"' >> ~/.zshrc
+echo 'export CONFLUENCE_TOKEN="<your-api-token>"' >> ~/.zshrc
 source ~/.zshrc
+```
 
-# Edit the page registry to add your team's pages
-nano ~/claude-os/scripts/4-sync-confluence.sh
+Edit the page registry in `~/claude-os/scripts/4-sync-confluence.sh` to add your team's pages.
 
-# Install and test
+Then install and test:
+```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 bash ~/claude-os/scripts/4-sync-confluence.sh
 ```
@@ -713,7 +712,7 @@ Yes. launchd agents run as long as you're logged in. Lock screen does not stop t
 launchd catches up on missed runs when the Mac wakes. No data is lost.
 
 **How much does the automation cost?**
-Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.10 for distill, $0.10 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$2.50/week.
+Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$4/week.
 
 **What if MEMORY.md gets too long?**
 Keep it under 200 lines. Lines beyond 200 are truncated when loaded into context. Archive old log entries monthly.

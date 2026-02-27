@@ -28,7 +28,7 @@ Your job:
 Output what you changed." \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
-  --max-budget-usd 0.10 \
-  -p >> "$LOG_DIR/2-distill.log" 2>&1
+  --max-budget-usd 0.25 \
+  < /dev/null >> "$LOG_DIR/2-distill.log" 2>&1
 
 echo "$(date): Distill complete" >> "$LOG_DIR/2-distill.log"

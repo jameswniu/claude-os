@@ -29,7 +29,7 @@ Your job:
 Output what you promoted (or 'No new promotions' if nothing qualified)." \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
-  --max-budget-usd 0.10 \
-  -p >> "$LOG_DIR/3-promote.log" 2>&1
+  --max-budget-usd 0.25 \
+  < /dev/null >> "$LOG_DIR/3-promote.log" 2>&1
 
 echo "$(date): Promote complete" >> "$LOG_DIR/3-promote.log"

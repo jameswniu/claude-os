@@ -66,7 +66,7 @@ Rules:
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
   --max-budget-usd 0.05 \
-  -p >> "$LOG_DIR/1-log.log" 2>&1
+  < /dev/null >> "$LOG_DIR/1-log.log" 2>&1
 
 echo "$CURRENT_TIME" > "$LAST_RUN_FILE"
 echo "$(date): Log complete" >> "$LOG_DIR/1-log.log"
