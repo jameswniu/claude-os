@@ -12,8 +12,9 @@ mkdir -p "$LOG_DIR"
 echo "$(date): Starting promote..." >> "$LOG_DIR/3-promote.log"
 
 cd "$PROJECT_DIR"
+unset CLAUDECODE
 
-claude -p "You are a rule promoter. Read both files:
+(claude -p "You are a rule promoter. Read both files:
 1. $MEMORY_DIR/MEMORY.md (learned patterns)
 2. $CLAUDE_MD (current personal rules)
 
@@ -30,6 +31,6 @@ Output what you promoted (or 'No new promotions' if nothing qualified)." \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
   --max-budget-usd 0.25 \
-  < /dev/null >> "$LOG_DIR/3-promote.log" 2>&1
+  < /dev/null) >> "$LOG_DIR/3-promote.log" 2>&1
 
 echo "$(date): Promote complete" >> "$LOG_DIR/3-promote.log"

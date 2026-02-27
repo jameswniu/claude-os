@@ -52,8 +52,9 @@ fi
 echo "$(date): New sessions found, summarizing..." >> "$LOG_DIR/1-log.log"
 
 cd "$PROJECT_DIR"
+unset CLAUDECODE
 
-claude -p "You are a memory logger. Read the file at $MEMORY_DIR/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
+(claude -p "You are a memory logger. Read the file at $MEMORY_DIR/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
 
 Recent user messages from this project:
 $NEW_ENTRIES
@@ -65,8 +66,8 @@ Rules:
 - Use the existing logs.md format" \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
-  --max-budget-usd 0.05 \
-  < /dev/null >> "$LOG_DIR/1-log.log" 2>&1
+  --max-budget-usd 0.15 \
+  < /dev/null) >> "$LOG_DIR/1-log.log" 2>&1
 
 echo "$CURRENT_TIME" > "$LAST_RUN_FILE"
 echo "$(date): Log complete" >> "$LOG_DIR/1-log.log"

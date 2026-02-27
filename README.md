@@ -43,7 +43,7 @@ When you `cd` into a new repo and start Claude Code:
 
 To bootstrap a new repo with your templates:
 ```bash
-cd ~/new-repo
+cd ~/<new-repo>
 bootstrap
 ```
 
@@ -329,9 +329,9 @@ The first three steps are personal. The last step is a team activity: during spr
    ```markdown
    ## Memory
 
-   - Hybrid approach: `MEMORY.md` for topical lookup, `logs.md` for chronological history.
-   - At the end of each session, append a dated entry to `logs.md`.
-   - Update `MEMORY.md` topics only when stable new patterns are confirmed.
+   - Hybrid approach: MEMORY.md for topical lookup, logs.md for chronological history.
+   - At the end of each session, append a dated entry to logs.md.
+   - Update MEMORY.md topics only when stable new patterns are confirmed.
    ```
 
 3. **Distill (daily)** - at the end of each day, tell Claude:
@@ -365,27 +365,23 @@ Sarah builds REST APIs in Python/FastAPI. She uses Claude Code to generate endpo
 Monday, she asks Claude to generate a new `/api/campaigns/:id/metrics` endpoint. Claude puts validation in the controller instead of the service layer.
 
 She logs it manually:
-```
-## 2026-03-03
-- Generated metrics endpoint. Claude put validation in controller instead of service layer.
-- Had to move validation to CampaignService.validate_metrics_params().
-- Claude also tried to import from `src.utils.validators` which doesn't exist.
-```
+
+> **logs.md** — `## 2026-03-03`
+> - Generated metrics endpoint. Claude put validation in controller instead of service layer.
+> - Had to move validation to CampaignService.validate_metrics_params().
+> - Claude also tried to import from `src.utils.validators` which doesn't exist.
 
 End of day, she tells Claude to distill. MEMORY.md gets:
-```
-## Code Patterns
-- Validation logic belongs in the service layer, not controllers.
-- No `src.utils.validators` module exists. Validation helpers are in each service file.
-```
+
+> **MEMORY.md** — `## Code Patterns`
+> - Validation logic belongs in the service layer, not controllers.
+> - No `src.utils.validators` module exists. Validation helpers are in each service file.
 
 By Friday, the same issue came up 3 more times. She promotes to her personal rules:
-```
-# .claude/CLAUDE.md (personal)
-## Code Patterns
-- Always put validation logic in the service layer, never in controllers.
-- There is no shared validators module. Each service handles its own validation.
-```
+
+> **.claude/CLAUDE.md** — `## Code Patterns`
+> - Always put validation logic in the service layer, never in controllers.
+> - There is no shared validators module. Each service handles its own validation.
 
 **Week 2: Set up automation**
 
@@ -397,38 +393,34 @@ The automation handles the loop. Claude no longer puts validation in controllers
 
 ---
 
-#### Derek, Sales Engineer (Enterprise Sales)
+#### Derek, Account Executive (Sales)
 
-Derek responds to RFPs and prepares technical demos. He uses Claude Code to draft proposal sections, compare features against competitors, and summarize product updates for client meetings.
+Derek responds to RFPs and prepares client-facing materials. He uses Claude Code to draft proposal sections, compare features against competitors, and summarize product updates for client meetings.
 
 **Week 1: Manual iteration**
 
 Tuesday, a client sends an RFP asking about real-time reporting capabilities. Derek asks Claude to draft a response. Claude writes a generic answer that misses Basis-specific terminology and includes features that don't exist yet.
 
 He logs it:
-```
-## 2026-03-04
-- Drafted RFP response for real-time reporting. Claude used "dashboard" instead of "Insights Hub."
-- Included predictive analytics as a feature. That's on the roadmap, not shipped.
-- Had to rewrite 60% of the response to match our product language.
-```
+
+> **logs.md** — `## 2026-03-04`
+> - Drafted RFP response for real-time reporting. Claude used "dashboard" instead of "Insights Hub."
+> - Included predictive analytics as a feature. That's on the roadmap, not shipped.
+> - Had to rewrite 60% of the response to match our product language.
 
 End of day, he distills to MEMORY.md:
-```
-## Product Language
-- Real-time reporting product is called "Insights Hub," not "dashboard" or "reporting tool."
-- Predictive analytics is roadmap only (Q3 2026). Do not reference as a current feature.
-- Standard RFP responses use "Basis platform" not "our system" or "the tool."
-```
+
+> **MEMORY.md** — `## Product Language`
+> - Real-time reporting product is called "Insights Hub," not "dashboard" or "reporting tool."
+> - Predictive analytics is roadmap only (Q3 2026). Do not reference as a current feature.
+> - Standard RFP responses use "Basis platform" not "our system" or "the tool."
 
 By Friday, the naming issue came up in two more RFP sections and a client email. He promotes:
-```
-# .claude/CLAUDE.md (personal)
-## RFP Rules
-- Use official product names: "Insights Hub" (reporting), "Basis DSP" (buying), "Campaign Manager" (planning).
-- Never reference roadmap features as current capabilities. Check with Product if unsure.
-- Use "Basis platform" as the default product reference, not "our system/tool/software."
-```
+
+> **.claude/CLAUDE.md** — `## RFP Rules`
+> - Use official product names: "Insights Hub" (reporting), "Basis DSP" (buying), "Campaign Manager" (planning).
+> - Never reference roadmap features as current capabilities. Check with Product if unsure.
+> - Use "Basis platform" as the default product reference, not "our system/tool/software."
 
 **Week 2: Set up automation**
 
@@ -449,29 +441,25 @@ Lisa manages campaign trafficking, tag implementation, and delivery troubleshoot
 Wednesday, a campaign shows zero impressions. She asks Claude to help diagnose. Claude suggests checking the ad server logs, but uses Google Ad Manager terminology instead of Basis DSP terms and misses the most common cause (timezone mismatch in flight dates).
 
 She logs it:
-```
-## 2026-03-05
-- Debugged zero-impression campaign. Claude suggested "line item" checks (GAM term). We use "ad group."
-- Missed the #1 cause: flight start date timezone is UTC, campaign was set to EST.
-- Had to manually check timezone offset before Claude's other suggestions were useful.
-```
+
+> **logs.md** — `## 2026-03-05`
+> - Debugged zero-impression campaign. Claude suggested "line item" checks (GAM term). We use "ad group."
+> - Missed the #1 cause: flight start date timezone is UTC, campaign was set to EST.
+> - Had to manually check timezone offset before Claude's other suggestions were useful.
 
 End of day, she distills:
-```
-## Ad Ops Terminology
-- Basis uses "ad group" not "line item" (Google), "placement" not "ad unit" (DFP).
-- Flight dates are stored in UTC. Always convert to the campaign's local timezone first.
-- Zero-impression triage order: (1) timezone mismatch, (2) budget cap, (3) targeting overlap, (4) creative approval status.
-```
+
+> **MEMORY.md** — `## Ad Ops Terminology`
+> - Basis uses "ad group" not "line item" (Google), "placement" not "ad unit" (DFP).
+> - Flight dates are stored in UTC. Always convert to the campaign's local timezone first.
+> - Zero-impression triage order: (1) timezone mismatch, (2) budget cap, (3) targeting overlap, (4) creative approval status.
 
 By Friday, the terminology issue appeared twice more. She promotes:
-```
-# .claude/CLAUDE.md (personal)
-## Ad Ops
-- Use Basis terminology: "ad group" (not line item), "placement" (not ad unit), "flight" (not campaign period).
-- Flight dates are UTC. Always check timezone offset as first troubleshooting step.
-- Zero-impression triage: timezone > budget > targeting > creative status. Follow this order.
-```
+
+> **.claude/CLAUDE.md** — `## Ad Ops`
+> - Use Basis terminology: "ad group" (not line item), "placement" (not ad unit), "flight" (not campaign period).
+> - Flight dates are UTC. Always check timezone offset as first troubleshooting step.
+> - Zero-impression triage: timezone > budget > targeting > creative status. Follow this order.
 
 **Week 2: Set up automation**
 
@@ -505,12 +493,12 @@ Automate the loop so it runs without manual intervention.
 
 ### Architecture
 
-```
-Every 1 hour   →  1-log.sh             →  Append new sessions to logs.md
-Every 24 hours →  2-distill.sh          →  Distill logs.md patterns into MEMORY.md
-Every 24 hours →  4-sync-confluence.sh  →  Re-fetch Confluence pages into topic files
-Every 7 days   →  3-promote.sh          →  Promote stable patterns to .claude/CLAUDE.md
-```
+| Frequency | Script | Action |
+|-----------|--------|--------|
+| Every 1 hour | `1-log.sh` | Append new sessions to logs.md |
+| Every 24 hours | `2-distill.sh` | Distill logs.md patterns into MEMORY.md |
+| Every 24 hours | `4-sync-confluence.sh` | Re-fetch Confluence pages into topic files |
+| Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.md |
 
 Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Script 4 syncs Confluence pages directly via REST API (no LLM needed).
 
@@ -530,7 +518,6 @@ Keeps topic files fresh by re-fetching registered Confluence pages every 24 hour
 PAGES=(
     "1597341723|claudehub.md|ClaudeHub main page"
     "1559166979|use-case-library.md|AI dev tools use-case library"
-    # Add more pages here: "page_id|filename.md|description"
 )
 ```
 
@@ -539,8 +526,9 @@ PAGES=(
 1. Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens
 2. Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
    ```bash
-   export CONFLUENCE_EMAIL="your.email@basis.com"
-   export CONFLUENCE_TOKEN="your-api-token"
+   echo 'export CONFLUENCE_EMAIL="your.email@basis.com"' >> ~/.zshrc
+   echo 'export CONFLUENCE_TOKEN="your-api-token"' >> ~/.zshrc
+   source ~/.zshrc
    ```
 3. For automated runs via launchd, add to the sync plist (`com.claude.memory-sync.plist`):
    ```xml
@@ -563,18 +551,19 @@ The script skips gracefully if credentials are not set. No errors, no data loss.
 Best for individual use. Runs when your Mac is on, catches up on missed runs after sleep.
 
 **Install:**
+
+Clone and set up:
 ```bash
-# Clone the repo
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 cd ~/claude-os && mkdir -p output
 chmod +x scripts/*.sh
+```
 
-# Edit scripts: update PROJECT_DIR and MEMORY_DIR paths for your project
+Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project.
 
-# Copy launchd plists
+Copy plists and load agents:
+```bash
 cp launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
-
-# Load all three
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
@@ -639,103 +628,76 @@ client = anthropic.Anthropic()
 ## File Tree
 
 **Your repo (Phase 1 & 2):**
-```
-/your-repo/
-├── CLAUDE.md                          ← Team rules (git tracked)
-├── .claude/
-│   ├── CLAUDE.md                      ← Personal rules (gitignored)
-│   ├── settings.local.json            ← Permission auto-approvals (gitignored)
-│   └── commands/
-│       └── review.md                  ← Custom slash commands
-│
-~/.claude/projects/{project}/memory/
-├── MEMORY.md                          ← Topical patterns (auto-loaded)
-├── logs.md                             ← Session history (on demand)
-├── topics/                            ← Topic files (on demand, zero tokens until read)
-│   ├── claudehub.md                   ← Synced from Confluence
-│   ├── use-case-library.md            ← Synced from Confluence
-│   └── api-specs.md                   ← Manual or synced
-└── archive/
-    └── YYYY-MM.md                     ← Rolled-off old logs
-```
+
+- `/your-repo/`
+  - `CLAUDE.md` — Team rules (git tracked)
+  - `.claude/`
+    - `CLAUDE.md` — Personal rules (gitignored)
+    - `settings.local.json` — Permission auto-approvals (gitignored)
+    - `commands/review.md` — Custom slash commands
+- `~/.claude/projects/{project}/memory/`
+  - `MEMORY.md` — Topical patterns (auto-loaded)
+  - `logs.md` — Session history (on demand)
+  - `topics/` — On-demand reference files (zero tokens until read)
+    - `claudehub.md` — Synced from Confluence
+    - `use-case-library.md` — Synced from Confluence
+    - `api-specs.md` — Manual or synced
+  - `archive/YYYY-MM.md` — Rolled-off old logs
 
 **This repo (Phase 3 automation):**
-```
-claude-os/
-├── .github
-    ├── workflows
-        ├── test.yml
-├── .gitignore
-├── EXAMPLES
-    ├── .claude
-        ├── CLAUDE.md
-        ├── commands
-            ├── review.md
-        ├── settings.local.json
-    ├── CLAUDE.md
-    ├── memory
-        ├── MEMORY.md
-        ├── logs.md
-        ├── topics
-            ├── claudehub.md
-            ├── plugin-marketplace.md
-            ├── tips-bash-mode.md
-            ├── use-case-library.md
-├── README.md
-├── install.sh
-├── launchd
-    ├── com.claude.memory-distill.plist
-    ├── com.claude.memory-log.plist
-    ├── com.claude.memory-promote.plist
-    ├── com.claude.memory-sync.plist
-├── scripts
-    ├── 1-log.sh
-    ├── 2-distill.sh
-    ├── 3-promote.sh
-    ├── 4-sync-confluence.sh
-    ├── 5-checkpoint.sh
-    ├── 6-init.sh
-    ├── update-readme.sh
-├── tests
-    ├── test.sh
-```
+
+- `claude-os/`
+  - `.github/workflows/test.yml` — CI test runner
+  - `EXAMPLES/` — Snapshot templates (CLAUDE.md, .claude/, memory/)
+  - `README.md`
+  - `install.sh` — Installs `checkpoint` and `bootstrap` commands
+  - `launchd/` — macOS scheduler plists (log, distill, promote, sync)
+  - `scripts/`
+    - `1-log.sh` — Session logger (every 1h)
+    - `2-distill.sh` — Pattern distiller (every 24h)
+    - `3-promote.sh` — Rule promoter (every 7d)
+    - `4-sync-confluence.sh` — Confluence page syncer (every 24h)
+    - `5-checkpoint.sh` — Snapshot workspace to this repo
+    - `6-init.sh` — Bootstrap new project workspace
+    - `update-readme.sh` — Regenerate file tree in README
+  - `tests/test.sh` — Validation tests
 
 ---
 
 ## FAQ
 
 **Can I lock my screen?**
-Yes. launchd agents run as long as you're logged in. Lock screen does not stop them.
+> Yes. launchd agents run as long as you're logged in. Lock screen does not stop them.
 
 **What about sleep?**
-launchd catches up on missed runs when the Mac wakes. No data is lost.
+> launchd catches up on missed runs when the Mac wakes. No data is lost.
 
 **How much does the automation cost?**
-Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$4/week.
+> Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$4/week.
 
 **What if MEMORY.md gets too long?**
-Keep it under 200 lines. Lines beyond 200 are truncated when loaded into context. Archive old log entries monthly.
+> Keep it under 200 lines. Lines beyond 200 are truncated when loaded into context. Archive old log entries monthly.
 
 **Can multiple projects share the same loop?**
-Each project gets its own memory directory under `~/.claude/projects/`. You'd need separate script copies (or parameterize PROJECT_DIR) per project.
+> Each project gets its own memory directory under `~/.claude/projects/`. You'd need separate script copies (or parameterize PROJECT_DIR) per project.
 
 **Does MEMORY.md eat tokens every message?**
-Yes. It's injected into the system prompt at session start and stays in context for every request. That's why the 200-line cap matters. Topic files, by contrast, cost zero tokens until Claude reads them mid-session.
+> Yes. It's injected into the system prompt at session start and stays in context for every request. That's why the 200-line cap matters. Topic files, by contrast, cost zero tokens until Claude reads them mid-session.
 
 **Does settings.local.json eat tokens?**
-No. It's client-side only, never sent to the LLM. It only controls which tool calls auto-approve without prompting.
+> No. It's client-side only, never sent to the LLM. It only controls which tool calls auto-approve without prompting.
 
 **What are topic files?**
-Additional markdown files in the memory directory alongside MEMORY.md. They're loaded on demand (zero tokens until read). Use them for Confluence docs, API specs, runbooks, or any reference material too large for MEMORY.md. Add one-line hints in MEMORY.md so Claude knows they exist.
+> Additional markdown files in the memory directory alongside MEMORY.md. They're loaded on demand (zero tokens until read). Use them for Confluence docs, API specs, runbooks, or any reference material too large for MEMORY.md. Add one-line hints in MEMORY.md so Claude knows they exist.
 
 **How do I add a Confluence page as a topic file?**
-Add the page ID and filename to the `PAGES` array in `scripts/4-sync-confluence.sh`. The page ID is in the Confluence URL (e.g., `1597341723` from `.../pages/1597341723/ClaudeHub`). The sync script will fetch it on the next run.
+> Add the page ID and filename to the `PAGES` array in `scripts/4-sync-confluence.sh`. The page ID is in the Confluence URL (e.g., `1597341723` from `.../pages/1597341723/ClaudeHub`). The sync script will fetch it on the next run.
 
 **Can I pull from other teams' Confluence spaces?**
-Yes, if you have read access. The sync script works with any Confluence space. Request access from the team, then add their page IDs to the registry.
+> Yes, if you have read access. The sync script works with any Confluence space. Request access from the team, then add their page IDs to the registry.
 
 **How do slash commands work with tokens?**
-Command names and descriptions are indexed at session start (~2% of context window). The full command content only loads when you invoke it (e.g., `/review`). So having many commands registered costs minimal tokens.
+> Command names and descriptions are indexed at session start (~2% of context window). The full command content only loads when you invoke it (e.g., `/review`). So having many commands registered costs minimal tokens.
 
 **What's the difference between CLAUDE.md and .claude/CLAUDE.md?**
-`CLAUDE.md` (repo root) is shared, checked into git, visible to the whole team. `.claude/CLAUDE.md` (gitignored) is personal, only you see it. Use the shared one for team rules, the personal one for your own preferences.
+> `CLAUDE.md` (repo root) is shared, checked into git, visible to the whole team. `.claude/CLAUDE.md` (gitignored) is personal, only you see it. Use the shared one for team rules, the personal one for your own preferences.

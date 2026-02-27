@@ -11,8 +11,9 @@ mkdir -p "$LOG_DIR"
 echo "$(date): Starting distill..." >> "$LOG_DIR/2-distill.log"
 
 cd "$PROJECT_DIR"
+unset CLAUDECODE
 
-claude -p "You are a memory distiller. Read both files:
+(claude -p "You are a memory distiller. Read both files:
 1. $MEMORY_DIR/logs.md (session history)
 2. $MEMORY_DIR/MEMORY.md (topical patterns)
 
@@ -29,6 +30,6 @@ Output what you changed." \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
   --max-budget-usd 0.25 \
-  < /dev/null >> "$LOG_DIR/2-distill.log" 2>&1
+  < /dev/null) >> "$LOG_DIR/2-distill.log" 2>&1
 
 echo "$(date): Distill complete" >> "$LOG_DIR/2-distill.log"
