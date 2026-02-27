@@ -182,3 +182,20 @@
 | 02-27 | Script 1 budget too low ($0.05) | Bumped to $0.15 |
 | 02-27 | Confluence token placeholder in plist | Replaced with real token |
 | 02-27 | Mac sleep kills launchd jobs | Applied `pmset sleep 0` to prevent system sleep |
+| 02-27 | Posted PR comment without showing user first | Added "always show before posting" rule |
+| 02-27 | PR comment too long/formal (structured report style) | Added rules: bite-sized, plain language, before/after fix only |
+
+## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
+
+- Reviewed BP-29423 (artifact streaming phase 2, 28 files, +1378/-191)
+- PR adds proactive artifact streaming, sequential graph execution, page-reload SSE reconnect fix, and moves intent classification into ToolService
+- Found one MEDIUM issue: orphaned empty artifact rows in DB when tool call fails after persist_artifact
+- Attempted to post full structured review (headers, categories, impact labels, regression dump, notes). User rejected it as too long/formal.
+- Iterated 4 times to condense: structured report -> condensed report -> short paragraph -> plain language with before/after code fix
+- User corrected: PR comments should be human-scannable, plain language, just the issue + fix + whether rest looks good
+- Posted final comment on PR #197 (comment ID 599103)
+- New rules saved to .claude/CLAUDE.md:
+  - Always show comment to user before posting (never post blind)
+  - Keep comments bite-sized, plain human language
+  - Only flag issues with one-liner + before/after fix
+  - No headers, categories, impact labels, regression dumps, or notes sections

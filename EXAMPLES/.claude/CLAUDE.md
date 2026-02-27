@@ -11,10 +11,8 @@
 ## PR Comment Style
 
 - No em dashes. Use commas, periods, or parentheses instead.
-- Keep comments short and human-scannable. Bite-sized. No walls of text.
-- Write in plain human language, not formal/structured report style.
-- Only flag real issues with a one-liner explanation and before/after code fix.
-- No headers, no categories/impact labels, no regression scan dumps, no notes sections. Just say what's wrong, show the fix, and whether the rest looks good.
+- Format: short human-readable description of the issue, then before/after code (or suggested fix), then whether the rest looks good. That's it.
+- Write in plain human language. No structured reports, no headers, no categories/impact labels, no regression dumps, no notes sections.
 - Do not include a verdict section (APPROVE, REQUEST CHANGES, etc.) when posting review comments on PRs.
 
 ## Behavior Rules
