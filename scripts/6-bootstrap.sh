@@ -44,5 +44,11 @@ else
     echo ".claude/" > .gitignore && echo "  CREATED  .gitignore"
 fi
 
+# Phase 2: Run sync scripts to populate topic files from Confluence/Notion
+echo ""
+echo "  Syncing topic files..."
+bash "$CLAUDE_OS/scripts/4-sync-confluence.sh" 2>/dev/null && echo "  SYNCED   Confluence topics" || echo "  SKIPPED  Confluence (no credentials)"
+bash "$CLAUDE_OS/scripts/5-sync-notion.sh" 2>/dev/null && echo "  SYNCED   Notion topics" || echo "  SKIPPED  Notion (no credentials)"
+
 echo ""
 echo "Done. Start Claude Code and ask: \"What do you know about this project?\""
