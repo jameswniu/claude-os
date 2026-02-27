@@ -6,10 +6,13 @@
 LOG_DIR="$HOME/claude-os/output"
 NOTION_API="https://api.notion.com/v1"
 
-# Auto-detect: find the first MEMORY.md with notion: entries
+# Auto-detect: find the first MEMORY.md (prefer one with notion: entries, fallback to any)
 MEMORY_FILE=$(grep -rl 'notion:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
 if [ -z "$MEMORY_FILE" ]; then
-    echo "$(date): No MEMORY.md with notion entries found, skipping" >> "$LOG_DIR/5-sync-notion.log"
+    MEMORY_FILE=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)
+fi
+if [ -z "$MEMORY_FILE" ]; then
+    echo "$(date): No MEMORY.md found, skipping" >> "$LOG_DIR/5-sync-notion.log"
     exit 0
 fi
 MEMORY_DIR=$(dirname "$MEMORY_FILE")
