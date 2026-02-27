@@ -17,6 +17,7 @@ cp "$PROJECT/.claude/CLAUDE.md" "$EX/.claude/" 2>/dev/null
 cp "$PROJECT/.claude/commands"/*.md "$EX/.claude/commands/" 2>/dev/null
 sed -E 's/ATATT[A-Za-z0-9_=+\/-]{20,}/REDACTED/g' "$PROJECT/.claude/settings.local.json" > "$EX/.claude/settings.local.json" 2>/dev/null
 cp "$MEM/MEMORY.md" "$MEM/logs.md" "$EX/memory/" 2>/dev/null
+rm -f "$EX/memory/topics"/*.md 2>/dev/null
 cp "$MEM/topics"/*.md "$EX/memory/topics/" 2>/dev/null
 
 # Commit and push
