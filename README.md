@@ -117,7 +117,7 @@ launchctl list | grep com.claude
 
 **Confluence sync (optional):**
 
-Add credentials to `~/.zshrc`:
+Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens and add credentials to `~/.zshrc`:
 ```bash
 echo 'export CONFLUENCE_EMAIL="<your.email@basis.com>"' >> ~/.zshrc
 echo 'export CONFLUENCE_TOKEN="<your-api-token>"' >> ~/.zshrc
