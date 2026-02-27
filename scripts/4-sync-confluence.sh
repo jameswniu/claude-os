@@ -29,6 +29,12 @@ SEARCH_QUERIES=(
     "BET:AI tools"
 )
 
+# Relevance filter: page title must contain at least one of these terms (case-insensitive)
+RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+
+# Exclude filter: page titles matching these terms are skipped (case-insensitive)
+EXCLUDE_TERMS="upgrade|hack-ai-thon|hackathon|refactor from|loading indicator|pricing evaluation"
+
 # Collect already-synced page IDs from MEMORY.md
 EXISTING_IDS=$(grep 'confluence:' "$MEMORY_FILE" | sed -n 's/.*(confluence:\([^)]*\)).*/\1/p')
 
@@ -61,11 +67,16 @@ for i, line in enumerate(lines):
     if '(confluence:' in line and '\`topics/' in line:
         last_confluence_idx = i
 
+relevant_terms = '$RELEVANT_TERMS'
+exclude_terms = '$EXCLUDE_TERMS'
+relevant_pattern = re.compile(relevant_terms, re.IGNORECASE)
+exclude_pattern = re.compile(exclude_terms, re.IGNORECASE)
+
 new_pages = []
 for r in data.get('results', []):
     page_id = r['id']
     title = r['title']
-    if page_id not in existing:
+    if page_id not in existing and relevant_pattern.search(title) and not exclude_pattern.search(title):
         # Generate filename from title
         filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
         new_pages.append((page_id, filename, title))
