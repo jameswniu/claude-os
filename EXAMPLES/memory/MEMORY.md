@@ -4,16 +4,31 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 ## Bitbucket API
 
-(Learned per project: API base URL, auth, endpoints)
+- Base URL: (learned per project)
+- Project and repo: (learned per project)
+- PR list endpoint: (learned per project)
+- PR comments endpoint: (learned per project)
+- To update a comment, PUT with the current `version` number (increments on each edit).
+- Auth: basic auth with username:token from git remote URL
+
 ## Branch Naming
 
-(Learned per project: branch patterns, target branch)
+- Branches follow pattern: (learned per project)
+- Target branch is almost always `main`. Detect via `git merge-base`.
+
 ## Project Architecture
 
-(Learned per project: services, directories, tech stack)
+- Services, ports, directories: (learned per project)
+- Tech stack: (learned per project)
+- Test suite: (learned per project)
+
 ## PR Review Patterns
 
-(Learned per project: PR types, review cadence, tool usage)
+- Two PR types: config-only (version bumps, YAML changes) and feature PRs (multi-file, complex)
+- Config PRs are low-risk but still get full test suite runs
+- Feature PRs often need multiple review sessions as PR evolves
+- Tool usage is overwhelmingly read-only: Bash >> Read >> Grep >> Edit >> Write
+
 ## Recurring Mistakes (Self-Corrections)
 
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
