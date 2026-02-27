@@ -173,6 +173,14 @@
 - 19 stale topic files cleaned down to 7 matching MEMORY.md
 - All changes committed and pushed to claude-os repo (c598cf1 through 455b3ab)
 
+### Graceful Error Handling for Bootstrap Sync (session)
+- Bootstrap Phase 2 previously said "SYNCED" even when sync scripts silently skipped (exit 0 on missing credentials)
+- Fixed bootstrap to check credentials before calling sync scripts: shows SYNCED/SKIPPED/FAILED with specific missing var names
+- Changed sync scripts to `exit 2` (not 0) when credentials missing, so callers can distinguish skip from success
+- Launchd doesn't care about exit codes for scheduled jobs, so exit 2 is safe
+- On machines without Notion key, bootstrap now correctly shows "SKIPPED Notion (NOTION_TOKEN not set)"
+- Committed and pushed to claude-os repo (c6bd2b3)
+
 ---
 
 ## Cumulative Friction Log

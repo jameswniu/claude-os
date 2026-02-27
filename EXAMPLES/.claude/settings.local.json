@@ -61,7 +61,9 @@
       "Bash(sed:*)",
       "Bash(~/.local/bin/bootstrap:*)",
       "Bash(alias:*)",
-      "Bash(checkpoint:*)"
+      "Bash(checkpoint:*)",
+      "Bash(bootstrap:*)",
+      "Bash(cursor:*)"
     ]
   }
 }
