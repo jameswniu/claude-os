@@ -154,12 +154,24 @@
 - Key learning: always run `checkpoint` after syncing to push topic files to the repo
 - Multiple commits pushed to claude-os repo across the session (55e1a7b through 48a5ae5)
 
-### Bootstrap & Auto-Checkpoint (session)
+### Bootstrap, Auto-Checkpoint & Dynamic Sync (session)
 - Diagnosed bootstrap not syncing slash commands: `.claude/commands/` exists in EXAMPLES but `6-bootstrap.sh` never copied it
 - Added slash commands sync loop to `6-bootstrap.sh` (always overwrite with latest, same pattern as topic files)
 - Added `chpwd` hook to `~/.zshrc`: auto-checkpoints in background when leaving a directory with `.claude/`
 - Guards against forgetting to checkpoint before switching projects
-- Committed and pushed to claude-os repo
+- Set up Mac mini (hazelbolts) for Confluence sync: added env vars to `.zshrc`, installed `html2text` via pip3
+- Fixed Notion sync chicken-and-egg bug: script required existing `(notion:...)` entries to find MEMORY.md, added fallback to any MEMORY.md (matching Confluence script pattern)
+- Fixed dedup bug in both sync scripts: `EXISTING_IDS` was read once before loop, not updated between iterations. Moved inside loop.
+- Rewrote Phase 1 discovery in both sync scripts to be fully dynamic:
+  - Search queries derived from MEMORY.md topic descriptions + section headings + CLAUDE.md section headings
+  - Relevance terms extracted from bold text, headings, and capitalized phrases in both files
+  - No hardcoded search queries, relevance filters, or exclude terms
+  - Finds project CLAUDE.md by matching slug against real directories (avoids broken slug reversal)
+- Tested from clean slate: 7 pages discovered from cold start (vs 4 with old hardcoded queries)
+- Fixed em dash encoding in Python-generated MEMORY.md entries (was `. `, now `—`)
+- Fixed stale topic files in EXAMPLES: checkpoint script now cleans target before copying (`rm` then `cp`)
+- 19 stale topic files cleaned down to 7 matching MEMORY.md
+- All changes committed and pushed to claude-os repo (c598cf1 through 455b3ab)
 
 ---
 
@@ -184,6 +196,10 @@
 | 02-27 | Mac sleep kills launchd jobs | Applied `pmset sleep 0` to prevent system sleep |
 | 02-27 | Posted PR comment without showing user first | Added "always show before posting" rule |
 | 02-27 | PR comment too long/formal (structured report style) | Added rules: bite-sized, plain language, before/after fix only |
+| 02-27 | Notion sync chicken-and-egg: required existing entries to find MEMORY.md | Added fallback to any MEMORY.md |
+| 02-27 | Dedup bug: same pages discovered by multiple queries | Re-read EXISTING_IDS inside loop |
+| 02-27 | Hardcoded search queries and relevance filters in sync scripts | Rewrote to derive dynamically from MEMORY.md + CLAUDE.md |
+| 02-27 | Stale topic files accumulate in EXAMPLES (copy-only, no delete) | Added rm before cp in checkpoint script |
 
 ## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
 
