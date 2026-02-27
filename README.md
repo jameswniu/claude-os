@@ -215,21 +215,22 @@ flowchart TD
     C --> L1["1-log.sh"]
     C --> L2["2-distill.sh"]
     C --> L3["3-promote.sh"]
-    C --> L4["4-sync-confluence.sh"]
+    C --> L45["4-sync-confluence.sh\n5-sync-notion.sh"]
 
     L1 --> LOG["logs.md"]
     L2 --> MEM["MEMORY.md"]
     L3 --> RUL[".claude/CLAUDE.md"]
-    L4 --> TOP["topic files"]
+    L45 --> TOP["topic files"]
 
     LOG -. reads .-> L2
     MEM -. reads .-> L3
+    MEM -. reads .-> L45
 
     style C fill:#FF8F00,color:#fff,stroke:#E65100,stroke-width:2px
     style L1 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style L2 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style L3 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
-    style L4 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
+    style L45 fill:#546E7A,color:#fff,stroke:#37474F,stroke-width:2px
     style LOG fill:#78909C,color:#fff,stroke:#455A64,stroke-width:2px
     style MEM fill:#EF5350,color:#fff,stroke:#C62828,stroke-width:2px
     style RUL fill:#5C6BC0,color:#fff,stroke:#303F9F,stroke-width:2px
