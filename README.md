@@ -539,8 +539,11 @@ claude-os/
     ├── CLAUDE.md
     ├── memory
         ├── MEMORY.md
+        ├── claudehub.md
         ├── log.md
+        ├── plugin-marketplace.md
         ├── tips-bash-mode.md
+        ├── use-case-library.md
 ├── README.md
 ├── launchd
     ├── com.claude.memory-distill.plist
