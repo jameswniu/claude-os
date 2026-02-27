@@ -1,6 +1,6 @@
 #!/bin/bash
 # test.sh - Validate scripts without running Claude Code
-# Run: bash test.sh
+# Usage: bash test.sh
 
 PASS=0
 FAIL=0
