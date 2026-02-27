@@ -45,7 +45,7 @@ head -1 "$SCRIPT_DIR/2-distill.sh" | grep -q "#!/bin/bash" && pass "has bash she
 grep -q "MEMORY_DIR" "$SCRIPT_DIR/2-distill.sh" && pass "references MEMORY_DIR" || fail "missing MEMORY_DIR"
 grep -q "claude -p" "$SCRIPT_DIR/2-distill.sh" && pass "calls claude headless mode" || fail "missing claude -p call"
 grep -q "max-budget-usd" "$SCRIPT_DIR/2-distill.sh" && pass "has budget cap" || fail "missing budget cap"
-grep -q "log.md" "$SCRIPT_DIR/2-distill.sh" && pass "reads log.md" || fail "missing log.md reference"
+grep -q "logs.md" "$SCRIPT_DIR/2-distill.sh" && pass "reads logs.md" || fail "missing logs.md reference"
 grep -q "MEMORY.md" "$SCRIPT_DIR/2-distill.sh" && pass "writes MEMORY.md" || fail "missing MEMORY.md reference"
 grep -q "200 lines" "$SCRIPT_DIR/2-distill.sh" && pass "enforces 200 line limit" || fail "missing line limit rule"
 
@@ -112,7 +112,7 @@ if [ -z "$CI" ]; then
   MEMORY_DIR="$HOME/.claude/projects/${PROJECT_SLUG}/memory"
   [ -d "$MEMORY_DIR" ] && pass "memory directory exists" || fail "memory directory missing"
   [ -f "$MEMORY_DIR/MEMORY.md" ] && pass "MEMORY.md exists" || fail "MEMORY.md missing"
-  [ -f "$MEMORY_DIR/log.md" ] && pass "log.md exists" || fail "log.md missing"
+  [ -f "$MEMORY_DIR/logs.md" ] && pass "logs.md exists" || fail "logs.md missing"
 
   # Test: launchd agents loaded
   launchctl list | grep -q "com.claude.memory-log" && pass "log agent loaded" || fail "log agent not loaded"

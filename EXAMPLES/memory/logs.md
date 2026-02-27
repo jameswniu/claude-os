@@ -72,7 +72,7 @@
 - Learned Bitbucket API comment versioning: PUT with current `version` number, got `CommentOutOfDateException` on first attempt with stale version
 - Discovered accidental nested settings file at `.claude/commands/.claude/settings.local.json`, confirmed duplicate, deleted it
 - Explored Claude Code file system with user: CLAUDE.md (team), .claude/CLAUDE.md (personal), commands/review.md (skills), settings.local.json (permissions), memory/ (persistence)
-- Set up hybrid memory system: MEMORY.md for topic lookup, log.md for chronological record
+- Set up hybrid memory system: MEMORY.md for topic lookup, logs.md for chronological record
 - User preference: timestamped memory for future learning loop / rolling window
 - Wrote Slack message summarizing Claude Code's native context/memory system as a table
 
@@ -87,7 +87,7 @@
 - User asked about enforcing test runs when pushing PRs, interest in adding pre-push hooks or CI gates for test execution
 
 ### Rollout Planning & GitHub Setup (evening-night)
-- Planned two-phase company rollout: (1) Claude, personal Claude, memory, settings.local.json (2a) add log.md, manual learning loop (3) local/cloud setup, automatic loop
+- Planned two-phase company rollout: (1) Claude, personal Claude, memory, settings.local.json (2a) add logs.md, manual learning loop (3) local/cloud setup, automatic loop
 - Created Mermaid architecture diagram for Claude OS system (memory, hooks, skills, insights pipeline)
 - Set up GitHub repo at github.com/jameswniu for publishing: installed `gh` CLI via Homebrew, authenticated via browser
 - Clarified /review always hits local branch/Bitbucket, never personal GitHub

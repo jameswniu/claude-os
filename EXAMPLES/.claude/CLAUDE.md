@@ -34,6 +34,6 @@
 
 ## Memory
 
-- Hybrid approach: `MEMORY.md` is organized by topic for quick lookup. `log.md` is append-only chronological session history.
-- At the end of each session, append a dated entry to `log.md` summarizing what was done and learned.
+- Hybrid approach: `MEMORY.md` is organized by topic for quick lookup. `logs.md` is append-only chronological session history.
+- At the end of each session, append a dated entry to `logs.md` summarizing what was done and learned.
 - Update `MEMORY.md` topics only when stable new patterns or facts are confirmed.

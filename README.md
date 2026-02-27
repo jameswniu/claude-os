@@ -4,16 +4,16 @@ An enterprise standards personalized assistant for Claude Code. A layered contex
 
 ## What Teams Are Asking
 
-| Department | # | Top 3 Pain Points | Evals |
-|------------|---|-------------------|-------|
-| **Engineering** | 42 | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" | Review time (30-50% faster) / Debug-to-fix time (20-40% faster) / Refactoring time (25-50% faster) |
-| **Data & Analytics** | 36 | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" | Time-to-resolution (30-50% faster) / Query gen time (50-70% faster) / Test scaffolding time (50-80% faster) |
-| **Product & Design** | 24 | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" | First-draft time (50-70% faster) / Impact analysis time (40-60% faster) / Summarization time (70-85% faster) |
-| **IT & ProdOps** | 24 | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" | Incident triage time (40-60% faster) / IaC gen time (40-60% faster) / Investigation time (50-75% faster) |
-| **Ad Operations** | 23 | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" | Troubleshooting time (30-50% faster) / Validation time (50-70% faster) / Report gen time (50-70% faster) |
-| **Sales** | 45 | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" | RFP drafting time (50-70% faster) / Summarization time (60-80% faster) / Analysis time (50-65% faster) |
-| **Investment & Buying** | 31 | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" | Calculation time (50-70% faster) / Audit time (60-80% faster) / Reconciliation time (60-80% faster) |
-| **Integrated Planners** | 23 | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" | Plan drafting time (40-60% faster) / Scenario analysis time (50-70% faster) / Research time (50-70% faster) |
+| Department | # | Top 3 Pain Points | Evals (Time Saved) |
+|------------|---|-------------------|---------------------|
+| **Engineering** | 42 | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" | Review time (30-50%) / Debug-to-fix time (20-40%) / Refactoring time (25-50%) |
+| **Data & Analytics** | 36 | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" | Time-to-resolution (30-50%) / Query gen time (50-70%) / Test scaffolding time (50-80%) |
+| **Product & Design** | 24 | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" | First-draft time (50-70%) / Impact analysis time (40-60%) / Summarization time (70-85%) |
+| **IT & ProdOps** | 24 | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" | Incident triage time (40-60%) / IaC gen time (40-60%) / Investigation time (50-75%) |
+| **Ad Operations** | 23 | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" | Troubleshooting time (30-50%) / Validation time (50-70%) / Report gen time (50-70%) |
+| **Sales** | 45 | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" | RFP drafting time (50-70%) / Summarization time (60-80%) / Analysis time (50-65%) |
+| **Investment & Buying** | 31 | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" | Calculation time (50-70%) / Audit time (60-80%) / Reconciliation time (60-80%) |
+| **Integrated Planners** | 23 | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" | Plan drafting time (40-60%) / Scenario analysis time (50-70%) / Research time (50-70%) |
 
 Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
 
@@ -53,7 +53,7 @@ Session data flows through three stages: log, distill, promote.
 
 ```mermaid
 flowchart TD
-    S["Session"] -- "1h" --> L["log.md"]
+    S["Session"] -- "1h" --> L["logs.md"]
     L -- "24h" --> D["MEMORY.md"]
     D -- "7d" --> R[".claude/CLAUDE.md"]
     R -. "next session" .-> S
@@ -80,7 +80,7 @@ flowchart TD
     C --> L3["3-promote.sh"]
     C --> L4["4-sync-confluence.sh"]
 
-    L1 --> LOG["log.md"]
+    L1 --> LOG["logs.md"]
     L2 --> MEM["MEMORY.md"]
     L3 --> RUL[".claude/CLAUDE.md"]
     L4 --> TOP["topic files"]
@@ -113,7 +113,7 @@ flowchart TD
 | `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
-| `log.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
+| `logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/logs.md) |
 | Topic files | `~/.claude/projects/{project}/memory/topics/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/topics/) |
 | `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
@@ -171,13 +171,13 @@ Start a new Claude Code session and ask: "What do you know about this project?" 
 
 Add a session log and manually run distill/promote cycles to build up your memory over time. This phase fits naturally into your existing team workflow.
 
-> **Note:** The loop below is for iteration only. You can manually write to any file at any time (log.md, MEMORY.md, .claude/CLAUDE.md, or the shared CLAUDE.md). However, it is recommended to leave the automated cadence to Phase 3 and focus here on learning the rhythm.
+> **Note:** The loop below is for iteration only. You can manually write to any file at any time (logs.md, MEMORY.md, .claude/CLAUDE.md, or the shared CLAUDE.md). However, it is recommended to leave the automated cadence to Phase 3 and focus here on learning the rhythm.
 
 ### Who Does What
 
 | Action | Who | When | Target File |
 |--------|-----|------|-------------|
-| Log sessions | Individual developer | After each session | `log.md` (personal) |
+| Log sessions | Individual developer | After each session | `logs.md` (personal) |
 | Distill patterns | Individual developer | End of day | `MEMORY.md` (personal) |
 | Promote to personal rules | Individual developer | End of week | `.claude/CLAUDE.md` (personal, gitignored) |
 | Promote to team rules | Team together | End of sprint review | `CLAUDE.md` (shared, checked into git) |
@@ -188,20 +188,20 @@ The first three steps are personal. The last step is a team activity: during spr
 
 | File | Purpose |
 |------|---------|
-| `~/.claude/projects/{project}/memory/log.md` | Append-only chronological session history |
+| `~/.claude/projects/{project}/memory/logs.md` | Append-only chronological session history |
 
 ### The Loop
 
 ```
-After each session  →  Append entry to log.md
-End of day          →  Distill log.md patterns into MEMORY.md
+After each session  →  Append entry to logs.md
+End of day          →  Distill logs.md patterns into MEMORY.md
 End of week         →  Promote stable patterns to personal .claude/CLAUDE.md
 End of sprint       →  Team promotes shared patterns to CLAUDE.md (git tracked)
 ```
 
 ### Setup
 
-1. **Add log.md** - create `~/.claude/projects/{project}/memory/log.md`:
+1. **Add logs.md** - create `~/.claude/projects/{project}/memory/logs.md`:
    ```markdown
    # Session Log
 
@@ -214,14 +214,14 @@ End of sprint       →  Team promotes shared patterns to CLAUDE.md (git tracked
    ```markdown
    ## Memory
 
-   - Hybrid approach: `MEMORY.md` for topical lookup, `log.md` for chronological history.
-   - At the end of each session, append a dated entry to `log.md`.
+   - Hybrid approach: `MEMORY.md` for topical lookup, `logs.md` for chronological history.
+   - At the end of each session, append a dated entry to `logs.md`.
    - Update `MEMORY.md` topics only when stable new patterns are confirmed.
    ```
 
 3. **Distill (daily)** - at the end of each day, tell Claude:
    ```
-   Read memory/log.md and memory/MEMORY.md.
+   Read memory/logs.md and memory/MEMORY.md.
    Distill any new patterns from today's logs into MEMORY.md.
    Do not duplicate existing entries.
    ```
@@ -376,9 +376,9 @@ Claude now uses `createMockService`, includes edge cases, and uses the factory f
 After a few weeks, your `.claude/CLAUDE.md` should contain rules that were earned through repeated experience, not guessed upfront. Example progression:
 
 ```
-log.md:    "02-18: Claude tried gh CLI, not installed"
-log.md:    "02-19: Claude tried gh CLI again"
-log.md:    "02-20: Claude tried gh CLI a third time"
+logs.md:    "02-18: Claude tried gh CLI, not installed"
+logs.md:    "02-19: Claude tried gh CLI again"
+logs.md:    "02-20: Claude tried gh CLI a third time"
            ↓ distill
 MEMORY.md: "gh CLI is not installed, recurring friction (3x)"
            ↓ promote
@@ -394,8 +394,8 @@ Automate the loop so it runs without manual intervention.
 ### Architecture
 
 ```
-Every 1 hour   →  1-log.sh             →  Append new sessions to log.md
-Every 24 hours →  2-distill.sh          →  Distill log.md patterns into MEMORY.md
+Every 1 hour   →  1-log.sh             →  Append new sessions to logs.md
+Every 24 hours →  2-distill.sh          →  Distill logs.md patterns into MEMORY.md
 Every 24 hours →  4-sync-confluence.sh  →  Re-fetch Confluence pages into topic files
 Every 7 days   →  3-promote.sh          →  Promote stable patterns to .claude/CLAUDE.md
 ```
@@ -538,7 +538,7 @@ client = anthropic.Anthropic()
 │
 ~/.claude/projects/{project}/memory/
 ├── MEMORY.md                          ← Topical patterns (auto-loaded)
-├── log.md                             ← Session history (on demand)
+├── logs.md                             ← Session history (on demand)
 ├── topics/                            ← Topic files (on demand, zero tokens until read)
 │   ├── claudehub.md                   ← Synced from Confluence
 │   ├── use-case-library.md            ← Synced from Confluence
@@ -563,7 +563,7 @@ claude-os/
     ├── CLAUDE.md
     ├── memory
         ├── MEMORY.md
-        ├── log.md
+        ├── logs.md
         ├── topics
             ├── claudehub.md
             ├── plugin-marketplace.md

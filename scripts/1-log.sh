@@ -1,6 +1,6 @@
 #!/bin/bash
 # 1-log.sh — Runs every 20 min (test) / 1 hour (prod)
-# Reads recent Claude Code session history and appends a summary to log.md
+# Reads recent Claude Code session history and appends a summary to logs.md
 
 PROJECT_DIR="/Users/james.niu/media-strategy-generator"
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
@@ -53,7 +53,7 @@ echo "$(date): New sessions found, summarizing..." >> "$LOG_DIR/1-log.log"
 
 cd "$PROJECT_DIR"
 
-claude -p "You are a memory logger. Read the file at $MEMORY_DIR/log.md. Then read the recent session history below and append a new timestamped entry to log.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
+claude -p "You are a memory logger. Read the file at $MEMORY_DIR/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
 
 Recent user messages from this project:
 $NEW_ENTRIES
@@ -62,7 +62,7 @@ Rules:
 - Only log meaningful work (PR reviews, code changes, config updates, new learnings)
 - Skip trivial messages (greetings, confirmations)
 - Each bullet should be one concise line
-- Use the existing log.md format" \
+- Use the existing logs.md format" \
   --allowedTools "Read,Edit" \
   --permission-mode bypassPermissions \
   --max-budget-usd 0.05 \
