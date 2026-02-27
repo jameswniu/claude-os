@@ -658,7 +658,7 @@ client = anthropic.Anthropic()
     - `3-promote.sh` - Rule promoter (every 7d)
     - `4-sync-confluence.sh` - Confluence page syncer (every 24h)
     - `5-checkpoint.sh` - Snapshot workspace to this repo
-    - `6-init.sh` - Bootstrap new project workspace
+    - `6-bootstrap.sh` - Pull repo config into live workspace
     - `update-readme.sh` - Regenerate file tree in README
   - `tests/test.sh` - Validation tests
 

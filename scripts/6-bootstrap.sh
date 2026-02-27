@@ -1,6 +1,6 @@
 #!/bin/bash
-# 6-init.sh — Set up Claude Code workspace for any project
-# Usage: cd ~/some-repo && bash ~/claude-os/scripts/6-init.sh
+# 6-bootstrap.sh — Pull claude-os repo config into a live workspace
+# Usage: cd ~/some-repo && bash ~/claude-os/scripts/6-bootstrap.sh
 
 CLAUDE_OS="$HOME/claude-os"
 EX="$CLAUDE_OS/EXAMPLES"

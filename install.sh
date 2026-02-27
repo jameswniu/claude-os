@@ -11,7 +11,7 @@ chmod +x ~/.local/bin/checkpoint
 
 cat > ~/.local/bin/bootstrap << 'EOF'
 #!/bin/bash
-bash ~/claude-os/scripts/6-init.sh
+bash ~/claude-os/scripts/6-bootstrap.sh
 EOF
 chmod +x ~/.local/bin/bootstrap
 
