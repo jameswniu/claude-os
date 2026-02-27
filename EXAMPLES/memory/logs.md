@@ -95,6 +95,23 @@
 - Renamed project to "claude-os" per user preference
 - Removed em dashes from documentation per style rules
 
+## 2026-02-27 (Day 10 — Claude OS Automation & Account Questions)
+
+- Q&A session: user asked about Claude headless mode, budget limits, and why nested features are banned in certain contexts
+- Discussed switching from company Claude Code account to personal account (billing changes only, same functionality)
+- Re-ran claude-os automation scripts 1 through 4 in correct order (log, distill, promote, sync-confluence)
+- Troubleshot script execution: user needed step-by-step guidance on running scripts from a separate zsh terminal
+- Fixed script issues (likely path or permission errors) and re-ran all 4 automation scripts successfully
+- Worked on claude-os repo documentation: reformatted FAQ to show answers below questions, enforced copy-paste boxes only for runnable code (not prose/explanations), audited all markdown files for compliance
+- Pushed documentation updates to claude-os repo
+- User asked about Claude's identity and AI capabilities
+- Debugged automation scripts failing when run from Claude Code terminal: scripts 1-2 completed but script 3 (promote) dropped into interactive bash shell due to `CLAUDECODE` env var triggering nested session detection
+- Fixed all 3 scripts (1-log, 2-distill, 3-promote): added `unset CLAUDECODE` before `claude -p` calls
+- Bumped script 1 budget from $0.05 to $0.15 (was being exceeded on almost every run)
+- Fixed Confluence token placeholder in `com.claude.memory-sync.plist` (was `YOUR_TOKEN_HERE`, replaced with real token)
+- Discovered PATH issue in all 4 launchd plists: `claude` lives at `~/.local/bin/claude` but plists only had `/usr/local/bin:/usr/bin:/bin`. Added `~/.local/bin` to PATH in all 4 plists
+- Applied `sudo pmset -a displaysleep 15 sleep 0 disksleep 0` to prevent Mac from sleeping (launchd jobs now run 24/7 even with screen locked)
+
 ---
 
 ## Cumulative Friction Log
@@ -111,3 +128,8 @@
 | 02-23 | Verdict posted in PR comment | Added no-verdict rule to .claude/CLAUDE.md |
 | 02-26 | Verdict posted again (this session) | Rule existed but wasn't followed, edited comment |
 | 02-26 | Bitbucket comment version stale on update | Learned: must use current `version` number in PUT |
+| 02-27 | Scripts fail from Claude Code terminal (CLAUDECODE env var) | Added `unset CLAUDECODE` to scripts 1-3 |
+| 02-27 | `claude` not on launchd PATH | Added `~/.local/bin` to PATH in all 4 plists |
+| 02-27 | Script 1 budget too low ($0.05) | Bumped to $0.15 |
+| 02-27 | Confluence token placeholder in plist | Replaced with real token |
+| 02-27 | Mac sleep kills launchd jobs | Applied `pmset sleep 0` to prevent system sleep |

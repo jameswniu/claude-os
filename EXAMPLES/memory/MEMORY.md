@@ -31,20 +31,23 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 ## PR Review Patterns
 
-- 98% of sessions are code review, not code writing
+- Majority of sessions are code review, but code authoring is increasing (e.g., BP-29704 prompt migration to Langfuse, BP-29836 model version bumps)
 - Two PR types: config-only (version bumps, YAML changes) and feature PRs (multi-file, complex)
 - Config PRs are low-risk but still get full test suite runs — could be optimized with a lightweight profile
 - Feature PRs (e.g., BP-29421 streaming orchestrator, 21+ files) often need multiple review sessions as PR evolves
 - Tool usage is overwhelmingly read-only: Bash >> Read >> Grep >> Edit >> Write
+- Usage baseline (02-26 insights): 103 sessions, 57 PR reviews, 93% satisfaction, 80% fully achieved
+- Parallel multi-Claude sessions observed (02-24): 7 overlap events across 14 sessions
 
 ## Recurring Mistakes (Self-Corrections)
 
 - **Verdict in PR comments**: Rule exists in .claude/CLAUDE.md line 14. Violated twice (02-23, 02-26). Must check before posting.
-- **`gh` CLI**: Not installed. Discovered early (02-18), added to CLAUDE.md, but still attempted occasionally. Always use git + curl.
+- **`gh` CLI**: Installed via Homebrew (02-26) for GitHub use (claude-os repo). Still use git + curl for Bitbucket PR reviews, never `gh`.
 - **Wrong branch**: Must always `git fetch origin` first and diff against remote refs (`origin/main...origin/branch`), never local checkout.
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
 - **Wrong config file**: Personal preferences go in `.claude/CLAUDE.md` (gitignored), never in root `CLAUDE.md` (shared).
 - **node_modules in scans**: Exclude `node_modules/`, `dist/`, `.next/` from all grep/regression scans to avoid timeouts and false positives.
+- **Session cut-offs on long reviews**: Recurring on 02-21 and 02-25. Rule added to output complete review in single response, but large PRs (20+ files) can still hit context/timeout limits. Consider chunking very large reviews.
 
 ## User Preferences
 
@@ -53,6 +56,7 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 - Wants timestamped memory for future learning loop / rolling window implementation.
 - Hybrid memory system: MEMORY.md (topical lookup) + logs.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
+- Interested in pre-push hooks or CI gates to enforce test runs before pushing
 
 ## Topic Files (on demand, read when relevant)
 
@@ -73,10 +77,14 @@ Reference docs in `topics/` subfolder. Zero tokens until read.
 - `launchd/` — macOS scheduler plists for scripts 1-4
 - `tests/test.sh` — 46 validation tests
 - Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo
+- Automation scripts must run in order (1→2→3→4) from a separate zsh terminal
+- Company rollout plan: (1) CLAUDE.md, personal CLAUDE.md, memory, settings.local.json (2) add logs.md, manual learning loop (3) local/cloud setup, automatic loop
+- Documentation style: FAQ answers below questions (not inline), copy-paste boxes only for runnable code (not prose/explanations)
 
 ## Claude Code File System
 
 - `/CLAUDE.md` — Team instructions, checked into git
+- `/.claude/` — Gitignored as of 02-27 (removed from tracking, added to `.gitignore`)
 - `/.claude/CLAUDE.md` — Personal instructions, gitignored
 - `/.claude/commands/review.md` — /review slash command
 - `/.claude/settings.local.json` — Permission auto-approvals

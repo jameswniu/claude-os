@@ -51,7 +51,13 @@
       "WebFetch(domain:www.getpanto.ai)",
       "Bash(source:*)",
       "Bash(wc:*)",
-      "Bash(launchctl:*)"
+      "Bash(launchctl:*)",
+      "Bash(mkdir:*)",
+      "Bash(/Users/james.niu/.local/bin/checkpoint:*)",
+      "Bash(claude:*)",
+      "Bash(pmset:*)",
+      "Bash(sudo pmset:*)",
+      "Bash(do:*)"
     ]
   }
 }

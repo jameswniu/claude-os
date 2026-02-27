@@ -22,9 +22,11 @@
 
 ## Environment Constraints
 
-- `gh` CLI is NOT installed. Do not attempt to use it.
+- `gh` CLI is installed but reserved for GitHub repos only. Never use it for Bitbucket PR reviews.
 - Use `git` commands for branch operations and `curl` with Bitbucket Server REST API for PR metadata.
 - Bitbucket base URL: `https://stash.centro.net`, Project: `CEN`, Repo: `media-strategy-generator`.
+- Bitbucket API endpoints: PR list at `/rest/api/1.0/projects/CEN/repos/media-strategy-generator/pull-requests`, comments at `.../pull-requests/{id}/comments`.
+- Bitbucket auth: basic auth with username:token extracted from git remote URL.
 - Branch naming: `BP-{ticket}_description` or `BP-{ticket}-description`.
 
 ## Prompts
