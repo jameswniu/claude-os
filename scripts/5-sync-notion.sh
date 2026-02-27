@@ -21,7 +21,7 @@ mkdir -p "$LOG_DIR"
 
 if [ -z "$NOTION_TOKEN" ]; then
     echo "$(date): NOTION_TOKEN not set, skipping" >> "$LOG_DIR/5-sync-notion.log"
-    exit 0
+    exit 2
 fi
 
 if [ ! -f "$MEMORY_FILE" ]; then

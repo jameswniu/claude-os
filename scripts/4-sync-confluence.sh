@@ -21,7 +21,7 @@ mkdir -p "$LOG_DIR"
 
 if [ -z "$CONFLUENCE_EMAIL" ] || [ -z "$CONFLUENCE_TOKEN" ]; then
     echo "$(date): CONFLUENCE_EMAIL or CONFLUENCE_TOKEN not set, skipping" >> "$LOG_DIR/4-sync-confluence.log"
-    exit 0
+    exit 2
 fi
 
 if [ ! -f "$MEMORY_FILE" ]; then

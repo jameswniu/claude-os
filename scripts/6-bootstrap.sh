@@ -47,8 +47,26 @@ fi
 # Phase 2: Run sync scripts to populate topic files from Confluence/Notion
 echo ""
 echo "  Syncing topic files..."
-bash "$CLAUDE_OS/scripts/4-sync-confluence.sh" 2>/dev/null && echo "  SYNCED   Confluence topics" || echo "  SKIPPED  Confluence (no credentials)"
-bash "$CLAUDE_OS/scripts/5-sync-notion.sh" 2>/dev/null && echo "  SYNCED   Notion topics" || echo "  SKIPPED  Notion (no credentials)"
+
+if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
+    if bash "$CLAUDE_OS/scripts/4-sync-confluence.sh"; then
+        echo "  SYNCED   Confluence topics"
+    else
+        echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
+    fi
+else
+    echo "  SKIPPED  Confluence (CONFLUENCE_EMAIL or CONFLUENCE_TOKEN not set)"
+fi
+
+if [ -n "$NOTION_TOKEN" ]; then
+    if bash "$CLAUDE_OS/scripts/5-sync-notion.sh"; then
+        echo "  SYNCED   Notion topics"
+    else
+        echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
+    fi
+else
+    echo "  SKIPPED  Notion (NOTION_TOKEN not set)"
+fi
 
 echo ""
 echo "Done. Start Claude Code and ask: \"What do you know about this project?\""
