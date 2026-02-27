@@ -61,7 +61,7 @@ if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
         echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
     fi
 else
-    echo "  SKIPPED  Confluence (set CONFLUENCE_EMAIL + CONFLUENCE_TOKEN in ~/.zshrc)"
+    echo "  SKIPPED  Confluence (see README for setup)"
 fi
 
 if [ -n "$NOTION_TOKEN" ]; then
@@ -71,7 +71,7 @@ if [ -n "$NOTION_TOKEN" ]; then
         echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
     fi
 else
-    echo "  SKIPPED  Notion (set NOTION_TOKEN in ~/.zshrc)"
+    echo "  SKIPPED  Notion (see README for setup)"
 fi
 
 echo ""
