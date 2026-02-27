@@ -6,14 +6,14 @@ A layered context and learning loop system for Claude Code. Execution rolled out
 
 | Department | Top 3 Pain Points |
 |------------|-------------------|
-| **Apps Engineering** | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this 200-line function" |
-| **Data Engineering** | "Debug this data pipeline failure" / "Refactor this ETL script" / "Generate tests for this transformation" |
-| **Product Management** | "Summarize what shipped this sprint from the PR list" / "Draft acceptance criteria for this feature" / "What's the blast radius of removing this field?" |
-| **Security Ops** | "Review this change for auth vulnerabilities" / "Trace this token flow, where is it dropped?" / "Scan this PR for secrets or injection risks" |
-| **Data Science** | "Document this analysis pipeline" / "Review this notebook for correctness" / "Generate tests for this data model" |
-| **Media Operations** | "What fields does this campaign export include?" / "Why is this report showing zero impressions?" / "Map these CSV columns to our schema" |
-| **Sales Engineering** | "Draft a technical response to this RFP section" / "What API endpoints does this integration need?" / "Generate a demo dataset for this client pitch" |
-| **Client Services** | "Explain this discrepancy between our report and the client's" / "What changed in the last release that affects this workflow?" / "Draft a client-facing summary of this bug fix" |
+| **Engineering** (42) | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" |
+| **Data & Analytics** (36) | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" |
+| **Product & Design** (24) | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" |
+| **IT & ProdOps** (24) | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" |
+| **Ad Operations** (23) | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" |
+| **Sales** (45) | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" |
+| **Investment & Buying** (31) | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" |
+| **Integrated Planners** (23) | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" |
 
 Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
 
