@@ -4,53 +4,80 @@ A layered context and learning loop system for Claude Code. Roll out in three ph
 
 ## Architecture
 
+### Phase 1 — Static Context
+
+Four files loaded into every Claude Code session automatically.
+
 ```mermaid
-graph TD
-    subgraph "Phase 1: Static Context"
-        A["/CLAUDE.md<br/>Team Rules"] -->|loaded every session| S((Claude Code<br/>Session))
-        B["/.claude/CLAUDE.md<br/>Personal Rules"] -->|loaded every session| S
-        C["settings.local.json<br/>Permissions"] -->|loaded every session| S
-        D["MEMORY.md<br/>Learned Patterns"] -->|loaded every session| S
-    end
+block-beta
+    columns 4
+    A["📄 /CLAUDE.md\nTeam Rules"]:1
+    B["📄 /.claude/CLAUDE.md\nPersonal Rules"]:1
+    C["⚙️ settings.local.json\nPermissions"]:1
+    D["🧠 MEMORY.md\nLearned Patterns"]:1
+    space:4
+    S["🤖 Claude Code Session"]:4
 
-    subgraph "Phase 2: Manual Loop"
-        S -->|"user appends after session"| E["log.md<br/>Session History"]
-        E -->|"user runs daily"| F{Distill}
-        F -->|"new patterns"| D
-        D -->|"user runs weekly"| G{Promote}
-        G -->|"stable rules (3+ occurrences)"| B
-    end
+    A --> S
+    B --> S
+    C --> S
+    D --> S
 
-    subgraph "Phase 3: Automated Loop"
-        S -->|"1-log.sh<br/>every 1 hour"| E
-        E -->|"2-distill.sh<br/>every 24 hours"| F
-        D -->|"3-promote.sh<br/>every 7 days"| G
-        H["launchd / cloud cron"] -.->|triggers| E
-        H -.->|triggers| F
-        H -.->|triggers| G
-    end
-
-    style A fill:#e8f4e8,stroke:#2d7d2d
-    style B fill:#e8e8f4,stroke:#2d2d7d
-    style C fill:#f4f4e8,stroke:#7d7d2d
-    style D fill:#f4e8e8,stroke:#7d2d2d
-    style E fill:#f0f0f0,stroke:#666
-    style S fill:#fff3e0,stroke:#e65100
+    style A fill:#4CAF50,color:#fff,stroke:#2E7D32
+    style B fill:#5C6BC0,color:#fff,stroke:#303F9F
+    style C fill:#FFA726,color:#fff,stroke:#E65100
+    style D fill:#EF5350,color:#fff,stroke:#C62828
+    style S fill:#212121,color:#fff,stroke:#424242
 ```
 
-```mermaid
-graph LR
-    subgraph "Data Flow"
-        L["log.md<br/>Raw sessions"] -->|distill| M["MEMORY.md<br/>Patterns"]
-        M -->|promote| R["CLAUDE.md<br/>Rules"]
-        R -->|informs| L
-    end
+### Phase 2 & 3 — Learning Loop
 
-    subgraph "Frequency"
-        H1["Every 1h"] --> L
-        H2["Every 24h"] --> M
-        H3["Every 7d"] --> R
-    end
+Session data flows through three stages: log, distill, promote.
+
+```mermaid
+flowchart LR
+    S["🤖 Session"] -- "every 1h" --> L["📝 log.md\nRaw History"]
+    L -- "every 24h" --> D["🧠 MEMORY.md\nPatterns"]
+    D -- "every 7d" --> R["📄 CLAUDE.md\nRules"]
+    R -. "loaded next session" .-> S
+
+    style S fill:#212121,color:#fff,stroke:#424242
+    style L fill:#78909C,color:#fff,stroke:#455A64
+    style D fill:#EF5350,color:#fff,stroke:#C62828
+    style R fill:#5C6BC0,color:#fff,stroke:#303F9F
+
+    linkStyle 0 stroke:#78909C,stroke-width:2px
+    linkStyle 1 stroke:#EF5350,stroke-width:2px
+    linkStyle 2 stroke:#5C6BC0,stroke-width:2px
+    linkStyle 3 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
+```
+
+### Automation Scripts
+
+```mermaid
+flowchart LR
+    C["⏰ launchd\ncloud cron"] -- triggers --> L1["1-log.sh\n⏱️ every 1h"]
+    C -- triggers --> L2["2-distill.sh\n⏱️ every 24h"]
+    C -- triggers --> L3["3-promote.sh\n⏱️ every 7d"]
+
+    L1 -- appends --> LOG["📝 log.md"]
+    L2 -- updates --> MEM["🧠 MEMORY.md"]
+    L3 -- updates --> RUL["📄 CLAUDE.md"]
+
+    LOG -. reads .-> L2
+    MEM -. reads .-> L3
+
+    style C fill:#FF8F00,color:#fff,stroke:#E65100
+    style L1 fill:#546E7A,color:#fff,stroke:#37474F
+    style L2 fill:#546E7A,color:#fff,stroke:#37474F
+    style L3 fill:#546E7A,color:#fff,stroke:#37474F
+    style LOG fill:#78909C,color:#fff,stroke:#455A64
+    style MEM fill:#EF5350,color:#fff,stroke:#C62828
+    style RUL fill:#5C6BC0,color:#fff,stroke:#303F9F
+
+    linkStyle 0,1,2 stroke:#FF8F00,stroke-width:2px
+    linkStyle 3,4,5 stroke:#4CAF50,stroke-width:2px
+    linkStyle 6,7 stroke:#9E9E9E,stroke-width:1px,stroke-dasharray:5
 ```
 
 ---
