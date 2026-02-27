@@ -31,105 +31,148 @@ fi
 
 # --- Phase 1: Auto-discover new pages ---
 
-# Search queries (Notion search API searches across all shared pages)
-SEARCH_QUERIES=(
-    "claude"
-    "AI tools"
-    "prompt"
-)
+# Find project CLAUDE.md by matching slug against real directories
+PROJECT_SLUG=$(basename "$(dirname "$(dirname "$MEMORY_FILE")")")
+CLAUDE_MD=""
+for F in "$HOME"/*/CLAUDE.md "$HOME"/*/*/CLAUDE.md; do
+    [ -f "$F" ] || continue
+    D=$(dirname "$F")
+    if [ "$(echo "$D" | tr '/.' '-')" = "$PROJECT_SLUG" ]; then
+        CLAUDE_MD="$F"
+        break
+    fi
+done
 
-# Relevance filter: page title must contain at least one of these terms (case-insensitive)
-RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+# Extract search queries + relevance terms dynamically, then search Notion
+DISCOVERY_RESULT=$(python3 -c "
+import re, json, subprocess, os
 
-# Exclude filter: page titles matching these terms are skipped (case-insensitive)
-EXCLUDE_TERMS="upgrade|hackathon|meeting notes|archive"
-
-# Collect already-synced page IDs from MEMORY.md
-EXISTING_IDS=$(grep 'notion:' "$MEMORY_FILE" | sed -n 's/.*(notion:\([^)]*\)).*/\1/p')
-
-for QUERY in "${SEARCH_QUERIES[@]}"; do
-    SEARCH_RESULT=$(curl -s -X POST \
-        "$NOTION_API/search" \
-        -H "Authorization: Bearer $NOTION_TOKEN" \
-        -H "Notion-Version: 2022-06-28" \
-        -H "Content-Type: application/json" \
-        -d "{\"query\": \"$QUERY\", \"filter\": {\"value\": \"page\", \"property\": \"object\"}, \"page_size\": 25}")
-
-    TMPFILE=$(mktemp)
-    echo "$SEARCH_RESULT" > "$TMPFILE"
-
-    python3 -c "
-import json, re
-
-with open('$TMPFILE') as f:
-    data = json.load(f)
-
-existing = set('''$EXISTING_IDS'''.split())
 memory_file = '$MEMORY_FILE'
-relevant_terms = '$RELEVANT_TERMS'
-exclude_terms = '$EXCLUDE_TERMS'
-relevant_pattern = re.compile(relevant_terms, re.IGNORECASE)
-exclude_pattern = re.compile(exclude_terms, re.IGNORECASE)
+claude_md = '$CLAUDE_MD'
+notion_api = '$NOTION_API'
+notion_token = '$NOTION_TOKEN'
 
 with open(memory_file) as f:
-    content = f.read()
+    memory = f.read()
 
-lines = content.split('\n')
-last_notion_idx = -1
-last_confluence_idx = -1
+claude_content = ''
+if claude_md and os.path.exists(claude_md):
+    with open(claude_md) as f:
+        claude_content = f.read()
+
+# --- Extract search queries from project context ---
+queries = set()
+
+# 1. Topic descriptions (highest signal, for organic growth)
+for m in re.finditer(r'\x60topics/[^\x60]+\x60\s+.+?\s+(.+?)\s+\([a-z]+:', memory):
+    queries.add(m.group(1))
+
+# 2. Section headings from MEMORY.md
+skip_headings = {'topic files', 'memory', 'claude os', 'file system', 'cumulative friction'}
+for m in re.finditer(r'^## (.+?)(?:\s*\(.*\))?\s*$', memory, re.MULTILINE):
+    heading = m.group(1).strip()
+    if heading.lower() not in skip_headings:
+        queries.add(heading)
+
+# 3. Section headings from CLAUDE.md
+skip_claude = {'build', 'commands', 'docker', 'testing', 'style', 'quality', 'e2e', 'environment', 'configuration', 'local development'}
+for m in re.finditer(r'^#{2,3} (.+?)$', claude_content, re.MULTILINE):
+    heading = m.group(1).strip()
+    if not any(s in heading.lower() for s in skip_claude):
+        queries.add(heading)
+
+# --- Extract relevance terms from both files ---
+terms = set()
+combined = memory + '\n' + claude_content
+
+# Bold terms
+for m in re.finditer(r'\*\*(.+?)\*\*', combined):
+    term = m.group(1).strip().rstrip(':')
+    if len(term) > 2 and len(term) < 40:
+        terms.add(term.lower())
+
+# Section headings as terms
+for m in re.finditer(r'^#{1,3} (.+?)(?:\s*\(.*\))?\s*$', combined, re.MULTILINE):
+    for word in re.split(r'[\s/]+', m.group(1)):
+        word = re.sub(r'[^a-zA-Z0-9]', '', word)
+        if len(word) > 2:
+            terms.add(word.lower())
+
+# Capitalized phrases (proper nouns/tools)
+for m in re.finditer(r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', combined):
+    terms.add(m.group(1).lower())
+
+# Filter out generic terms
+generic = {'the', 'this', 'that', 'with', 'from', 'into', 'all', 'run', 'use', 'set', 'not', 'for', 'and', 'are', 'can', 'may', 'will', 'has', 'get', 'new', 'key', 'see', 'how', 'code', 'file', 'files', 'line', 'start', 'check', 'install', 'important', 'must', 'pass', 'source', 'directories'}
+terms = {t for t in terms if t not in generic and len(t) > 2}
+relevant_pattern = '|'.join(re.escape(t) for t in sorted(terms)) if terms else '.'
+
+# --- Search Notion and discover pages ---
+existing_ids = set(re.findall(r'\(notion:([a-f0-9]+)\)', memory))
+
+lines = memory.split('\n')
+
+# Find insertion point (after last notion entry, or last confluence entry, or after Topic Files header)
+last_idx = -1
 for i, line in enumerate(lines):
-    if '(notion:' in line and '\`topics/' in line:
-        last_notion_idx = i
-    if '(confluence:' in line and '\`topics/' in line:
-        last_confluence_idx = i
-
-# Insert after last notion entry, or after last confluence entry, or after Topic Files header
-insert_idx = last_notion_idx if last_notion_idx >= 0 else last_confluence_idx
-if insert_idx < 0:
-    # Look for Topic Files section header
+    if '(notion:' in line and '\x60topics/' in line:
+        last_idx = i
+if last_idx < 0:
+    for i, line in enumerate(lines):
+        if '(confluence:' in line and '\x60topics/' in line:
+            last_idx = i
+if last_idx < 0:
     for i, line in enumerate(lines):
         if 'Topic Files' in line and line.startswith('#'):
-            insert_idx = i + 2  # skip header and blank line
+            last_idx = i + 2
             break
-if insert_idx < 0:
-    # No Topic Files section, append one
-    lines.append('')
-    lines.append('## Topic Files (on demand, read when relevant)')
-    lines.append('')
-    insert_idx = len(lines) - 1
 
-new_pages = []
-for r in data.get('results', []):
-    page_id = r['id'].replace('-', '')
-    # Extract title
-    title = 'Untitled'
-    props = r.get('properties', {})
-    for key, val in props.items():
-        if val.get('type') == 'title':
-            title_parts = val.get('title', [])
-            title = ''.join(t.get('plain_text', '') for t in title_parts)
-            break
-    if page_id not in existing and relevant_pattern.search(title) and not exclude_pattern.search(title):
-        filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
-        new_pages.append((page_id, filename, title))
-        existing.add(page_id)
+total_new = 0
+relevant_re = re.compile(relevant_pattern, re.IGNORECASE)
 
-if new_pages and insert_idx >= 0:
-    new_lines = []
-    for page_id, filename, title in new_pages:
-        new_lines.append(f'- \`topics/{filename}\` — {title} (notion:{page_id})')
-    lines = lines[:insert_idx + 1] + new_lines + lines[insert_idx + 1:]
+for query in sorted(queries):
+    try:
+        result = subprocess.run(
+            ['curl', '-s', '-X', 'POST', f'{notion_api}/search',
+             '-H', f'Authorization: Bearer {notion_token}',
+             '-H', 'Notion-Version: 2022-06-28',
+             '-H', 'Content-Type: application/json',
+             '-d', json.dumps({'query': query, 'filter': {'value': 'page', 'property': 'object'}, 'page_size': 25})],
+            capture_output=True, text=True, timeout=30
+        )
+        data = json.loads(result.stdout)
+    except Exception:
+        continue
+
+    new_pages = []
+    for r in data.get('results', []):
+        page_id = r['id'].replace('-', '')
+        title = 'Untitled'
+        props = r.get('properties', {})
+        for key, val in props.items():
+            if val.get('type') == 'title':
+                title_parts = val.get('title', [])
+                title = ''.join(t.get('plain_text', '') for t in title_parts)
+                break
+        if page_id not in existing_ids and relevant_re.search(title):
+            filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
+            new_pages.append((page_id, filename, title))
+            existing_ids.add(page_id)
+
+    if new_pages and last_idx >= 0:
+        new_lines = [f'- \x60topics/{fn}\x60 \u2014 {t} (notion:{pid})' for pid, fn, t in new_pages]
+        lines = lines[:last_idx + 1] + new_lines + lines[last_idx + 1:]
+        last_idx += len(new_lines)
+        total_new += len(new_pages)
+
+if total_new > 0:
     with open(memory_file, 'w') as f:
         f.write('\n'.join(lines))
 
-print(len(new_pages))
-" 2>/dev/null
+print(total_new)
+" 2>/dev/null)
 
-    rm -f "$TMPFILE"
-done
-
-TOTAL_NEW=$(grep -c 'notion:' "$MEMORY_FILE")
-echo "$(date): Discovery complete. $TOTAL_NEW total notion entries in MEMORY.md" >> "$LOG_DIR/5-sync-notion.log"
+echo "$(date): Discovery complete. $(grep -c 'notion:' "$MEMORY_FILE" 2>/dev/null || echo 0) total notion entries in MEMORY.md" >> "$LOG_DIR/5-sync-notion.log"
 
 # --- Phase 2: Sync all entries ---
 

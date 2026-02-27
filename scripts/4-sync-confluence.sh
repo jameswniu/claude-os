@@ -31,97 +31,139 @@ fi
 
 # --- Phase 1: Auto-discover new pages ---
 
-# Search queries to find relevant pages (space:keyword pairs)
-SEARCH_QUERIES=(
-    "BET:claude"
-    "BET:claude code"
-    "BET:AI tools"
-)
+DEFAULT_SPACE="BET"
 
-# Relevance filter: page title must contain at least one of these terms (case-insensitive)
-RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+# Find project CLAUDE.md by matching slug against real directories
+PROJECT_SLUG=$(basename "$(dirname "$(dirname "$MEMORY_FILE")")")
+CLAUDE_MD=""
+for F in "$HOME"/*/CLAUDE.md "$HOME"/*/*/CLAUDE.md; do
+    [ -f "$F" ] || continue
+    D=$(dirname "$F")
+    if [ "$(echo "$D" | tr '/.' '-')" = "$PROJECT_SLUG" ]; then
+        CLAUDE_MD="$F"
+        break
+    fi
+done
 
-# Exclude filter: page titles matching these terms are skipped (case-insensitive)
-EXCLUDE_TERMS="upgrade|hack-ai-thon|hackathon|refactor from|loading indicator|pricing evaluation"
+# Extract search queries + relevance terms dynamically from MEMORY.md + CLAUDE.md
+DISCOVERY_RESULT=$(python3 -c "
+import re, json, urllib.parse, subprocess, os
 
-# Collect already-synced page IDs from MEMORY.md
-EXISTING_IDS=$(grep 'confluence:' "$MEMORY_FILE" | sed -n 's/.*(confluence:\([^)]*\)).*/\1/p')
-
-DISCOVERED=0
-
-for QUERY in "${SEARCH_QUERIES[@]}"; do
-    IFS=':' read -r SPACE KEYWORD <<< "$QUERY"
-    ENCODED_KEYWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$KEYWORD'))")
-
-    SEARCH_RESULT=$(curl -s -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
-        "$CONFLUENCE_BASE/search?cql=type=page+AND+space=$SPACE+AND+text~%22$ENCODED_KEYWORD%22&limit=25" \
-        -H "Accept: application/json")
-
-    # Parse results and check for new pages
-    python3 -c "
-import sys, json, re
-
-data = json.loads('''$(echo "$SEARCH_RESULT" | sed "s/'/'\\''/g")''')
-existing = set('''$EXISTING_IDS'''.split())
 memory_file = '$MEMORY_FILE'
+claude_md = '$CLAUDE_MD'
+space = '$DEFAULT_SPACE'
+confluence_base = '$CONFLUENCE_BASE'
+auth = ('$CONFLUENCE_EMAIL', '$CONFLUENCE_TOKEN')
 
-# Read current MEMORY.md
 with open(memory_file) as f:
-    content = f.read()
+    memory = f.read()
 
-# Find the insertion point: last (confluence:...) line in Topic Files section
-lines = content.split('\n')
-last_confluence_idx = -1
+claude_content = ''
+if claude_md and os.path.exists(claude_md):
+    with open(claude_md) as f:
+        claude_content = f.read()
+
+# --- Extract search queries from project context ---
+queries = set()
+
+# 1. Topic descriptions (highest signal, for organic growth)
+for m in re.finditer(r'\x60topics/[^\x60]+\x60\s+.+?\s+(.+?)\s+\([a-z]+:', memory):
+    queries.add(m.group(1))
+
+# 2. Section headings from MEMORY.md
+skip_headings = {'topic files', 'memory', 'claude os', 'file system', 'cumulative friction'}
+for m in re.finditer(r'^## (.+?)(?:\s*\(.*\))?\s*$', memory, re.MULTILINE):
+    heading = m.group(1).strip()
+    if heading.lower() not in skip_headings:
+        queries.add(heading)
+
+# 3. Section headings from CLAUDE.md
+skip_claude = {'build', 'commands', 'docker', 'testing', 'style', 'quality', 'e2e', 'environment', 'configuration', 'local development'}
+for m in re.finditer(r'^#{2,3} (.+?)$', claude_content, re.MULTILINE):
+    heading = m.group(1).strip()
+    if not any(s in heading.lower() for s in skip_claude):
+        queries.add(heading)
+
+# --- Extract relevance terms from both files ---
+terms = set()
+combined = memory + '\n' + claude_content
+
+# Bold terms
+for m in re.finditer(r'\*\*(.+?)\*\*', combined):
+    term = m.group(1).strip().rstrip(':')
+    if len(term) > 2 and len(term) < 40:
+        terms.add(term.lower())
+
+# Section headings as terms
+for m in re.finditer(r'^#{1,3} (.+?)(?:\s*\(.*\))?\s*$', combined, re.MULTILINE):
+    for word in re.split(r'[\s/]+', m.group(1)):
+        word = re.sub(r'[^a-zA-Z0-9]', '', word)
+        if len(word) > 2:
+            terms.add(word.lower())
+
+# Key terms from content (capitalized phrases likely to be proper nouns/tools)
+for m in re.finditer(r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', combined):
+    terms.add(m.group(1).lower())
+
+# Filter out generic terms
+generic = {'the', 'this', 'that', 'with', 'from', 'into', 'all', 'run', 'use', 'set', 'not', 'for', 'and', 'are', 'can', 'may', 'will', 'has', 'get', 'new', 'key', 'see', 'how', 'code', 'file', 'files', 'line', 'start', 'check', 'install', 'important', 'must', 'pass', 'source', 'directories'}
+terms = {t for t in terms if t not in generic and len(t) > 2}
+relevant_pattern = '|'.join(re.escape(t) for t in sorted(terms)) if terms else '.'
+
+# --- Search Confluence and discover pages ---
+existing_ids = set(re.findall(r'\(confluence:(\d+)\)', memory))
+
+lines = memory.split('\n')
+
+# Find insertion point
+last_idx = -1
 for i, line in enumerate(lines):
-    if '(confluence:' in line and '\`topics/' in line:
-        last_confluence_idx = i
-
-if last_confluence_idx < 0:
-    # Look for Topic Files section header
+    if '(confluence:' in line and '\x60topics/' in line:
+        last_idx = i
+if last_idx < 0:
     for i, line in enumerate(lines):
         if 'Topic Files' in line and line.startswith('#'):
-            last_confluence_idx = i + 2  # skip header and blank line
+            # Insert after the header line + description line
+            last_idx = i + 2
             break
-if last_confluence_idx < 0:
-    # No Topic Files section, append one
-    lines.append('')
-    lines.append('## Topic Files (on demand, read when relevant)')
-    lines.append('')
-    last_confluence_idx = len(lines) - 1
 
-relevant_terms = '$RELEVANT_TERMS'
-exclude_terms = '$EXCLUDE_TERMS'
-relevant_pattern = re.compile(relevant_terms, re.IGNORECASE)
-exclude_pattern = re.compile(exclude_terms, re.IGNORECASE)
+total_new = 0
+for query in sorted(queries):
+    encoded = urllib.parse.quote(query)
+    url = f'{confluence_base}/search?cql=type=page+AND+space={space}+AND+text~%22{encoded}%22&limit=25'
+    try:
+        result = subprocess.run(
+            ['curl', '-s', '-u', f'{auth[0]}:{auth[1]}', url, '-H', 'Accept: application/json'],
+            capture_output=True, text=True, timeout=30
+        )
+        data = json.loads(result.stdout)
+    except Exception:
+        continue
 
-new_pages = []
-for r in data.get('results', []):
-    page_id = r['id']
-    title = r['title']
-    if page_id not in existing and relevant_pattern.search(title) and not exclude_pattern.search(title):
-        # Generate filename from title
-        filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
-        new_pages.append((page_id, filename, title))
-        existing.add(page_id)
+    relevant_re = re.compile(relevant_pattern, re.IGNORECASE)
+    new_pages = []
+    for r in data.get('results', []):
+        page_id = r['id']
+        title = r['title']
+        if page_id not in existing_ids and relevant_re.search(title):
+            filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
+            new_pages.append((page_id, filename, title))
+            existing_ids.add(page_id)
 
-if new_pages and last_confluence_idx >= 0:
-    new_lines = []
-    for page_id, filename, title in new_pages:
-        new_lines.append(f'- \`topics/{filename}\` — {title} (confluence:{page_id})')
-    # Insert after the last confluence line
-    lines = lines[:last_confluence_idx + 1] + new_lines + lines[last_confluence_idx + 1:]
+    if new_pages and last_idx >= 0:
+        new_lines = [f'- \x60topics/{fn}\x60 \u2014 {t} (confluence:{pid})' for pid, fn, t in new_pages]
+        lines = lines[:last_idx + 1] + new_lines + lines[last_idx + 1:]
+        last_idx += len(new_lines)
+        total_new += len(new_pages)
+
+if total_new > 0:
     with open(memory_file, 'w') as f:
         f.write('\n'.join(lines))
 
-print(len(new_pages))
-" 2>/dev/null
+print(total_new)
+" 2>/dev/null)
 
-    NEW_COUNT=$?
-done
-
-# Log discovery results
-TOTAL_NEW=$(grep -c 'confluence:' "$MEMORY_FILE")
-echo "$(date): Discovery complete. $TOTAL_NEW total confluence entries in MEMORY.md" >> "$LOG_DIR/4-sync-confluence.log"
+echo "$(date): Discovery complete. $(grep -c 'confluence:' "$MEMORY_FILE") total confluence entries in MEMORY.md" >> "$LOG_DIR/4-sync-confluence.log"
 
 # --- Phase 2: Sync all entries ---
 
