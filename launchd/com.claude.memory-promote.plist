@@ -7,14 +7,14 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>$HOME/claude-os/3-promote.sh</string>
+		<string>/Users/james.niu/claude-os/scripts/3-promote.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>604800</integer>
 	<key>StandardOutPath</key>
-	<string>$HOME/claude-os/output/3-promote-stdout.log</string>
+	<string>/Users/james.niu/claude-os/output/3-promote-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>$HOME/claude-os/output/3-promote-stderr.log</string>
+	<string>/Users/james.niu/claude-os/output/3-promote-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>

@@ -7,14 +7,14 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>$HOME/claude-os/scripts/4-sync-confluence.sh</string>
+		<string>/Users/james.niu/claude-os/scripts/4-sync-confluence.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>86400</integer>
 	<key>StandardOutPath</key>
-	<string>$HOME/claude-os/output/4-sync-stdout.log</string>
+	<string>/Users/james.niu/claude-os/output/4-sync-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>$HOME/claude-os/output/4-sync-stderr.log</string>
+	<string>/Users/james.niu/claude-os/output/4-sync-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
