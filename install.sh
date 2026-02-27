@@ -34,7 +34,11 @@ alias checkpoint="bash ~/claude-os/scripts/5-checkpoint.sh"
 alias bootstrap="bash ~/claude-os/scripts/6-bootstrap.sh"
 ALIASES
 
+# Install pre-push hook
+CLAUDE_OS="$HOME/claude-os"
+ln -sf "$CLAUDE_OS/hooks/pre-push" "$CLAUDE_OS/.git/hooks/pre-push"
+
 # Apply immediately
 source "$SHELL_RC" 2>/dev/null
 
-echo "Installed: checkpoint, bootstrap (ready to use)"
+echo "Installed: checkpoint, bootstrap, pre-push hook (ready to use)"

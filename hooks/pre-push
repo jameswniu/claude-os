@@ -1,0 +1,12 @@
+#!/bin/bash
+# pre-push hook - runs tests before allowing push to remote
+# Installed by: bash ~/claude-os/install.sh
+
+echo "Running tests before push..."
+bash "$(dirname "$(dirname "$(readlink -f "$0")")")/tests/test.sh"
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "Push blocked: tests failed. Fix the issues and try again."
+    exit 1
+fi
