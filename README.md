@@ -10,11 +10,11 @@ Four files loaded into every Claude Code session automatically.
 
 ```mermaid
 flowchart TD
-    A["📄 CLAUDE.md\nTeam rules, build commands,\narchitecture, code style"]
-    B["📄 .claude/CLAUDE.md\nPersonal workflow preferences,\nenvironment constraints"]
-    C["⚙️ settings.local.json\nTool permissions and\nauto-approval rules"]
-    D["🧠 MEMORY.md\nLearned patterns, API notes,\nproject conventions"]
-    S["🤖 Claude Code Session"]
+    A["📄 CLAUDE.md\nTeam rules, build commands,\narchitecture, code style\n(checked into git)"]
+    B["📄 .claude/CLAUDE.md\nPersonal workflow preferences,\nenvironment constraints\n(gitignored)"]
+    C["⚙️ settings.local.json\nTool permissions and\nauto-approval rules\n(gitignored)"]
+    D["🧠 MEMORY.md\nLearned patterns, API notes,\nproject conventions\n(auto-loaded per project)"]
+    S["🤖 Claude Code Session\nAll four files loaded automatically"]
 
     A --> S
     B --> S
