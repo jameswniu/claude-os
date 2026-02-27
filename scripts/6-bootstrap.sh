@@ -44,6 +44,12 @@ else
     echo ".claude/" > .gitignore && echo "  CREATED  .gitignore"
 fi
 
+# Ensure install.sh has run (aliases + PATH)
+if ! command -v checkpoint &>/dev/null; then
+    bash "$CLAUDE_OS/install.sh"
+    echo "  INSTALLED shell aliases (bootstrap, checkpoint)"
+fi
+
 # Phase 2: Run sync scripts to populate topic files from Confluence/Notion
 echo ""
 echo "  Syncing topic files..."
