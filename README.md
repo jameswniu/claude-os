@@ -124,12 +124,7 @@ echo 'export CONFLUENCE_TOKEN="<your-api-token>"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Add pages to sync in your `MEMORY.md` under the Topic Files section:
-```markdown
-- `topics/my-page.md` — Description of the page (confluence:PAGE_ID)
-```
-
-Then install and run the first sync:
+Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 bash ~/claude-os/scripts/4-sync-confluence.sh
@@ -145,12 +140,11 @@ source ~/.zshrc
 
 Share each Notion page with the integration (page `...` menu > "Connections" > add integration).
 
-Add pages to sync in your `MEMORY.md` under the Topic Files section:
+Notion pages must be added manually to MEMORY.md (no auto-discovery). Add entries under the Topic Files section:
 ```markdown
-- `topics/my-page.md` — Description of the page (notion:PAGE_ID)
+- `topics/my-page.md` — Description (notion:PAGE_ID)
 ```
-
-To find a page ID: copy the Notion URL, the ID is the 32-character hex string at the end.
+To find the page ID: copy the Notion URL, the ID is the 32-character hex string at the end.
 
 Then install and run the first sync:
 ```bash
