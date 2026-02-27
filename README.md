@@ -543,13 +543,14 @@ Auto-discovers new Confluence pages and keeps topic files fresh every 24 hours.
 
 **How it works:**
 1. **Discovery:** Searches Confluence using configured `SEARCH_QUERIES` (space:keyword pairs)
-2. Compares results against existing `(confluence:ID)` entries in MEMORY.md
-3. Auto-adds new pages to the Topic Files section of MEMORY.md
-4. **Sync:** Scans MEMORY.md for all `(confluence:PAGE_ID)` entries
-5. Fetches each page via Confluence REST API with basic auth
-6. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
-7. Writes the result to `memory/topics/` as a topic file
-8. Logs results to `output/4-sync-confluence.log`
+2. Filters results by `RELEVANT_TERMS` (must match) and `EXCLUDE_TERMS` (must not match)
+3. Compares against existing `(confluence:ID)` entries in MEMORY.md
+4. Auto-adds new relevant pages to the Topic Files section of MEMORY.md
+5. **Sync:** Scans MEMORY.md for all `(confluence:PAGE_ID)` entries
+6. Fetches each page via Confluence REST API with basic auth
+7. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
+8. Writes the result to `memory/topics/` as a topic file
+9. Logs results to `output/4-sync-confluence.log`
 
 **Search queries** are configured in the script:
 ```bash
@@ -560,6 +561,15 @@ SEARCH_QUERIES=(
 )
 ```
 Add more `"SPACE:keyword"` pairs to broaden discovery.
+
+**Relevance filters** are also configured in the script:
+```bash
+# Page title must contain at least one of these (case-insensitive)
+RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+
+# Page title matching any of these is skipped (case-insensitive)
+EXCLUDE_TERMS="upgrade|hack-ai-thon|hackathon|refactor from|loading indicator|pricing evaluation"
+```
 
 **To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
