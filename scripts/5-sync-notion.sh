@@ -80,8 +80,20 @@ for i, line in enumerate(lines):
     if '(confluence:' in line and '\`topics/' in line:
         last_confluence_idx = i
 
-# Insert after last notion entry, or after last confluence entry if no notion entries yet
+# Insert after last notion entry, or after last confluence entry, or after Topic Files header
 insert_idx = last_notion_idx if last_notion_idx >= 0 else last_confluence_idx
+if insert_idx < 0:
+    # Look for Topic Files section header
+    for i, line in enumerate(lines):
+        if 'Topic Files' in line and line.startswith('#'):
+            insert_idx = i + 2  # skip header and blank line
+            break
+if insert_idx < 0:
+    # No Topic Files section, append one
+    lines.append('')
+    lines.append('## Topic Files (on demand, read when relevant)')
+    lines.append('')
+    insert_idx = len(lines) - 1
 
 new_pages = []
 for r in data.get('results', []):

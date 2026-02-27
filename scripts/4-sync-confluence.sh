@@ -73,6 +73,19 @@ for i, line in enumerate(lines):
     if '(confluence:' in line and '\`topics/' in line:
         last_confluence_idx = i
 
+if last_confluence_idx < 0:
+    # Look for Topic Files section header
+    for i, line in enumerate(lines):
+        if 'Topic Files' in line and line.startswith('#'):
+            last_confluence_idx = i + 2  # skip header and blank line
+            break
+if last_confluence_idx < 0:
+    # No Topic Files section, append one
+    lines.append('')
+    lines.append('## Topic Files (on demand, read when relevant)')
+    lines.append('')
+    last_confluence_idx = len(lines) - 1
+
 relevant_terms = '$RELEVANT_TERMS'
 exclude_terms = '$EXCLUDE_TERMS'
 relevant_pattern = re.compile(relevant_terms, re.IGNORECASE)
