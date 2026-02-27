@@ -2,6 +2,18 @@
 
 Topical reference for quick lookup. See `logs.md` for chronological session history.
 
+## Bitbucket API
+
+(Learned per project: API base URL, auth, endpoints)
+## Branch Naming
+
+(Learned per project: branch patterns, target branch)
+## Project Architecture
+
+(Learned per project: services, directories, tech stack)
+## PR Review Patterns
+
+(Learned per project: PR types, review cadence, tool usage)
 ## Recurring Mistakes (Self-Corrections)
 
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
