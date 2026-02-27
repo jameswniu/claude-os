@@ -1,6 +1,6 @@
 # Claude Code Memory System
 
-A layered context and learning loop system for Claude Code. Execution rolled out in three phases. *Iterate on each phase before moving to the next.*
+An enterprise standards personalized assistant for Claude Code. A layered context and learning loop architecture. Executed in three phases, iterate on each phase.
 
 ## What Teams Are Asking
 
