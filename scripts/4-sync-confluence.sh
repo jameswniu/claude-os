@@ -6,8 +6,10 @@
 LOG_DIR="$HOME/claude-os/output"
 CONFLUENCE_BASE="https://basis.atlassian.net/wiki/rest/api/content"
 
-# Auto-detect: find the first MEMORY.md (prefer one with confluence: entries, fallback to any)
-MEMORY_FILE=$(grep -rl 'confluence:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+# Use MEMORY_FILE if passed (e.g. from bootstrap), otherwise auto-detect
+if [ -z "$MEMORY_FILE" ]; then
+    MEMORY_FILE=$(grep -rl 'confluence:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+fi
 if [ -z "$MEMORY_FILE" ]; then
     MEMORY_FILE=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)
 fi

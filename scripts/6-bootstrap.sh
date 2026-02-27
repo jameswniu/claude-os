@@ -57,6 +57,8 @@ echo "  Syncing topic files..."
 CONFLUENCE_COUNT=0
 NOTION_COUNT=0
 
+export MEMORY_FILE="$MEM/MEMORY.md"
+
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
     if bash "$CLAUDE_OS/scripts/4-sync-confluence.sh"; then
         CONFLUENCE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)

@@ -6,8 +6,10 @@
 LOG_DIR="$HOME/claude-os/output"
 NOTION_API="https://api.notion.com/v1"
 
-# Auto-detect: find the first MEMORY.md (prefer one with notion: entries, fallback to any)
-MEMORY_FILE=$(grep -rl 'notion:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+# Use MEMORY_FILE if passed (e.g. from bootstrap), otherwise auto-detect
+if [ -z "$MEMORY_FILE" ]; then
+    MEMORY_FILE=$(grep -rl 'notion:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+fi
 if [ -z "$MEMORY_FILE" ]; then
     MEMORY_FILE=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)
 fi
