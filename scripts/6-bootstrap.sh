@@ -54,9 +54,13 @@ fi
 echo ""
 echo "  Syncing topic files..."
 
+CONFLUENCE_COUNT=0
+NOTION_COUNT=0
+
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
     if bash "$CLAUDE_OS/scripts/4-sync-confluence.sh"; then
-        echo "  SYNCED   Confluence topics"
+        CONFLUENCE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        echo "  SYNCED   Confluence ($CONFLUENCE_COUNT topics)"
     else
         echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
     fi
@@ -66,7 +70,8 @@ fi
 
 if [ -n "$NOTION_TOKEN" ]; then
     if bash "$CLAUDE_OS/scripts/5-sync-notion.sh"; then
-        echo "  SYNCED   Notion topics"
+        NOTION_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        echo "  SYNCED   Notion ($NOTION_COUNT topics)"
     else
         echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
     fi
