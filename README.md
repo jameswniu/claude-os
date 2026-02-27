@@ -422,7 +422,27 @@ PAGES=(
 )
 ```
 
-**Requirements:** `CONFLUENCE_EMAIL` and `CONFLUENCE_TOKEN` environment variables set in the launchd plist (or exported in your shell for manual runs). Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens.
+**Setup:**
+
+1. Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens
+2. Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
+   ```bash
+   export CONFLUENCE_EMAIL="your.email@basis.com"
+   export CONFLUENCE_TOKEN="your-api-token"
+   ```
+3. For automated runs via launchd, add to the sync plist (`com.claude.memory-sync.plist`):
+   ```xml
+   <key>EnvironmentVariables</key>
+   <dict>
+       <key>CONFLUENCE_EMAIL</key>
+       <string>your.email@basis.com</string>
+       <key>CONFLUENCE_TOKEN</key>
+       <string>your-api-token</string>
+   </dict>
+   ```
+4. Test manually: `bash scripts/4-sync-confluence.sh`
+
+The script skips gracefully if credentials are not set. No errors, no data loss.
 
 **Cross-team access:** Topic files can pull from any Confluence space you have permission to read. To pull from another team's space, request access and add their page IDs to the registry.
 
