@@ -10,10 +10,10 @@ Four files loaded into every Claude Code session automatically.
 
 ```mermaid
 flowchart TD
-    A["📄 CLAUDE.md\nTeam Rules"]
-    B["📄 .claude/CLAUDE.md\nPersonal Rules"]
-    C["⚙️ settings.local.json\nPermissions"]
-    D["🧠 MEMORY.md\nLearned Patterns"]
+    A["📄 CLAUDE.md\nTeam rules, build commands,\narchitecture, code style"]
+    B["📄 .claude/CLAUDE.md\nPersonal workflow preferences,\nenvironment constraints"]
+    C["⚙️ settings.local.json\nTool permissions and\nauto-approval rules"]
+    D["🧠 MEMORY.md\nLearned patterns, API notes,\nproject conventions"]
     S["🤖 Claude Code Session"]
 
     A --> S
