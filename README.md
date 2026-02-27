@@ -88,9 +88,10 @@ flowchart TD
 |------|-------|----------|---------|--------|---------|
 | `CLAUDE.md` | 1 | Repo root | Team rules, build commands, architecture, code style | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
 | `.claude/CLAUDE.md` | 1 | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
-| `settings.local.json` | 1 | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Auto, every session | [view](EXAMPLES/.claude/settings.local.json) |
+| `settings.local.json` | 1 | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | 2 | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
 | `log.md` | 2 | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
+| Topic files | 1 | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | - |
 | `commands/review.md` | 1 | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
 ---
@@ -132,6 +133,8 @@ Set up the four core files that give Claude persistent context across sessions.
    ```
 
 4. **Memory** - Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
+
+5. **Topic files** (optional) - Drop additional markdown files in the memory directory alongside `MEMORY.md`. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Use them for reference material that's too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides.
 
 ### Verify
 
@@ -311,7 +314,9 @@ client = anthropic.Anthropic()
 │
 ~/.claude/projects/{project}/memory/
 ├── MEMORY.md                          ← Topical patterns (auto-loaded)
-├── log.md                             ← Session history (read on demand)
+├── log.md                             ← Session history (on demand)
+├── api-specs.md                       ← Topic file (on demand, zero tokens until read)
+├── confluence-runbook.md              ← Topic file (on demand, zero tokens until read)
 └── archive/
     └── YYYY-MM.md                     ← Rolled-off old logs
 ```
