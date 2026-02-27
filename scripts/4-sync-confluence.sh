@@ -28,7 +28,8 @@ FAILED=0
 
 for ENTRY in "${PAGES[@]}"; do
     IFS='|' read -r PAGE_ID FILENAME DESCRIPTION <<< "$ENTRY"
-    OUTFILE="$MEMORY_DIR/$FILENAME"
+    mkdir -p "$MEMORY_DIR/topics"
+    OUTFILE="$MEMORY_DIR/topics/$FILENAME"
 
     RESULT=$(curl -s -w "\n%{http_code}" -u "$CONFLUENCE_EMAIL:$CONFLUENCE_TOKEN" \
         "$CONFLUENCE_BASE/$PAGE_ID?expand=body.storage" \
@@ -63,26 +64,45 @@ md = h.handle(html)
 import re
 lines = md.split('\n')
 clean = []
+prev_line = ''
 for line in lines:
+    stripped = line.strip()
     # Skip lines that are just Confluence macro IDs/metadata
-    if re.match(r'^[a-f0-9]{10,}$', line.strip()):
+    if re.match(r'^[a-f0-9]{10,}$', stripped):
         continue
-    if re.match(r'^none$', line.strip()):
+    if re.match(r'^none$', stripped):
         continue
-    if re.match(r'^note[a-f0-9]+$', line.strip()):
+    if re.match(r'^note[a-f0-9]+$', stripped):
         continue
-    if re.match(r'^:.*:.*#', line.strip()):
+    if re.match(r'^:.*:.*#', stripped):
+        continue
+    # Skip lines that are just numbers + booleans (macro params)
+    if re.match(r'^[\d]+(true|false|default|flat|none)+', stripped):
+        continue
+    # Skip emoji codes like :zap: :bulb: at start of otherwise empty lines
+    if re.match(r'^:[a-z_]+:\s*$', stripped):
         continue
     # Remove trailing UUIDs from lines
     line = re.sub(r'\s+[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\s*$', '', line)
+    # Remove unnecessary backslash escapes
+    line = re.sub(r'\\([*._~])', r'\1', line)
+    # Skip duplicate consecutive lines
+    if stripped and stripped == prev_line:
+        continue
+    prev_line = stripped
     clean.append(line)
 
 md = '\n'.join(clean)
 
-# Remove duplicate consecutive headers
-md = re.sub(r'(\*\*[^*]+\*\*)\s*\n\s*\1', r'\1', md)
+# Remove status color suffixes (completeGreen, in progressYellow, etc.)
+md = re.sub(r'(complete|not started|in progress|cancelled)\s*(Green|Yellow|Red)', r'\1', md, flags=re.IGNORECASE)
 
-source = f'https://basis.atlassian.net/wiki/rest/api/content/{page_id}/view'
+# Collapse 3+ consecutive blank lines to 2
+md = re.sub(r'\n{3,}', '\n\n', md)
+
+# Human-readable source URL
+space_key = data.get('_expandable', {}).get('space', '').split('/')[-1] if '_expandable' in data else ''
+source = f'https://basis.atlassian.net/wiki/spaces/{space_key}/pages/{page_id}' if space_key else f'https://basis.atlassian.net/wiki/rest/api/content/{page_id}/view'
 print(f'# {title}\n\nSource: {source}\n\n{md}')
 " > "$OUTFILE" 2>/dev/null
 

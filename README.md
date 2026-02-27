@@ -114,7 +114,7 @@ flowchart TD
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
 | `log.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
-| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/tips-bash-mode.md) |
+| Topic files | `~/.claude/projects/{project}/memory/topics/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/topics/) |
 | `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
 ---
@@ -157,7 +157,7 @@ Set up the four core files that give Claude persistent context across sessions.
 
 4. **Memory** - Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
 
-5. **Topic files** (optional) - Drop additional markdown files in the memory directory alongside `MEMORY.md`. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Use them for reference material that's too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. Add one-line hints in `MEMORY.md` so Claude knows they exist and when to read them.
+5. **Topic files** (optional) - Create a `topics/` subfolder in the memory directory. Drop markdown files there for reference material too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Add one-line hints in `MEMORY.md` pointing to `topics/filename.md` so Claude knows they exist and when to read them.
 
    Topic files can be pulled from Confluence via API (`curl` with basic auth). Each team's Confluence space requires separate access, so topic files can cross-pull from other teams' spaces when given permission. This makes it easy to build a shared knowledge base across org boundaries without duplicating docs.
 
@@ -410,7 +410,7 @@ Keeps topic files fresh by re-fetching registered Confluence pages every 24 hour
 1. Reads a `PAGES` registry array in the script (page ID, filename, description)
 2. Fetches each page via Confluence REST API with basic auth
 3. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
-4. Writes the result to the memory directory as a topic file
+4. Writes the result to `memory/topics/` as a topic file
 5. Logs results to `output/4-sync-confluence.log`
 
 **To add a new page**, add a line to the `PAGES` array in `scripts/4-sync-confluence.sh`:
@@ -519,8 +519,10 @@ client = anthropic.Anthropic()
 ~/.claude/projects/{project}/memory/
 ├── MEMORY.md                          ← Topical patterns (auto-loaded)
 ├── log.md                             ← Session history (on demand)
-├── api-specs.md                       ← Topic file (on demand, zero tokens until read)
-├── confluence-runbook.md              ← Topic file (on demand, zero tokens until read)
+├── topics/                            ← Topic files (on demand, zero tokens until read)
+│   ├── claudehub.md                   ← Synced from Confluence
+│   ├── use-case-library.md            ← Synced from Confluence
+│   └── api-specs.md                   ← Manual or synced
 └── archive/
     └── YYYY-MM.md                     ← Rolled-off old logs
 ```
@@ -541,11 +543,12 @@ claude-os/
     ├── CLAUDE.md
     ├── memory
         ├── MEMORY.md
-        ├── claudehub.md
         ├── log.md
-        ├── plugin-marketplace.md
-        ├── tips-bash-mode.md
-        ├── use-case-library.md
+        ├── topics
+            ├── claudehub.md
+            ├── plugin-marketplace.md
+            ├── tips-bash-mode.md
+            ├── use-case-library.md
 ├── README.md
 ├── launchd
     ├── com.claude.memory-distill.plist

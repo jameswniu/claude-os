@@ -54,6 +54,15 @@ Topical reference for quick lookup. See `log.md` for chronological session histo
 - Hybrid memory system: MEMORY.md (topical lookup) + log.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
 
+## Topic Files
+
+Reference docs in `topics/` subfolder. Read on demand (zero tokens until opened).
+
+- `topics/claudehub.md` - ClaudeHub onboarding page, quick start, resources
+- `topics/use-case-library.md` - Proven prompts for code gen, debugging, testing, code review
+- `topics/tips-bash-mode.md` - Using `!` bash mode for efficient command execution
+- `topics/plugin-marketplace.md` - Plugin marketplace plan, repos, task status
+
 ## Claude Code File System
 
 - `/CLAUDE.md` - Team instructions, checked into git
@@ -62,3 +71,4 @@ Topical reference for quick lookup. See `log.md` for chronological session histo
 - `/.claude/settings.local.json` - Permission auto-approvals
 - `~/.claude/projects/{project}/memory/MEMORY.md` - This file, auto-loaded
 - `~/.claude/projects/{project}/memory/log.md` - Session log, read on demand
+- `~/.claude/projects/{project}/memory/topics/` - Topic files, read on demand
