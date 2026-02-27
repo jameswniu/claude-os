@@ -7,14 +7,13 @@ A layered context and learning loop system for Claude Code. Execution rolled out
 | Department | Top 3 Pain Points |
 |------------|-------------------|
 | **Apps Engineering** | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this 200-line function" |
-| **DSP Backend** | "Generate a REST endpoint with validation and tests" / "Why is this API returning 500? Here's the stack trace" / "Write unit tests for this service" |
-| **Front End** | "Create a React component following our patterns" / "Why is this component re-rendering?" / "Add TypeScript types to these components" |
-| **App/Data Engineering** | "Debug this data pipeline failure" / "Refactor this ETL script" / "Generate tests for this transformation" |
-| **Auth** | "Add a new auth endpoint with proper validation" / "Review this change for security vulnerabilities" / "Trace this auth flow, where is the token dropped?" |
-| **Platform / CI/CD** | "Fix this CI pipeline failure" / "Generate Helm values for this service" / "Why is this deployment failing? Here are the logs" |
-| **QA** | "Generate comprehensive tests for this module" / "These tests are flaky, find the root cause" / "Run the suite and fix all failures" |
+| **Data Engineering** | "Debug this data pipeline failure" / "Refactor this ETL script" / "Generate tests for this transformation" |
+| **Product Management** | "Summarize what shipped this sprint from the PR list" / "Draft acceptance criteria for this feature" / "What's the blast radius of removing this field?" |
+| **Security Ops** | "Review this change for auth vulnerabilities" / "Trace this token flow, where is it dropped?" / "Scan this PR for secrets or injection risks" |
 | **Data Science** | "Document this analysis pipeline" / "Review this notebook for correctness" / "Generate tests for this data model" |
-| **Release Management** | "Write a commit message with Jira ticket format" / "Create a PR with a comprehensive description" / "What changed between these two releases?" |
+| **Media Operations** | "What fields does this campaign export include?" / "Why is this report showing zero impressions?" / "Map these CSV columns to our schema" |
+| **Sales Engineering** | "Draft a technical response to this RFP section" / "What API endpoints does this integration need?" / "Generate a demo dataset for this client pitch" |
+| **Client Services** | "Explain this discrepancy between our report and the client's" / "What changed in the last release that affects this workflow?" / "Draft a client-facing summary of this bug fix" |
 
 Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
 
@@ -106,15 +105,15 @@ flowchart TD
 
 ## Quick Reference
 
-| File | Phase | Location | Purpose | Loaded | Example |
-|------|-------|----------|---------|--------|---------|
-| `CLAUDE.md` | 1 | Repo root | Team rules, build commands, architecture, code style | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
-| `.claude/CLAUDE.md` | 1 | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
-| `settings.local.json` | 1 | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
-| `MEMORY.md` | 2 | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
-| `log.md` | 2 | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
-| Topic files | 1 | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | - |
-| `commands/review.md` | 1 | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
+| File | Location | Purpose | Loaded | Example |
+|------|----------|---------|--------|---------|
+| `CLAUDE.md` | Repo root | Team rules, build commands, architecture, code style | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
+| `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
+| `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
+| `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
+| `log.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
+| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | - |
+| `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
 ---
 
@@ -168,7 +167,20 @@ Start a new Claude Code session and ask: "What do you know about this project?" 
 
 ## Phase 2: Manual Learning Loop
 
-Add a session log and manually run distill/promote cycles to build up your memory over time.
+Add a session log and manually run distill/promote cycles to build up your memory over time. This phase fits naturally into your existing team workflow.
+
+> **Note:** The loop below is for iteration only. You can manually write to any file at any time (log.md, MEMORY.md, .claude/CLAUDE.md, or the shared CLAUDE.md). However, it is recommended to leave the automated cadence to Phase 3 and focus here on learning the rhythm.
+
+### Who Does What
+
+| Action | Who | When | Target File |
+|--------|-----|------|-------------|
+| Log sessions | Individual developer | After each session | `log.md` (personal) |
+| Distill patterns | Individual developer | End of day | `MEMORY.md` (personal) |
+| Promote to personal rules | Individual developer | End of week | `.claude/CLAUDE.md` (personal, gitignored) |
+| Promote to team rules | Team together | End of sprint review | `CLAUDE.md` (shared, checked into git) |
+
+The first three steps are personal. The last step is a team activity: during sprint reviews or retros, share patterns that kept coming up across the team and collectively decide which ones belong in the shared `CLAUDE.md`.
 
 ### New File
 
@@ -181,7 +193,8 @@ Add a session log and manually run distill/promote cycles to build up your memor
 ```
 After each session  →  Append entry to log.md
 End of day          →  Distill log.md patterns into MEMORY.md
-End of week         →  Promote stable MEMORY.md patterns to .claude/CLAUDE.md
+End of week         →  Promote stable patterns to personal .claude/CLAUDE.md
+End of sprint       →  Team promotes shared patterns to CLAUDE.md (git tracked)
 ```
 
 ### Setup
@@ -211,12 +224,150 @@ End of week         →  Promote stable MEMORY.md patterns to .claude/CLAUDE.md
    Do not duplicate existing entries.
    ```
 
-4. **Promote (weekly)** - at the end of each week, tell Claude:
+4. **Promote to personal rules (weekly)** - at the end of each week, tell Claude:
    ```
    Read memory/MEMORY.md and .claude/CLAUDE.md.
    If any pattern in MEMORY.md appeared 3+ times and is not yet a rule,
    add it to .claude/CLAUDE.md under the appropriate section.
    ```
+
+5. **Promote to team rules (sprint review)** - during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example discussion:
+   ```
+   "Claude keeps trying to use gh CLI, which we don't have installed."
+   "Same here, three times this sprint."
+   → Add to CLAUDE.md: "gh CLI is NOT installed. Do not attempt to use it."
+   ```
+
+### Tutorials: Three Engineers, Three Workflows
+
+Each tutorial follows the same arc: start manual to learn the rhythm, set up automation, then go hands-off. You can always manually write to any file at any time.
+
+---
+
+#### Sarah, Backend Engineer (DSP Backend)
+
+Sarah builds REST APIs in Python/FastAPI. She uses Claude Code to generate endpoints, debug stack traces, and write tests.
+
+**Week 1: Manual iteration**
+
+Monday, she asks Claude to generate a new `/api/campaigns/:id/metrics` endpoint. Claude puts validation in the controller instead of the service layer.
+
+She logs it manually:
+```
+## 2026-03-03
+- Generated metrics endpoint. Claude put validation in controller instead of service layer.
+- Had to move validation to CampaignService.validate_metrics_params().
+- Claude also tried to import from `src.utils.validators` which doesn't exist.
+```
+
+End of day, she tells Claude to distill. MEMORY.md gets:
+```
+## Code Patterns
+- Validation logic belongs in the service layer, not controllers.
+- No `src.utils.validators` module exists. Validation helpers are in each service file.
+```
+
+By Friday, the same issue came up 3 more times. She promotes to her personal rules:
+```
+# .claude/CLAUDE.md (personal)
+## Code Patterns
+- Always put validation logic in the service layer, never in controllers.
+- There is no shared validators module. Each service handles its own validation.
+```
+
+**Week 2: Set up automation**
+
+She installs the Phase 3 scripts. The log, distill, and promote cycles now run on a schedule. She stops manually logging and distilling.
+
+**Week 3+: Hands-off**
+
+The automation handles the loop. Claude no longer puts validation in controllers. When she notices something new mid-session (e.g., a new API pattern), she still writes it directly to MEMORY.md or .claude/CLAUDE.md on the spot. The automation and manual writes coexist.
+
+---
+
+#### Marcus, Frontend Engineer (Basis UI)
+
+Marcus builds React components with TypeScript. He uses Claude Code for component scaffolding, debugging re-renders, and writing Jest tests.
+
+**Week 1: Manual iteration**
+
+Tuesday, he asks Claude to create a `CampaignCard` component. Claude uses `useEffect` for data fetching instead of React Query, and CSS modules instead of styled-components.
+
+He logs it:
+```
+## 2026-03-04
+- Generated CampaignCard. Claude used useEffect + fetch instead of React Query.
+- Had to refactor to useQuery with the existing queryClient setup.
+- Claude also generated CSS modules, but we use styled-components.
+```
+
+End of day, he distills to MEMORY.md:
+```
+## Frontend Patterns
+- Data fetching uses React Query (useQuery/useMutation), not useEffect + fetch.
+- Styling uses styled-components, not CSS modules.
+- Query client configured in src/providers/QueryProvider.tsx.
+```
+
+At the sprint retro, he shares: "Claude keeps generating useEffect for data fetching. Anyone else?" Three others nod. The team adds to the shared CLAUDE.md:
+```
+# CLAUDE.md (team, git tracked)
+## Frontend
+- Use React Query for all data fetching. Never use useEffect + fetch.
+- Use styled-components for styling. Never use CSS modules.
+```
+
+**Week 2: Set up automation**
+
+He installs the Phase 3 scripts. Personal logging and distilling are now automatic. Team promotes still happen at sprint reviews (those stay manual and collaborative).
+
+**Week 3+: Hands-off**
+
+Claude now scaffolds components with React Query and styled-components every time. When a new library gets adopted (e.g., Zustand for state), Marcus writes it directly to MEMORY.md without waiting for the automation cycle.
+
+---
+
+#### Priya, QA Engineer
+
+Priya writes and maintains test suites. She uses Claude Code to generate test cases, debug flaky tests, and improve coverage.
+
+**Week 1: Manual iteration**
+
+Wednesday, she asks Claude to generate tests for `OrderService.calculateTotal`. Claude generates 8 tests but misses the discount edge case and uses `jest.mock` instead of the team's `createMockService` helper.
+
+She logs it:
+```
+## 2026-03-05
+- Generated tests for calculateTotal. Missed discount edge case (negative totals).
+- Claude used jest.mock() directly. We have createMockService() helper in tests/helpers.
+- Had to add 2 edge case tests manually.
+```
+
+End of day, she distills:
+```
+## Testing Patterns
+- Test helpers in tests/helpers/: createMockService(), createMockUser(), etc.
+- Always test discount edge cases: zero, negative, exceeds-total scenarios.
+- Use createMockService() instead of raw jest.mock() for service mocks.
+```
+
+By Friday, she promotes:
+```
+# .claude/CLAUDE.md (personal)
+## Testing
+- Use helpers from tests/helpers/ (createMockService, createMockUser) instead of raw jest.mock.
+- For any calculation function, always include edge cases: zero, negative, overflow, null.
+```
+
+**Week 2: Set up automation**
+
+She installs the Phase 3 scripts. The loop runs automatically now. She notices Claude is still missing a specific pattern (factory fixtures), so she writes it directly to .claude/CLAUDE.md without waiting for the cycle.
+
+**Week 3+: Hands-off**
+
+Claude now uses `createMockService`, includes edge cases, and uses the factory fixtures she added manually. The automation catches any new patterns she doesn't bother to write herself.
+
+---
 
 ### What Good Looks Like
 
