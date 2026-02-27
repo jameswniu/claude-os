@@ -43,7 +43,7 @@ When you `cd` into a new repo and start Claude Code:
 To bootstrap a new repo with your templates:
 ```bash
 cd ~/new-repo
-bash ~/claude-os/scripts/6-init.sh
+bootstrap
 ```
 
 ### Phase 1: Static Context
@@ -52,7 +52,7 @@ Run the init script from any project directory. It copies template files only if
 
 ```bash
 cd ~/your-project
-bash ~/claude-os/scripts/6-init.sh
+bootstrap
 ```
 
 Then edit the files for your project:
