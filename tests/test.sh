@@ -94,6 +94,15 @@ grep -q "output/" "$REPO_DIR/.gitignore" && pass ".gitignore excludes output/" |
 # Test: no em dashes in README
 grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
 
+# Test: EXAMPLES templates have no project-specific content
+EX="$REPO_DIR/EXAMPLES"
+grep -q "media-strategy-generator" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md is generic"
+grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md is generic"
+grep -q "stash.centro.net" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific URLs" || pass "EXAMPLES/MEMORY.md is generic"
+grep -q "BP-29" "$EX/.claude/commands/review.md" && fail "EXAMPLES/review.md has project-specific tickets" || pass "EXAMPLES/review.md is generic"
+grep -q "REDACTED\|ATATT" "$EX/.claude/settings.local.json" && fail "EXAMPLES/settings.local.json has secrets" || pass "EXAMPLES/settings.local.json is clean"
+grep -q "(confluence:" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific topic entries" || pass "EXAMPLES/MEMORY.md topic entries are clean"
+
 # Test: plist files are valid XML
 for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
   NAME=$(basename "$PLIST")
