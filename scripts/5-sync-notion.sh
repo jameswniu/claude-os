@@ -1,31 +1,36 @@
 #!/bin/bash
 # 5-sync-notion.sh — Runs every 24 hours
-# Re-fetches registered Notion pages into topic files in the memory directory
+# Scans MEMORY.md for (notion:ID) entries and syncs them to topic files
 
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
 LOG_DIR="/Users/james.niu/claude-os/output"
 NOTION_API="https://api.notion.com/v1"
+MEMORY_FILE="$MEMORY_DIR/MEMORY.md"
 
 mkdir -p "$LOG_DIR"
 
-# Auth: reads from environment variable NOTION_TOKEN
 if [ -z "$NOTION_TOKEN" ]; then
     echo "$(date): NOTION_TOKEN not set, skipping" >> "$LOG_DIR/5-sync-notion.log"
     exit 0
 fi
 
-# Registry: page_id | filename | description
-# Add new pages here to sync them automatically
-# To find a page ID: open the page in Notion, copy the URL, the ID is the 32-char hex string at the end
-PAGES=(
-    # "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|example.md|Example page"
-)
+if [ ! -f "$MEMORY_FILE" ]; then
+    echo "$(date): MEMORY.md not found at $MEMORY_FILE, skipping" >> "$LOG_DIR/5-sync-notion.log"
+    exit 0
+fi
 
+# Parse MEMORY.md for lines matching: `topics/filename.md` — description (notion:PAGE_ID)
 SYNCED=0
 FAILED=0
 
-for ENTRY in "${PAGES[@]}"; do
-    IFS='|' read -r PAGE_ID FILENAME DESCRIPTION <<< "$ENTRY"
+while IFS= read -r LINE; do
+    FILENAME=$(echo "$LINE" | sed -n 's/.*`topics\/\([^`]*\)`.*/\1/p')
+    PAGE_ID=$(echo "$LINE" | sed -n 's/.*(notion:\([^)]*\)).*/\1/p')
+
+    if [ -z "$FILENAME" ] || [ -z "$PAGE_ID" ]; then
+        continue
+    fi
+
     mkdir -p "$MEMORY_DIR/topics"
     OUTFILE="$MEMORY_DIR/topics/$FILENAME"
 
@@ -62,12 +67,19 @@ for ENTRY in "${PAGES[@]}"; do
         continue
     fi
 
-    # Convert Notion blocks to markdown
-    python3 -c "
-import sys, json
+    # Write blocks JSON to temp file to avoid shell quoting issues
+    TMPFILE=$(mktemp)
+    TITLE_TMPFILE=$(mktemp)
+    echo "$TITLE_BODY" > "$TITLE_TMPFILE"
+    echo "$BODY" > "$TMPFILE"
 
-title_data = json.loads('''$TITLE_BODY''')
-blocks_data = json.loads('''$BODY''')
+    python3 -c "
+import sys, json, re
+
+with open('$TITLE_TMPFILE') as f:
+    title_data = json.load(f)
+with open('$TMPFILE') as f:
+    blocks_data = json.load(f)
 
 # Extract title
 title = 'Untitled'
@@ -159,13 +171,12 @@ for block in blocks_data.get('results', []):
         lines.append(line)
 
 md = '\n\n'.join(lines)
-
-# Collapse 3+ consecutive blank lines to 2
-import re
 md = re.sub(r'\n{3,}', '\n\n', md)
 
 print(f'# {title}\n\nSource: {source}\n\n{md}')
 " > "$OUTFILE" 2>/dev/null
+
+    rm -f "$TMPFILE" "$TITLE_TMPFILE"
 
     if [ $? -eq 0 ]; then
         LINES=$(wc -l < "$OUTFILE")
@@ -175,6 +186,6 @@ print(f'# {title}\n\nSource: {source}\n\n{md}')
         echo "$(date): FAILED $FILENAME (parse error)" >> "$LOG_DIR/5-sync-notion.log"
         FAILED=$((FAILED + 1))
     fi
-done
+done < <(grep 'notion:' "$MEMORY_FILE" | grep '`topics/')
 
 echo "$(date): Sync complete. $SYNCED synced, $FAILED failed." >> "$LOG_DIR/5-sync-notion.log"
