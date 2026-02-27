@@ -669,6 +669,11 @@ OK use-case-library.md (461 lines)
 Sync complete. 2 synced, 0 failed.
 ```
 
+After syncing, run `checkpoint` to snapshot the new topic files to the `EXAMPLES/` directory in the repo:
+```bash
+checkpoint
+```
+
 ### Option A: Local (macOS launchd)
 
 Best for individual use. Runs when your Mac is on, catches up on missed runs after sleep.
