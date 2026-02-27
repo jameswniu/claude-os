@@ -27,23 +27,24 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 ```
 
-### What happens when you switch repos?
+### Switching repos
 
-Each project gets its own isolated workspace. When you `cd` into a different repo and start Claude Code, it loads that project's files only.
+All files persist on disk, but most are scoped per project directory. When you `cd` into a different repo, Claude Code loads that project's files only.
 
-| File | Location | Persists? | Comes with clone? | Need to set up per repo? |
-|------|----------|-----------|-------------------|--------------------------|
-| `CLAUDE.md` | Repo root | Yes (in git) | Yes | No (if repo has one) |
-| `.claude/CLAUDE.md` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
-| `.claude/settings.local.json` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
-| `.claude/commands/` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
-| `MEMORY.md` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
-| `logs.md` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
-| `topics/` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
-| `~/.claude/CLAUDE.md` | Home directory | Yes | N/A | No (global, loads everywhere) |
-| `~/.claude/settings.json` | Home directory | Yes | N/A | No (global) |
+| File | Scoped per repo? | Needs setup? |
+|------|-------------------|--------------|
+| `CLAUDE.md` | Yes (in git) | No, comes with clone |
+| `.claude/CLAUDE.md` | Yes (gitignored) | Yes |
+| `.claude/settings.local.json` | Yes (gitignored) | Yes |
+| `.claude/commands/` | Yes (gitignored) | Yes |
+| `MEMORY.md`, `logs.md`, `topics/` | Yes (`~/.claude/projects/{slug}/memory/`) | Yes |
+| `~/.claude/CLAUDE.md` | No (global) | No, loads everywhere |
 
-**Bottom line:** All files persist on disk, but most are scoped per project. When you clone a new repo, run `bash ~/claude-os/scripts/6-init.sh` to bootstrap it with your templates.
+When you clone a new repo:
+```bash
+cd ~/new-repo
+bash ~/claude-os/scripts/6-init.sh
+```
 
 ### Phase 1: Static Context
 
