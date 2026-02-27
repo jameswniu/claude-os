@@ -10,10 +10,10 @@ Four files loaded into every Claude Code session automatically.
 
 ```mermaid
 flowchart TD
-    A["📄 CLAUDE.md - Team Rules"]
-    B["📄 .claude/CLAUDE.md - Personal Rules"]
-    C["⚙️ settings.local.json - Permissions"]
-    D["🧠 MEMORY.md - Learned Patterns"]
+    A["📄 CLAUDE.md\nTeam Rules"]
+    B["📄 .claude/CLAUDE.md\nPersonal Rules"]
+    C["⚙️ settings.local.json\nPermissions"]
+    D["🧠 MEMORY.md\nLearned Patterns"]
     S["🤖 Claude Code Session"]
 
     A --> S
@@ -33,7 +33,7 @@ flowchart TD
 Session data flows through three stages: log, distill, promote.
 
 ```mermaid
-flowchart TD
+flowchart LR
     S["Session"] -- "every 1h" --> L["log.md"]
     L -- "every 24h" --> D["MEMORY.md"]
     D -- "every 7d" --> R[".claude/CLAUDE.md"]
@@ -53,7 +53,7 @@ flowchart TD
 ### Automation Scripts
 
 ```mermaid
-flowchart TD
+flowchart LR
     C["Scheduler"]
 
     C -- triggers --> L1["1-log.sh\nevery 1h"]
