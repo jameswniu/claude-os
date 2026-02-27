@@ -27,6 +27,24 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 ```
 
+### What happens when you switch repos?
+
+Each project gets its own isolated workspace. When you `cd` into a different repo and start Claude Code, it loads that project's files only.
+
+| File | Location | Persists? | Comes with clone? | Need to set up per repo? |
+|------|----------|-----------|-------------------|--------------------------|
+| `CLAUDE.md` | Repo root | Yes (in git) | Yes | No (if repo has one) |
+| `.claude/CLAUDE.md` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
+| `.claude/settings.local.json` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
+| `.claude/commands/` | Inside repo | Yes (on disk) | No (gitignored) | Yes |
+| `MEMORY.md` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
+| `logs.md` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
+| `topics/` | `~/.claude/projects/{slug}/memory/` | Yes (on disk) | No | Yes |
+| `~/.claude/CLAUDE.md` | Home directory | Yes | N/A | No (global, loads everywhere) |
+| `~/.claude/settings.json` | Home directory | Yes | N/A | No (global) |
+
+**Bottom line:** All files persist on disk, but most are scoped per project. When you clone a new repo, run `bash ~/claude-os/scripts/6-init.sh` to bootstrap it with your templates.
+
 ### Phase 1: Static Context
 
 Run the init script from any project directory. It copies template files only if they don't already exist.
