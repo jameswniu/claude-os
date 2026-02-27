@@ -562,7 +562,7 @@ EXCLUDE_TERMS="upgrade|hack-ai-thon|hackathon|refactor from|loading indicator|pr
 
 **To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
-- `topics/my-page.md` — Description of the page (confluence:1597341723)
+- `topics/my-page.md` - Description of the page (confluence:1597341723)
 ```
 
 Existing topic files are refreshed on every run, never deleted.
@@ -624,7 +624,7 @@ EXCLUDE_TERMS="upgrade|hackathon|meeting notes|archive"
 
 **To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
-- `topics/my-page.md` — Description (notion:PAGE_ID)
+- `topics/my-page.md` - Description (notion:PAGE_ID)
 ```
 
 To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end.
