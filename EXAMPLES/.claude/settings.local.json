@@ -57,7 +57,9 @@
       "Bash(claude:*)",
       "Bash(pmset:*)",
       "Bash(sudo pmset:*)",
-      "Bash(do:*)"
+      "Bash(do:*)",
+      "Bash(sed:*)",
+      "Bash(~/.local/bin/bootstrap:*)"
     ]
   }
 }

@@ -111,6 +111,27 @@
 - Fixed Confluence token placeholder in `com.claude.memory-sync.plist` (was `YOUR_TOKEN_HERE`, replaced with real token)
 - Discovered PATH issue in all 4 launchd plists: `claude` lives at `~/.local/bin/claude` but plists only had `/usr/local/bin:/usr/bin:/bin`. Added `~/.local/bin` to PATH in all 4 plists
 - Applied `sudo pmset -a displaysleep 15 sleep 0 disksleep 0` to prevent Mac from sleeping (launchd jobs now run 24/7 even with screen locked)
+- Squashed multiple pushes into clean commits on claude-os repo
+- Iterated on README FAQ formatting: user corrected to put answers below questions (not inline), remove em dashes, limit copy-paste boxes to runnable code only
+- Verified all 4 launchd schedules running properly after PATH/token/script fixes
+- Discussed platform limitation: launchd automation is macOS-only; Linux would need cron/systemd
+- Discussed power loss/restart: launchd auto-restarts jobs on reboot, no manual intervention needed
+- Ran checkpoint to snapshot config/memory files to claude-os repo
+- Updated MEMORY.md with documentation style rules, pmset setting, and claude-os repo details
+
+### README Polish (afternoon session)
+- Restored copy-pasteable code blocks that were incorrectly converted to blockquotes in previous commit (JSON config, markdown templates, distill/promote prompts, PAGES array, plist XML, Python API snippet)
+- Split Install block into separate code blocks per step, removing shell comments that broke copy-paste
+- Updated FAQ: "What about sleep?" now explains jobs pause and includes pmset fix; added "Does this only work on Mac?" question
+- Changed FAQ formatting: answers use blockquote style (`>`) below each question per user preference
+- Replaced all em dashes with hyphens throughout README
+- Attempted to squash all README commits but realized nearly every commit (65 total) touches README, making selective squash impractical. Left history as-is.
+
+### Launchd Hardening & CLI Shortcuts (late session)
+- Verified launchd scheduled runs via `launchctl kickstart` smoke test, confirmed `claude` found on PATH
+- Renamed `6-init.sh` to `6-bootstrap.sh` across all references (README, install.sh, update-readme.sh, zshrc alias)
+- Confirmed CLI shortcuts: `checkpoint` (push live to git) and `bootstrap` (pull git to live workspace) are zsh aliases in `.zshrc`
+- Updated `install.sh` to add shell aliases to `.zshrc` and `source` automatically so new users don't need a manual reload
 
 ---
 

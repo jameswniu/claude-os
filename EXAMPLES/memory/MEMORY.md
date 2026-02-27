@@ -77,7 +77,11 @@ Reference docs in `topics/` subfolder. Zero tokens until read.
 - `launchd/` — macOS scheduler plists for scripts 1-4
 - `tests/test.sh` — 46 validation tests
 - Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo
-- Automation scripts must run in order (1→2→3→4) from a separate zsh terminal
+- Automation scripts must run in order (1→2→3→4); can run from Claude Code terminal now (fixed)
+- Scripts 1-3 need `unset CLAUDECODE` before `claude -p` to avoid nested session error
+- Launchd plists at `~/Library/LaunchAgents/com.claude.memory-*.plist`
+- Launchd PATH must include `~/.local/bin` (where `claude` is installed)
+- `pmset sleep 0` applied to keep Mac awake so launchd jobs run 24/7
 - Company rollout plan: (1) CLAUDE.md, personal CLAUDE.md, memory, settings.local.json (2) add logs.md, manual learning loop (3) local/cloud setup, automatic loop
 - Documentation style: FAQ answers below questions (not inline), copy-paste boxes only for runnable code (not prose/explanations)
 
