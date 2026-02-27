@@ -1,6 +1,7 @@
 #!/bin/bash
 # 5-sync-notion.sh — Runs every 24 hours
-# Scans MEMORY.md for (notion:ID) entries and syncs them to topic files
+# 1. Auto-discovers new relevant Notion pages and adds them to MEMORY.md
+# 2. Syncs all (notion:ID) entries from MEMORY.md to topic files
 
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
 LOG_DIR="/Users/james.niu/claude-os/output"
@@ -19,7 +20,98 @@ if [ ! -f "$MEMORY_FILE" ]; then
     exit 0
 fi
 
-# Parse MEMORY.md for lines matching: `topics/filename.md` — description (notion:PAGE_ID)
+# --- Phase 1: Auto-discover new pages ---
+
+# Search queries (Notion search API searches across all shared pages)
+SEARCH_QUERIES=(
+    "claude"
+    "AI tools"
+    "prompt"
+)
+
+# Relevance filter: page title must contain at least one of these terms (case-insensitive)
+RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+
+# Exclude filter: page titles matching these terms are skipped (case-insensitive)
+EXCLUDE_TERMS="upgrade|hackathon|meeting notes|archive"
+
+# Collect already-synced page IDs from MEMORY.md
+EXISTING_IDS=$(grep 'notion:' "$MEMORY_FILE" | sed -n 's/.*(notion:\([^)]*\)).*/\1/p')
+
+for QUERY in "${SEARCH_QUERIES[@]}"; do
+    SEARCH_RESULT=$(curl -s -X POST \
+        "$NOTION_API/search" \
+        -H "Authorization: Bearer $NOTION_TOKEN" \
+        -H "Notion-Version: 2022-06-28" \
+        -H "Content-Type: application/json" \
+        -d "{\"query\": \"$QUERY\", \"filter\": {\"value\": \"page\", \"property\": \"object\"}, \"page_size\": 25}")
+
+    TMPFILE=$(mktemp)
+    echo "$SEARCH_RESULT" > "$TMPFILE"
+
+    python3 -c "
+import json, re
+
+with open('$TMPFILE') as f:
+    data = json.load(f)
+
+existing = set('''$EXISTING_IDS'''.split())
+memory_file = '$MEMORY_FILE'
+relevant_terms = '$RELEVANT_TERMS'
+exclude_terms = '$EXCLUDE_TERMS'
+relevant_pattern = re.compile(relevant_terms, re.IGNORECASE)
+exclude_pattern = re.compile(exclude_terms, re.IGNORECASE)
+
+with open(memory_file) as f:
+    content = f.read()
+
+lines = content.split('\n')
+last_notion_idx = -1
+last_confluence_idx = -1
+for i, line in enumerate(lines):
+    if '(notion:' in line and '\`topics/' in line:
+        last_notion_idx = i
+    if '(confluence:' in line and '\`topics/' in line:
+        last_confluence_idx = i
+
+# Insert after last notion entry, or after last confluence entry if no notion entries yet
+insert_idx = last_notion_idx if last_notion_idx >= 0 else last_confluence_idx
+
+new_pages = []
+for r in data.get('results', []):
+    page_id = r['id'].replace('-', '')
+    # Extract title
+    title = 'Untitled'
+    props = r.get('properties', {})
+    for key, val in props.items():
+        if val.get('type') == 'title':
+            title_parts = val.get('title', [])
+            title = ''.join(t.get('plain_text', '') for t in title_parts)
+            break
+    if page_id not in existing and relevant_pattern.search(title) and not exclude_pattern.search(title):
+        filename = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.md'
+        new_pages.append((page_id, filename, title))
+        existing.add(page_id)
+
+if new_pages and insert_idx >= 0:
+    new_lines = []
+    for page_id, filename, title in new_pages:
+        new_lines.append(f'- \`topics/{filename}\` — {title} (notion:{page_id})')
+    lines = lines[:insert_idx + 1] + new_lines + lines[insert_idx + 1:]
+    with open(memory_file, 'w') as f:
+        f.write('\n'.join(lines))
+
+print(len(new_pages))
+" 2>/dev/null
+
+    rm -f "$TMPFILE"
+done
+
+TOTAL_NEW=$(grep -c 'notion:' "$MEMORY_FILE")
+echo "$(date): Discovery complete. $TOTAL_NEW total notion entries in MEMORY.md" >> "$LOG_DIR/5-sync-notion.log"
+
+# --- Phase 2: Sync all entries ---
+
 SYNCED=0
 FAILED=0
 

@@ -140,13 +140,7 @@ source ~/.zshrc
 
 Share each Notion page with the integration (page `...` menu > "Connections" > add integration).
 
-Notion pages must be added manually to MEMORY.md (no auto-discovery). Add entries under the Topic Files section:
-```markdown
-- `topics/my-page.md` — Description (notion:PAGE_ID)
-```
-To find the page ID: copy the Notion URL, the ID is the 32-character hex string at the end.
-
-Then install and run the first sync:
+Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
 bash ~/claude-os/scripts/5-sync-notion.sh
@@ -526,7 +520,7 @@ Automate the loop so it runs without manual intervention.
 | Every 1 hour | `1-log.sh` | Append new sessions to logs.md |
 | Every 24 hours | `2-distill.sh` | Distill logs.md patterns into MEMORY.md |
 | Every 24 hours | `4-sync-confluence.sh` | Auto-discover + sync Confluence pages to topic files |
-| Every 24 hours | `5-sync-notion.sh` | Sync Notion pages to topic files |
+| Every 24 hours | `5-sync-notion.sh` | Auto-discover + sync Notion pages to topic files |
 | Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.md |
 
 Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Scripts 4-5 sync external pages directly via REST API (no LLM needed).
@@ -599,24 +593,42 @@ The script skips gracefully if credentials are not set. No errors, no data loss.
 
 ### Notion Sync (5-sync-notion.sh)
 
-Keeps topic files fresh by re-fetching registered Notion pages every 24 hours.
+Auto-discovers new Notion pages and keeps topic files fresh every 24 hours.
 
 **How it works:**
-1. Scans `MEMORY.md` for lines containing `(notion:PAGE_ID)`
-2. Extracts the filename from `` `topics/filename.md` `` and the page ID from the tag
-3. Fetches each page's blocks via Notion API with bearer auth
-4. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
-5. Writes the result to `memory/topics/` as a topic file
-6. Logs results to `output/5-sync-notion.log`
+1. **Discovery:** Searches Notion using configured `SEARCH_QUERIES` via the search API
+2. Filters results by `RELEVANT_TERMS` (must match) and `EXCLUDE_TERMS` (must not match)
+3. Compares against existing `(notion:ID)` entries in MEMORY.md
+4. Auto-adds new relevant pages to the Topic Files section of MEMORY.md
+5. **Sync:** Scans MEMORY.md for all `(notion:PAGE_ID)` entries
+6. Fetches each page's blocks via Notion API with bearer auth
+7. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
+8. Writes the result to `memory/topics/` as a topic file
+9. Logs results to `output/5-sync-notion.log`
 
-**To add a new page**, add a line to the Topic Files section of your `MEMORY.md`:
+**Search queries** are configured in the script:
+```bash
+SEARCH_QUERIES=(
+    "claude"
+    "AI tools"
+    "prompt"
+)
+```
+
+**Relevance filters** are also configured in the script:
+```bash
+RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
+EXCLUDE_TERMS="upgrade|hackathon|meeting notes|archive"
+```
+
+**To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
-- `topics/my-page.md` — Description of the page (notion:abc123def456abc123def456abc123de)
+- `topics/my-page.md` — Description (notion:PAGE_ID)
 ```
 
 To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end.
 
-The next scheduled run (or manual run) will pick it up and create the topic file. Existing topic files are refreshed, never deleted.
+Existing topic files are refreshed on every run, never deleted.
 
 **Setup:**
 
