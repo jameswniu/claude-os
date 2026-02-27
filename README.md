@@ -25,6 +25,7 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
+bash ~/claude-os/install.sh
 ```
 
 ### Switching repos
@@ -74,7 +75,7 @@ bootstrap
 Run the init script from any project directory. It copies template files only if they don't already exist.
 
 ```bash
-cd ~/your-project
+cd ~/<your-project>
 bootstrap
 ```
 
@@ -89,12 +90,12 @@ Verify: start a new Claude Code session and ask "What do you know about this pro
 
 No setup needed. Just follow this rhythm as you work:
 
-```
-After each session  ->  Tell Claude: "Log what we did to logs.md"
-End of day          ->  Tell Claude: "Distill today's logs into MEMORY.md"
-End of week         ->  Tell Claude: "Promote stable patterns to .claude/CLAUDE.md"
-End of sprint       ->  Team promotes shared patterns to CLAUDE.md (git tracked)
-```
+| When | Action |
+|------|--------|
+| After each session | Tell Claude: "Log what we did to logs.md" |
+| End of day | Tell Claude: "Distill today's logs into MEMORY.md" |
+| End of week | Tell Claude: "Promote stable patterns to .claude/CLAUDE.md" |
+| End of sprint | Team promotes shared patterns to CLAUDE.md (git tracked) |
 
 ### Phase 3: Automation
 
@@ -306,12 +307,12 @@ The first three steps are personal. The last step is a team activity: during spr
 
 ### The Loop
 
-```
-After each session  →  Append entry to logs.md
-End of day          →  Distill logs.md patterns into MEMORY.md
-End of week         →  Promote stable patterns to personal .claude/CLAUDE.md
-End of sprint       →  Team promotes shared patterns to CLAUDE.md (git tracked)
-```
+| When | Action | Target |
+|------|--------|--------|
+| After each session | Append entry | `logs.md` |
+| End of day | Distill patterns | `MEMORY.md` |
+| End of week | Promote stable rules | `.claude/CLAUDE.md` |
+| End of sprint | Team promotes shared rules | `CLAUDE.md` (git tracked) |
 
 ### Setup
 
@@ -684,6 +685,7 @@ claude-os/
             ├── tips-bash-mode.md
             ├── use-case-library.md
 ├── README.md
+├── install.sh
 ├── launchd
     ├── com.claude.memory-distill.plist
     ├── com.claude.memory-log.plist
