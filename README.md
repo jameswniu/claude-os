@@ -84,14 +84,14 @@ flowchart TD
 
 ## Quick Reference
 
-| File | Phase | Location | Purpose | Scope | Editable By | Loaded | Example |
-|------|-------|----------|---------|-------|-------------|--------|---------|
-| `CLAUDE.md` | 1 | Repo root | Team rules, build commands, architecture, code style | Team | You | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
-| `.claude/CLAUDE.md` | 1 | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Personal | You + Claude | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
-| `settings.local.json` | 1 | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Personal | You + Claude | Auto, every session | [view](EXAMPLES/.claude/settings.local.json) |
-| `MEMORY.md` | 2 | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Per-project | Claude | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
-| `log.md` | 2 | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | Per-project | Claude | On demand | [view](EXAMPLES/memory/log.md) |
-| `commands/review.md` | 1 | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | Team/Personal | You | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
+| File | Phase | Location | Purpose | Loaded | Example |
+|------|-------|----------|---------|--------|---------|
+| `CLAUDE.md` | 1 | Repo root | Team rules, build commands, architecture, code style | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
+| `.claude/CLAUDE.md` | 1 | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
+| `settings.local.json` | 1 | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Auto, every session | [view](EXAMPLES/.claude/settings.local.json) |
+| `MEMORY.md` | 2 | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
+| `log.md` | 2 | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/log.md) |
+| `commands/review.md` | 1 | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
 ---
 
