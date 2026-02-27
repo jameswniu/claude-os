@@ -61,16 +61,13 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in `topics/` subfolder. Zero tokens until read.
-
-- `topics/claudehub.md` — ClaudeHub main page (confluence:1597341723)
-- `topics/use-case-library.md` — AI dev tools use-case library (confluence:1559166979)
-- `topics/tips-bash-mode.md` — Tip: using bash mode (confluence:1588723799)
-- `topics/plugin-marketplace.md` — Plugin marketplace plan (confluence:1527939210)
-- `topics/ai-code-reviewer.md` — AI Code Reviewer Project (confluence:1583513725)
-- `topics/ai-updates-q4-2025.md` — Apps Engineering AI Updates Q4 2025 (confluence:1531248685)
-- `topics/ai-tools-quickstart.md` — AI Tools Quick Start Initiative (confluence:1530822736)
-- `topics/claude-code-pricing.md` — Claude Code Pricing Evaluation (confluence:1492484268)
-- `topics/ai-pr-summaries.md` — AI Generated PR Summaries (confluence:1425604970)
+- `topics/scalable-applications-and-architecture.md` — Scalable Applications and Architecture (confluence:505544931)
+- `topics/tickets-branching-and-pull-requests-oh-my.md` — Tickets, Branching and Pull Requests Oh My! (confluence:35815828)
+- `topics/archived-git-branching-and-pull-request-guidelines.md` — Archived: Git Branching and Pull Request Guidelines (confluence:35815542)
+- `topics/claudehub.md` — ClaudeHub (confluence:1597341723)
+- `topics/ai-development-tools-use-case-library.md` — AI Development Tools: Use-Case Library (confluence:1559166979)
+- `topics/ai-code-reviewer-project.md` — AI Code Reviewer Project (confluence:1583513725)
+- `topics/informal-tech-mentorship.md` — Informal Tech Mentorship (confluence:35815632)
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
 
 ## Claude OS Repo

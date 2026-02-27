@@ -154,6 +154,13 @@
 - Key learning: always run `checkpoint` after syncing to push topic files to the repo
 - Multiple commits pushed to claude-os repo across the session (55e1a7b through 48a5ae5)
 
+### Bootstrap & Auto-Checkpoint (session)
+- Diagnosed bootstrap not syncing slash commands: `.claude/commands/` exists in EXAMPLES but `6-bootstrap.sh` never copied it
+- Added slash commands sync loop to `6-bootstrap.sh` (always overwrite with latest, same pattern as topic files)
+- Added `chpwd` hook to `~/.zshrc`: auto-checkpoints in background when leaving a directory with `.claude/`
+- Guards against forgetting to checkpoint before switching projects
+- Committed and pushed to claude-os repo
+
 ---
 
 ## Cumulative Friction Log
