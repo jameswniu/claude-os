@@ -321,21 +321,32 @@ client = anthropic.Anthropic()
 **This repo (Phase 3 automation):**
 ```
 claude-os/
+├── .github
+    ├── workflows
+        ├── test.yml
+├── .gitignore
+├── EXAMPLES
+    ├── .claude
+        ├── CLAUDE.md
+        ├── commands
+            ├── review.md
+        ├── settings.local.json
+    ├── CLAUDE.md
+    ├── memory
+        ├── MEMORY.md
+        ├── log.md
 ├── README.md
-├── scripts/
-│   ├── 1-log.sh                       ← Append new sessions to log.md
-│   ├── 2-distill.sh                   ← Distill log patterns into MEMORY.md
-│   └── 3-promote.sh                   ← Promote stable patterns to CLAUDE.md
-├── launchd/
-│   ├── com.claude.memory-log.plist    ← Every 1 hour
-│   ├── com.claude.memory-distill.plist← Every 24 hours
-│   └── com.claude.memory-promote.plist← Every 7 days
-├── tests/
-│   └── test.sh                        ← 37 validation checks
-├── .github/
-│   └── workflows/
-│       └── test.yml                   ← CI on push and PR
-└── output/                            ← Script execution logs (gitignored)
+├── launchd
+    ├── com.claude.memory-distill.plist
+    ├── com.claude.memory-log.plist
+    ├── com.claude.memory-promote.plist
+├── scripts
+    ├── 1-log.sh
+    ├── 2-distill.sh
+    ├── 3-promote.sh
+    ├── update-readme.sh
+├── tests
+    ├── test.sh
 ```
 
 ---
