@@ -348,14 +348,9 @@ The first three steps are personal. The last step is a team activity: during spr
    add it to .claude/CLAUDE.md under the appropriate section.
    ```
 
-5. **Promote to team rules (sprint review)** - during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example discussion:
-   ```
-   "Claude keeps trying to use gh CLI, which we don't have installed."
-   "Same here, three times this sprint."
-   → Add to CLAUDE.md: "gh CLI is NOT installed. Do not attempt to use it."
-   ```
+5. **Promote to team rules (sprint review)** - during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example: *"Claude keeps trying to use gh CLI." "Same here, three times this sprint."* → Add to CLAUDE.md: `gh CLI is NOT installed. Do not attempt to use it.`
 
-### Tutorials: Three Engineers, Three Workflows
+### Tutorials: Three Roles, Three Workflows
 
 Each tutorial follows the same arc: start manual to learn the rhythm, set up automation, then go hands-off. You can always manually write to any file at any time.
 
@@ -402,87 +397,89 @@ The automation handles the loop. Claude no longer puts validation in controllers
 
 ---
 
-#### Marcus, Frontend Engineer (Basis UI)
+#### Derek, Sales Engineer (Enterprise Sales)
 
-Marcus builds React components with TypeScript. He uses Claude Code for component scaffolding, debugging re-renders, and writing Jest tests.
+Derek responds to RFPs and prepares technical demos. He uses Claude Code to draft proposal sections, compare features against competitors, and summarize product updates for client meetings.
 
 **Week 1: Manual iteration**
 
-Tuesday, he asks Claude to create a `CampaignCard` component. Claude uses `useEffect` for data fetching instead of React Query, and CSS modules instead of styled-components.
+Tuesday, a client sends an RFP asking about real-time reporting capabilities. Derek asks Claude to draft a response. Claude writes a generic answer that misses Basis-specific terminology and includes features that don't exist yet.
 
 He logs it:
 ```
 ## 2026-03-04
-- Generated CampaignCard. Claude used useEffect + fetch instead of React Query.
-- Had to refactor to useQuery with the existing queryClient setup.
-- Claude also generated CSS modules, but we use styled-components.
+- Drafted RFP response for real-time reporting. Claude used "dashboard" instead of "Insights Hub."
+- Included predictive analytics as a feature. That's on the roadmap, not shipped.
+- Had to rewrite 60% of the response to match our product language.
 ```
 
 End of day, he distills to MEMORY.md:
 ```
-## Frontend Patterns
-- Data fetching uses React Query (useQuery/useMutation), not useEffect + fetch.
-- Styling uses styled-components, not CSS modules.
-- Query client configured in src/providers/QueryProvider.tsx.
+## Product Language
+- Real-time reporting product is called "Insights Hub," not "dashboard" or "reporting tool."
+- Predictive analytics is roadmap only (Q3 2026). Do not reference as a current feature.
+- Standard RFP responses use "Basis platform" not "our system" or "the tool."
 ```
 
-At the sprint retro, he shares: "Claude keeps generating useEffect for data fetching. Anyone else?" Three others nod. The team adds to the shared CLAUDE.md:
+By Friday, the naming issue came up in two more RFP sections and a client email. He promotes:
 ```
-# CLAUDE.md (team, git tracked)
-## Frontend
-- Use React Query for all data fetching. Never use useEffect + fetch.
-- Use styled-components for styling. Never use CSS modules.
+# .claude/CLAUDE.md (personal)
+## RFP Rules
+- Use official product names: "Insights Hub" (reporting), "Basis DSP" (buying), "Campaign Manager" (planning).
+- Never reference roadmap features as current capabilities. Check with Product if unsure.
+- Use "Basis platform" as the default product reference, not "our system/tool/software."
 ```
 
 **Week 2: Set up automation**
 
-He installs the Phase 3 scripts. Personal logging and distilling are now automatic. Team promotes still happen at sprint reviews (those stay manual and collaborative).
+He installs the Phase 3 scripts. Claude now consistently uses correct product names in first drafts. He adds a topic file synced from the product marketing Confluence page so Claude always has the latest feature list.
 
 **Week 3+: Hands-off**
 
-Claude now scaffolds components with React Query and styled-components every time. When a new library gets adopted (e.g., Zustand for state), Marcus writes it directly to MEMORY.md without waiting for the automation cycle.
+RFP first drafts require minimal edits. When a product name changes (e.g., "Campaign Manager" rebrands to "Plan Builder"), he updates MEMORY.md once and Claude picks it up everywhere.
 
 ---
 
-#### Priya, QA Engineer
+#### Lisa, Ad Operations Manager (Trafficking)
 
-Priya writes and maintains test suites. She uses Claude Code to generate test cases, debug flaky tests, and improve coverage.
+Lisa manages campaign trafficking, tag implementation, and delivery troubleshooting. She uses Claude Code to debug tag configurations, trace delivery issues, and generate QA checklists.
 
 **Week 1: Manual iteration**
 
-Wednesday, she asks Claude to generate tests for `OrderService.calculateTotal`. Claude generates 8 tests but misses the discount edge case and uses `jest.mock` instead of the team's `createMockService` helper.
+Wednesday, a campaign shows zero impressions. She asks Claude to help diagnose. Claude suggests checking the ad server logs, but uses Google Ad Manager terminology instead of Basis DSP terms and misses the most common cause (timezone mismatch in flight dates).
 
 She logs it:
 ```
 ## 2026-03-05
-- Generated tests for calculateTotal. Missed discount edge case (negative totals).
-- Claude used jest.mock() directly. We have createMockService() helper in tests/helpers.
-- Had to add 2 edge case tests manually.
+- Debugged zero-impression campaign. Claude suggested "line item" checks (GAM term). We use "ad group."
+- Missed the #1 cause: flight start date timezone is UTC, campaign was set to EST.
+- Had to manually check timezone offset before Claude's other suggestions were useful.
 ```
 
 End of day, she distills:
 ```
-## Testing Patterns
-- Test helpers in tests/helpers/: createMockService(), createMockUser(), etc.
-- Always test discount edge cases: zero, negative, exceeds-total scenarios.
-- Use createMockService() instead of raw jest.mock() for service mocks.
+## Ad Ops Terminology
+- Basis uses "ad group" not "line item" (Google), "placement" not "ad unit" (DFP).
+- Flight dates are stored in UTC. Always convert to the campaign's local timezone first.
+- Zero-impression triage order: (1) timezone mismatch, (2) budget cap, (3) targeting overlap, (4) creative approval status.
 ```
 
-By Friday, she promotes:
+By Friday, the terminology issue appeared twice more. She promotes:
 ```
 # .claude/CLAUDE.md (personal)
-## Testing
-- Use helpers from tests/helpers/ (createMockService, createMockUser) instead of raw jest.mock.
-- For any calculation function, always include edge cases: zero, negative, overflow, null.
+## Ad Ops
+- Use Basis terminology: "ad group" (not line item), "placement" (not ad unit), "flight" (not campaign period).
+- Flight dates are UTC. Always check timezone offset as first troubleshooting step.
+- Zero-impression triage: timezone > budget > targeting > creative status. Follow this order.
 ```
 
 **Week 2: Set up automation**
 
-She installs the Phase 3 scripts. The loop runs automatically now. She notices Claude is still missing a specific pattern (factory fixtures), so she writes it directly to .claude/CLAUDE.md without waiting for the cycle.
+She installs the Phase 3 scripts and adds a topic file from the trafficking team's Confluence runbook. Claude now has the full QA checklist and troubleshooting playbook available on demand.
 
 **Week 3+: Hands-off**
 
-Claude now uses `createMockService`, includes edge cases, and uses the factory fixtures she added manually. The automation catches any new patterns she doesn't bother to write herself.
+Claude uses correct Basis terminology and follows the triage order every time. When new campaign types launch (e.g., CTV), she adds the trafficking rules to MEMORY.md and Claude applies them immediately.
 
 ---
 
@@ -490,15 +487,15 @@ Claude now uses `createMockService`, includes edge cases, and uses the factory f
 
 After a few weeks, your `.claude/CLAUDE.md` should contain rules that were earned through repeated experience, not guessed upfront. Example progression:
 
-```
-logs.md:    "02-18: Claude tried gh CLI, not installed"
-logs.md:    "02-19: Claude tried gh CLI again"
-logs.md:    "02-20: Claude tried gh CLI a third time"
-           ↓ distill
-MEMORY.md: "gh CLI is not installed, recurring friction (3x)"
-           ↓ promote
-CLAUDE.md: "gh CLI is NOT installed. Do not attempt to use it."
-```
+> `logs.md` — "02-18: Claude tried gh CLI, not installed" ... "02-19: again" ... "02-20: a third time"
+>
+> ↓ distill
+>
+> `MEMORY.md` — "gh CLI is not installed, recurring friction (3x)"
+>
+> ↓ promote
+>
+> `.claude/CLAUDE.md` — "gh CLI is NOT installed. Do not attempt to use it."
 
 ---
 
