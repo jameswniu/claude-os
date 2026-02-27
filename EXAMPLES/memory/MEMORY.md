@@ -81,7 +81,7 @@ Reference docs in `topics/` subfolder. Zero tokens until read.
 - `scripts/` — Automation: 1-log, 2-distill, 3-promote, 4-sync-confluence, 5-checkpoint
 - `launchd/` — macOS scheduler plists for scripts 1-4
 - `tests/test.sh` — 46 validation tests
-- Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo
+- Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo. Run after syncing topic files to push them to EXAMPLES/.
 - Automation scripts must run in order (1→2→3→4); can run from Claude Code terminal now (fixed)
 - Scripts 1-3 need `unset CLAUDECODE` before `claude -p` to avoid nested session error
 - Launchd plists at `~/Library/LaunchAgents/com.claude.memory-*.plist`

@@ -133,6 +133,27 @@
 - Confirmed CLI shortcuts: `checkpoint` (push live to git) and `bootstrap` (pull git to live workspace) are zsh aliases in `.zshrc`
 - Updated `install.sh` to add shell aliases to `.zshrc` and `source` automatically so new users don't need a manual reload
 
+### Notion Integration & Sync Auto-Discovery (evening session)
+- Added Notion sync to claude-os: created `5-sync-notion.sh` script and `com.claude.memory-notion.plist`
+- Set up Notion internal integration ("claudeos"), got API token
+- Rewrote both Confluence and Notion scripts to read sync targets from MEMORY.md instead of hardcoded PAGES arrays
+- Added `(confluence:ID)` and `(notion:ID)` tags to MEMORY.md Topic Files entries so scripts can parse them
+- Fixed macOS grep compatibility (`-P` flag not supported), switched to `sed` for parsing
+- Fixed subshell counter bug (pipe to `while` loses variable state), switched to process substitution `< <()`
+- Added auto-discovery to Confluence script: searches Confluence with configurable `SEARCH_QUERIES`, filters by `RELEVANT_TERMS` and `EXCLUDE_TERMS`, auto-adds new relevant pages to MEMORY.md
+- Discovery found 5 new relevant pages (AI Code Reviewer, AI Updates Q4, AI Tools Quick Start, Claude Code Pricing, AI PR Summaries)
+- Also grabbed 4 irrelevant pages before filters were added (hack-ai-thon, campaign metrics, loading indicator, upgrade request), cleaned up MEMORY.md and added exclusion filter
+- Final state: 9 active Confluence entries in MEMORY.md, 13 topic files on disk (9 active + 4 stale, never deleted)
+- Notion sync skips gracefully when NOTION_TOKEN not set (token is on Mac mini, not this machine)
+- Added auto-discovery to Notion script (same mechanism as Confluence): searches Notion API with configurable queries, filters by relevance/exclusion, auto-adds to MEMORY.md
+- Both scripts now have identical two-phase flow: (1) discover new relevant pages, (2) sync all entries
+- Added Confluence API token link to quickstart (was missing, only had Notion's)
+- Updated README throughout: quickstart, deep-dive sections, verification steps, checkpoint after sync, architecture table
+- Ran all scripts end-to-end and verified: Confluence 9 synced/0 failed, Notion skipped (no token on this machine)
+- Ran checkpoint to push topic files to EXAMPLES/ in claude-os repo
+- Key learning: always run `checkpoint` after syncing to push topic files to the repo
+- Multiple commits pushed to claude-os repo across the session (55e1a7b through 48a5ae5)
+
 ---
 
 ## Cumulative Friction Log
