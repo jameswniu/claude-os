@@ -25,35 +25,21 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
-cd ~/your-project
 ```
 
 ### Phase 1: Static Context
 
-Set up the four files that load into every Claude Code session.
+Run the init script from any project directory. It copies template files only if they don't already exist.
 
 ```bash
-# Team rules (skip if your repo already has one)
-[ ! -f CLAUDE.md ] && cp ~/claude-os/EXAMPLES/CLAUDE.md ./CLAUDE.md
-# Edit with your project's build commands, architecture, and test instructions
-
-# Personal rules
-mkdir -p .claude
-[ ! -f .claude/CLAUDE.md ] && cp ~/claude-os/EXAMPLES/.claude/CLAUDE.md .claude/CLAUDE.md
-# Edit with your own preferences (review style, behavior rules, etc.)
-# Add .claude/ to .gitignore if not already there
-
-# Memory
-PROJECT_SLUG=$(pwd | tr '/.' '-' | sed 's/^//')
-MEMORY_DIR="$HOME/.claude/projects/${PROJECT_SLUG}/memory"
-mkdir -p "$MEMORY_DIR/topics"
-[ ! -f "$MEMORY_DIR/MEMORY.md" ] && cp ~/claude-os/EXAMPLES/memory/MEMORY.md "$MEMORY_DIR/MEMORY.md"
-[ ! -f "$MEMORY_DIR/logs.md" ] && cp ~/claude-os/EXAMPLES/memory/logs.md "$MEMORY_DIR/logs.md"
-# Edit MEMORY.md with your project's architecture and patterns
-
-# Optional: pull shared topic files (Confluence docs, runbooks, etc.)
-cp ~/claude-os/EXAMPLES/memory/topics/*.md "$MEMORY_DIR/topics/" 2>/dev/null
+cd ~/your-project
+bash ~/claude-os/scripts/6-init.sh
 ```
+
+Then edit the files for your project:
+- `CLAUDE.md` - add your build commands, architecture, and test instructions
+- `.claude/CLAUDE.md` - add your personal preferences (review style, behavior rules, etc.)
+- `MEMORY.md` - add your project's architecture and patterns
 
 Verify: start a new Claude Code session and ask "What do you know about this project?" Claude should reference content from CLAUDE.md and MEMORY.md.
 
@@ -668,6 +654,7 @@ claude-os/
     ├── 3-promote.sh
     ├── 4-sync-confluence.sh
     ├── 5-checkpoint.sh
+    ├── 6-init.sh
     ├── update-readme.sh
 ├── tests
     ├── test.sh
