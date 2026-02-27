@@ -67,6 +67,21 @@ grep -q "3+" "$SCRIPT_DIR/3-promote.sh" && pass "requires 3+ occurrences for pro
 echo ""
 
 # ----------------------------
+echo "## 4-sync-confluence.sh"
+# ----------------------------
+
+[ -x "$SCRIPT_DIR/4-sync-confluence.sh" ] && pass "script is executable" || fail "script is not executable"
+head -1 "$SCRIPT_DIR/4-sync-confluence.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
+grep -q "MEMORY_DIR" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "references MEMORY_DIR" || fail "missing MEMORY_DIR"
+grep -q "CONFLUENCE_BASE" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "references Confluence API" || fail "missing Confluence API"
+grep -q "CONFLUENCE_EMAIL" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "reads auth from env vars" || fail "missing auth env vars"
+grep -q "PAGES=" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "has page registry" || fail "missing page registry"
+grep -q "html2text" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "converts HTML to markdown" || fail "missing HTML conversion"
+grep -q "CONFLUENCE_EMAIL.*CONFLUENCE_TOKEN" "$SCRIPT_DIR/4-sync-confluence.sh" && pass "skips when no auth" || fail "missing auth skip logic"
+
+echo ""
+
+# ----------------------------
 echo "## Repo checks"
 # ----------------------------
 

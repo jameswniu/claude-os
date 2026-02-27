@@ -247,7 +247,31 @@ Every 24 hours →  4-sync-confluence.sh  →  Re-fetch Confluence pages into to
 Every 7 days   →  3-promote.sh          →  Promote stable patterns to .claude/CLAUDE.md
 ```
 
-Each script runs headless Claude Code (`claude -p`) to do the reading and writing.
+Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Script 4 syncs Confluence pages directly via REST API (no LLM needed).
+
+### Confluence Sync (4-sync-confluence.sh)
+
+Keeps topic files fresh by re-fetching registered Confluence pages every 24 hours.
+
+**How it works:**
+1. Reads a `PAGES` registry array in the script (page ID, filename, description)
+2. Fetches each page via Confluence REST API with basic auth
+3. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
+4. Writes the result to the memory directory as a topic file
+5. Logs results to `output/4-sync-confluence.log`
+
+**To add a new page**, add a line to the `PAGES` array in `scripts/4-sync-confluence.sh`:
+```bash
+PAGES=(
+    "1597341723|claudehub.md|ClaudeHub main page"
+    "1559166979|use-case-library.md|AI dev tools use-case library"
+    # Add more pages here: "page_id|filename.md|description"
+)
+```
+
+**Requirements:** `CONFLUENCE_EMAIL` and `CONFLUENCE_TOKEN` environment variables set in the launchd plist (or exported in your shell for manual runs). Get an API token at https://id.atlassian.com/manage-profile/security/api-tokens.
+
+**Cross-team access:** Topic files can pull from any Confluence space you have permission to read. To pull from another team's space, request access and add their page IDs to the registry.
 
 ### Option A: Local (macOS launchd)
 
@@ -392,10 +416,31 @@ Yes. launchd agents run as long as you're logged in. Lock screen does not stop t
 launchd catches up on missed runs when the Mac wakes. No data is lost.
 
 **How much does the automation cost?**
-Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.10 for distill, $0.10 for promote. At production frequency: ~$2.50/week.
+Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.10 for distill, $0.10 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$2.50/week.
 
 **What if MEMORY.md gets too long?**
 Keep it under 200 lines. Lines beyond 200 are truncated when loaded into context. Archive old log entries monthly.
 
 **Can multiple projects share the same loop?**
 Each project gets its own memory directory under `~/.claude/projects/`. You'd need separate script copies (or parameterize PROJECT_DIR) per project.
+
+**Does MEMORY.md eat tokens every message?**
+Yes. It's injected into the system prompt at session start and stays in context for every request. That's why the 200-line cap matters. Topic files, by contrast, cost zero tokens until Claude reads them mid-session.
+
+**Does settings.local.json eat tokens?**
+No. It's client-side only, never sent to the LLM. It only controls which tool calls auto-approve without prompting.
+
+**What are topic files?**
+Additional markdown files in the memory directory alongside MEMORY.md. They're loaded on demand (zero tokens until read). Use them for Confluence docs, API specs, runbooks, or any reference material too large for MEMORY.md. Add one-line hints in MEMORY.md so Claude knows they exist.
+
+**How do I add a Confluence page as a topic file?**
+Add the page ID and filename to the `PAGES` array in `scripts/4-sync-confluence.sh`. The page ID is in the Confluence URL (e.g., `1597341723` from `.../pages/1597341723/ClaudeHub`). The sync script will fetch it on the next run.
+
+**Can I pull from other teams' Confluence spaces?**
+Yes, if you have read access. The sync script works with any Confluence space. Request access from the team, then add their page IDs to the registry.
+
+**How do slash commands work with tokens?**
+Command names and descriptions are indexed at session start (~2% of context window). The full command content only loads when you invoke it (e.g., `/review`). So having many commands registered costs minimal tokens.
+
+**What's the difference between CLAUDE.md and .claude/CLAUDE.md?**
+`CLAUDE.md` (repo root) is shared, checked into git, visible to the whole team. `.claude/CLAUDE.md` (gitignored) is personal, only you see it. Use the shared one for team rules, the personal one for your own preferences.
