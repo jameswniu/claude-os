@@ -132,6 +132,28 @@ launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 bash ~/claude-os/scripts/4-sync-confluence.sh
 ```
 
+**Notion sync (optional):**
+
+Add credentials to `~/.zshrc`:
+```bash
+echo 'export NOTION_TOKEN="<your-integration-token>"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Edit the page registry in `~/claude-os/scripts/5-sync-notion.sh` to add your pages.
+
+Then install and test:
+```bash
+launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
+bash ~/claude-os/scripts/5-sync-notion.sh
+```
+
+**Verify scripts are running:**
+```bash
+launchctl list | grep com.claude
+```
+All loaded agents should appear with a `0` exit status (second column). A `-` in the PID column (first column) means the script is not currently running, which is normal between scheduled runs.
+
 > **Deep dive:** See the Architecture and Phase sections below for how each file works and design rationale.
 
 ---
