@@ -3,12 +3,16 @@
 # 1. Auto-discovers new relevant Notion pages and adds them to MEMORY.md
 # 2. Syncs all (notion:ID) entries from MEMORY.md to topic files
 
-PROJECT_PATH="$HOME/media-strategy-generator"
-PROJECT_SLUG=$(echo "$PROJECT_PATH" | sed 's|/|-|g; s|\.|-|g')
-MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
 LOG_DIR="$HOME/claude-os/output"
 NOTION_API="https://api.notion.com/v1"
-MEMORY_FILE="$MEMORY_DIR/MEMORY.md"
+
+# Auto-detect: find the first MEMORY.md with notion: entries
+MEMORY_FILE=$(grep -rl 'notion:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+if [ -z "$MEMORY_FILE" ]; then
+    echo "$(date): No MEMORY.md with notion entries found, skipping" >> "$LOG_DIR/5-sync-notion.log"
+    exit 0
+fi
+MEMORY_DIR=$(dirname "$MEMORY_FILE")
 
 mkdir -p "$LOG_DIR"
 

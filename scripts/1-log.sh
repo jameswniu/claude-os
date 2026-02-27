@@ -2,12 +2,18 @@
 # 1-log.sh — Runs every 20 min (test) / 1 hour (prod)
 # Reads recent Claude Code session history and appends a summary to logs.md
 
-PROJECT_DIR="$HOME/media-strategy-generator"
-PROJECT_SLUG=$(echo "$PROJECT_DIR" | sed 's|/|-|g; s|\.|-|g')
-MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
 HISTORY="$HOME/.claude/history.jsonl"
-LAST_RUN_FILE="$MEMORY_DIR/.last-log-run"
 LOG_DIR="$HOME/claude-os/output"
+
+# Auto-detect: find the first project with a MEMORY.md
+MEMORY_FILE=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)
+if [ -z "$MEMORY_FILE" ]; then
+    echo "$(date): No MEMORY.md found, skipping" >> "$LOG_DIR/1-log.log"
+    exit 0
+fi
+MEMORY_DIR=$(dirname "$MEMORY_FILE")
+PROJECT_DIR=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory||; s|-|/|g; s|^/||')
+LAST_RUN_FILE="$MEMORY_DIR/.last-log-run"
 
 mkdir -p "$LOG_DIR"
 

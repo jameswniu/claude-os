@@ -3,12 +3,16 @@
 # 1. Auto-discovers new relevant Confluence pages and adds them to MEMORY.md
 # 2. Syncs all (confluence:ID) entries from MEMORY.md to topic files
 
-PROJECT_PATH="$HOME/media-strategy-generator"
-PROJECT_SLUG=$(echo "$PROJECT_PATH" | sed 's|/|-|g; s|\.|-|g')
-MEMORY_DIR="$HOME/.claude/projects/$PROJECT_SLUG/memory"
 LOG_DIR="$HOME/claude-os/output"
 CONFLUENCE_BASE="https://basis.atlassian.net/wiki/rest/api/content"
-MEMORY_FILE="$MEMORY_DIR/MEMORY.md"
+
+# Auto-detect: find the first MEMORY.md with confluence: entries
+MEMORY_FILE=$(grep -rl 'confluence:' "$HOME/.claude/projects"/*/memory/MEMORY.md 2>/dev/null | head -1)
+if [ -z "$MEMORY_FILE" ]; then
+    echo "$(date): No MEMORY.md with confluence entries found, skipping" >> "$LOG_DIR/4-sync-confluence.log"
+    exit 0
+fi
+MEMORY_DIR=$(dirname "$MEMORY_FILE")
 
 mkdir -p "$LOG_DIR"
 
