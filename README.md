@@ -124,9 +124,12 @@ echo 'export CONFLUENCE_TOKEN="<your-api-token>"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Edit the page registry in `~/claude-os/scripts/4-sync-confluence.sh` to add your team's pages.
+Add pages to sync in your `MEMORY.md` under the Topic Files section:
+```markdown
+- `topics/my-page.md` — Description of the page (confluence:PAGE_ID)
+```
 
-Then install and test:
+Then install and run the first sync:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 bash ~/claude-os/scripts/4-sync-confluence.sh
@@ -134,15 +137,22 @@ bash ~/claude-os/scripts/4-sync-confluence.sh
 
 **Notion sync (optional):**
 
-Add credentials to `~/.zshrc`:
+Create an internal integration at https://www.notion.so/my-integrations and add credentials to `~/.zshrc`:
 ```bash
 echo 'export NOTION_TOKEN="<your-integration-token>"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Edit the page registry in `~/claude-os/scripts/5-sync-notion.sh` to add your pages.
+Share each Notion page with the integration (page `...` menu > "Connections" > add integration).
 
-Then install and test:
+Add pages to sync in your `MEMORY.md` under the Topic Files section:
+```markdown
+- `topics/my-page.md` — Description of the page (notion:PAGE_ID)
+```
+
+To find a page ID: copy the Notion URL, the ID is the 32-character hex string at the end.
+
+Then install and run the first sync:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
 bash ~/claude-os/scripts/5-sync-notion.sh
@@ -153,6 +163,8 @@ bash ~/claude-os/scripts/5-sync-notion.sh
 launchctl list | grep com.claude
 ```
 All loaded agents should appear with a `0` exit status (second column). A `-` in the PID column (first column) means the script is not currently running, which is normal between scheduled runs.
+
+After the first sync, the scripts run on schedule (every 24h) and automatically pick up any new `(confluence:ID)` or `(notion:ID)` entries added to MEMORY.md.
 
 > **Deep dive:** See the Architecture and Phase sections below for how each file works and design rationale.
 
@@ -530,19 +542,19 @@ Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing
 Keeps topic files fresh by re-fetching registered Confluence pages every 24 hours.
 
 **How it works:**
-1. Reads a `PAGES` registry array in the script (page ID, filename, description)
-2. Fetches each page via Confluence REST API with basic auth
-3. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
-4. Writes the result to `memory/topics/` as a topic file
-5. Logs results to `output/4-sync-confluence.log`
+1. Scans `MEMORY.md` for lines containing `(confluence:PAGE_ID)`
+2. Extracts the filename from `` `topics/filename.md` `` and the page ID from the tag
+3. Fetches each page via Confluence REST API with basic auth
+4. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
+5. Writes the result to `memory/topics/` as a topic file
+6. Logs results to `output/4-sync-confluence.log`
 
-**To add a new page**, add a line to the `PAGES` array in `scripts/4-sync-confluence.sh`:
-```bash
-PAGES=(
-    "1597341723|claudehub.md|ClaudeHub main page"
-    "1559166979|use-case-library.md|AI dev tools use-case library"
-)
+**To add a new page**, add a line to the Topic Files section of your `MEMORY.md`:
+```markdown
+- `topics/my-page.md` — Description of the page (confluence:1597341723)
 ```
+
+The next scheduled run (or manual run) will pick it up and create the topic file. Existing topic files are refreshed, never deleted.
 
 **Setup:**
 
@@ -567,27 +579,28 @@ PAGES=(
 
 The script skips gracefully if credentials are not set. No errors, no data loss.
 
-**Cross-team access:** Topic files can pull from any Confluence space you have permission to read. To pull from another team's space, request access and add their page IDs to the registry.
+**Cross-team access:** Topic files can pull from any Confluence space you have permission to read. To pull from another team's space, request access and add their page IDs to your MEMORY.md.
 
 ### Notion Sync (5-sync-notion.sh)
 
 Keeps topic files fresh by re-fetching registered Notion pages every 24 hours.
 
 **How it works:**
-1. Reads a `PAGES` registry array in the script (page ID, filename, description)
-2. Fetches each page's blocks via Notion API with bearer auth
-3. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
-4. Writes the result to `memory/topics/` as a topic file
-5. Logs results to `output/5-sync-notion.log`
+1. Scans `MEMORY.md` for lines containing `(notion:PAGE_ID)`
+2. Extracts the filename from `` `topics/filename.md` `` and the page ID from the tag
+3. Fetches each page's blocks via Notion API with bearer auth
+4. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
+5. Writes the result to `memory/topics/` as a topic file
+6. Logs results to `output/5-sync-notion.log`
 
-**To add a new page**, add a line to the `PAGES` array in `scripts/5-sync-notion.sh`:
-```bash
-PAGES=(
-    "abc123def456abc123def456abc123de|my-page.md|My Notion page"
-)
+**To add a new page**, add a line to the Topic Files section of your `MEMORY.md`:
+```markdown
+- `topics/my-page.md` — Description of the page (notion:abc123def456abc123def456abc123de)
 ```
 
-To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end of the URL.
+To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end.
+
+The next scheduled run (or manual run) will pick it up and create the topic file. Existing topic files are refreshed, never deleted.
 
 **Setup:**
 
@@ -610,6 +623,29 @@ To find a page ID: open the page in Notion, copy the URL. The ID is the 32-chara
 6. Test manually: `bash scripts/5-sync-notion.sh`
 
 The script skips gracefully if the token is not set. No errors, no data loss.
+
+### Verifying Sync Scripts
+
+After running a sync script, check that it worked:
+
+```bash
+# Check the log for results
+tail -10 ~/claude-os/output/4-sync-confluence.log
+tail -10 ~/claude-os/output/5-sync-notion.log
+
+# List topic files with timestamps to confirm they were created/refreshed
+ls -la ~/.claude/projects/*/memory/topics/
+
+# Preview a topic file
+head -20 ~/.claude/projects/*/memory/topics/claudehub.md
+```
+
+Each log entry shows the date, status (OK or FAILED), filename, and line count. A healthy run looks like:
+```
+OK claudehub.md (284 lines)
+OK use-case-library.md (461 lines)
+Sync complete. 2 synced, 0 failed.
+```
 
 ### Option A: Local (macOS launchd)
 
