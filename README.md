@@ -520,9 +520,10 @@ Automate the loop so it runs without manual intervention.
 | Every 1 hour | `1-log.sh` | Append new sessions to logs.md |
 | Every 24 hours | `2-distill.sh` | Distill logs.md patterns into MEMORY.md |
 | Every 24 hours | `4-sync-confluence.sh` | Re-fetch Confluence pages into topic files |
+| Every 24 hours | `5-sync-notion.sh` | Re-fetch Notion pages into topic files |
 | Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.md |
 
-Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Script 4 syncs Confluence pages directly via REST API (no LLM needed).
+Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Scripts 4-5 sync external pages directly via REST API (no LLM needed).
 
 ### Confluence Sync (4-sync-confluence.sh)
 
@@ -568,6 +569,48 @@ The script skips gracefully if credentials are not set. No errors, no data loss.
 
 **Cross-team access:** Topic files can pull from any Confluence space you have permission to read. To pull from another team's space, request access and add their page IDs to the registry.
 
+### Notion Sync (5-sync-notion.sh)
+
+Keeps topic files fresh by re-fetching registered Notion pages every 24 hours.
+
+**How it works:**
+1. Reads a `PAGES` registry array in the script (page ID, filename, description)
+2. Fetches each page's blocks via Notion API with bearer auth
+3. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
+4. Writes the result to `memory/topics/` as a topic file
+5. Logs results to `output/5-sync-notion.log`
+
+**To add a new page**, add a line to the `PAGES` array in `scripts/5-sync-notion.sh`:
+```bash
+PAGES=(
+    "abc123def456abc123def456abc123de|my-page.md|My Notion page"
+)
+```
+
+To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end of the URL.
+
+**Setup:**
+
+1. Create an internal integration at https://www.notion.so/my-integrations
+2. Copy the integration secret (starts with `ntn_`)
+3. Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
+   ```bash
+   echo 'export NOTION_TOKEN="ntn_your-token-here"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+4. **Share pages with the integration:** Open each Notion page, click `...` (top right) > "Connections" > add your integration name
+5. For automated runs via launchd, add to the notion plist (`com.claude.memory-notion.plist`):
+   ```xml
+   <key>EnvironmentVariables</key>
+   <dict>
+       <key>NOTION_TOKEN</key>
+       <string>ntn_your-token-here</string>
+   </dict>
+   ```
+6. Test manually: `bash scripts/5-sync-notion.sh`
+
+The script skips gracefully if the token is not set. No errors, no data loss.
+
 ### Option A: Local (macOS launchd)
 
 Best for individual use. Runs when your Mac is on, catches up on missed runs after sleep.
@@ -590,6 +633,7 @@ launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
+launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
 ```
 
 **Verify:**
@@ -614,6 +658,7 @@ launchctl unload ~/Library/LaunchAgents/com.claude.memory-*.plist
 | `com.claude.memory-log` | 3600 | Every 1 hour |
 | `com.claude.memory-distill` | 86400 | Every 24 hours |
 | `com.claude.memory-sync` | 86400 | Every 24 hours |
+| `com.claude.memory-notion` | 86400 | Every 24 hours |
 | `com.claude.memory-promote` | 604800 | Every 7 days |
 
 For testing, use 3x speed: 1200 / 28800 / 198720 seconds.
@@ -698,7 +743,7 @@ client = anthropic.Anthropic()
 > Phase 3 automation (launchd) is macOS only. On Linux, replace the plist files with cron jobs. Phases 1 and 2 (static context and manual loop) work on any OS that runs Claude Code.
 
 **How much does the automation cost?**
-> Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$4/week.
+> Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence and Notion syncs use no LLM (just curl), so they're free. At production frequency: ~$4/week.
 
 **What if MEMORY.md gets too long?**
 > Keep it under 200 lines. Lines beyond 200 are truncated when loaded into context. Archive old log entries monthly.
