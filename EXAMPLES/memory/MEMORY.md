@@ -4,10 +4,8 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 ## Recurring Mistakes (Self-Corrections)
 
-- **`gh` CLI**: Installed via Homebrew (02-26) for GitHub use (claude-os repo). Still use git + curl for Bitbucket PR reviews, never `gh`.
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
 - **Wrong config file**: Personal preferences go in `.claude/CLAUDE.md` (gitignored), never in root `CLAUDE.md` (shared).
-- **Session cut-offs on long reviews**: Recurring on 02-21 and 02-25. Rule added to output complete review in single response, but large PRs (20+ files) can still hit context/timeout limits. Consider chunking very large reviews.
 - **Stale files in copy-only sync**: When a script copies files to a target directory, always clean the target first if the source is the single source of truth. Copy-only accumulates stale files. Use delete-then-copy (or rsync --delete).
 
 ## User Preferences
