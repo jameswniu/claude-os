@@ -1,8 +1,7 @@
 # ClaudeHub
 
-Source: https://basis.atlassian.net/wiki/rest/api/content/1597341723/view
+Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1597341723
 
-21falsedefaultflattruenote2434d5b2cd3d
 
 **📣 Announcement of the Week**  
 💡 **Tip:** [Using Bash mode](https://basis.atlassian.net/wiki/spaces/BET/pages/edit-v2/1588723799) - Learn the most efficient way to run commands with Claude Code
@@ -11,7 +10,6 @@ Source: https://basis.atlassian.net/wiki/rest/api/content/1597341723/view
 💡 **Tip:** [Using Bash mode](https://basis.atlassian.net/wiki/spaces/BET/pages/edit-v2/1588723799) - Learn the most efficient way to run commands with Claude Code
 
 Welcome to Basis Applications Engineering ClaudeHub! Your central resource for onboarding to Claude Code. This page provides everything you need to get started, from official documentation to our custom Plugin Marketplace and Quick Start resources.
-
 
 If you are running into usage limits on the standard seat - [Request upgrade](https://basis.atlassian.net/wiki/x/LwDRXw) to Claude Premium
 
@@ -26,9 +24,6 @@ Claude Code is Anthropic's **agentic coding tool** that lives in your terminal a
   * **Automate tasks** \- Fix bugs, write tests, resolve merge conflicts
 
   * **Build features** \- Describe what you want in plain English
-
-
-
 
 Think of it as a collaborative coding partner that can read, understand, and modify your code while you focus on the bigger picture.
 
@@ -82,13 +77,11 @@ Clear explanations to help you understand Claude Code's extensibility model.
 
     * <https://docs.anthropic.com/en/docs/claude-code/jetbrains>
 
-
-
-
 * * *
 
 ## 🚀 Quick Start
 
+**📥 Install Claude Code**
 
 **📥 Install Claude Code**
 
@@ -100,6 +93,7 @@ Then run `claude` in your terminal.
 
 -> [Official Quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart)
 
+**💬 Join #tools-ai**
 
 **💬 Join #tools-ai**
 
@@ -113,11 +107,9 @@ Connect with fellow engineers:
 
   * Learn from others
 
-
-
-
 -> Join on Slack [#tools-ai](https://centro.slack.com/archives/C0A6ZEML1KN)
 
+**📚 Use-Case Library**
 
 **📚 Use-Case Library**
 
@@ -130,9 +122,6 @@ Browse proven prompts and workflows:
   * Testing & documentation
 
   * Code review
-
-
-
 
 -> Use-Case Library
 
@@ -161,9 +150,6 @@ A shared repository of AI-powered tools for our organization:
   * **Skills** \- Reusable knowledge and workflows
 
   * **MCP Servers** \- External service connections
-
-
-
 
 -> [Installation Instructions in README: apps-eng-ai-dev-tools](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse). 
 
@@ -203,9 +189,6 @@ Structured resources to help you get productive with AI tools quickly:
 
   * [**Tips of the Week**](https://basis.atlassian.net/wiki/spaces/BET/folder/1588723798?atlOrigin=eyJpIjoiYWE5MjFmODc5ZDEzNGQxMWE3MjE4MWY2M2ZmZDVhYzQiLCJwIjoiYyJ9) \- Weekly curated tips in #tools-ai
 
-
-
-
 * * *
 
 ## 📖 Official Claude Code Documentation
@@ -222,9 +205,6 @@ Structured resources to help you get productive with AI tools quickly:
 
   * [Best Practices](https://docs.anthropic.com/en/docs/claude-code/best-practices)
 
-
-
-
 **🔧 Extend Claude Code**
 
   * [CLAUDE.md Memory](https://docs.anthropic.com/en/docs/claude-code/memory)
@@ -237,9 +217,6 @@ Structured resources to help you get productive with AI tools quickly:
 
   * [Plugins & Marketplaces](https://docs.anthropic.com/en/docs/claude-code/plugins)
 
-
-
-
 **🖥️ IDE & Integrations**
 
   * [VS Code Extension](https://docs.anthropic.com/en/docs/claude-code/vs-code)
@@ -251,9 +228,6 @@ Structured resources to help you get productive with AI tools quickly:
   * [MCP (Model Context Protocol)](https://docs.anthropic.com/en/docs/claude-code/mcp)
 
   * [CLI Reference](https://docs.anthropic.com/en/docs/claude-code/cli-reference)
-
-
-
 
 * * *
 
@@ -291,9 +265,6 @@ Real examples of Code Changes built with assistance from Claude Code.
 
   * [Prevent stack traces from showing during outages](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30328/overview) | 
 
-
-
-
 ####   
 Internal Tools
 
@@ -303,17 +274,11 @@ Internal Tools
 
   * [Fetch Auth0 Realm for DataGen](https://stash.centro.net/projects/CEN/repos/py_data_generation/pull-requests/385/overview) | 
 
-
-
-
 #### In Development
 
   * [Upgrade MSW to v2 and fix test suite](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30260/overview) | 
 
   * [API Wrapper for Planning Service in CMM](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30093/overview) | 
-
-
-
 
 * * *
 

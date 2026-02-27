@@ -1,6 +1,6 @@
 # Plugin Marketplace Plan
 
-Source: https://basis.atlassian.net/wiki/rest/api/content/1527939210/view
+Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1527939210
 
 **Driver**|  Primary:  Secondary:   
 ---|---  
@@ -16,7 +16,7 @@ Source: https://basis.atlassian.net/wiki/rest/api/content/1527939210/view
   * Gather survey feedback on impact in efficiency.
 
   
-**Status**|  not started / in progressYellow / completeGreen  
+**Status**|  not started / in progress / complete  
   
 ##  Problem statement
 
@@ -55,19 +55,19 @@ Claude Code Plugin Marketplaces provide a way to create a shared set of AI based
 
 **Milestone**| **Owner**| **Deadline**| **Status**| **Notes**  
 ---|---|---|---|---  
-Create an [experimental Plugin Marketplace](https://stash.centro.net/projects/CEN/repos/ai-council/pull-requests/2/overview)|  | | completeGreen| [link](https://stash.centro.net/projects/CEN/repos/ai-council/browse/plugins/react-best-practices)  
-Create an official Plugin Marketplace - Dedicated repo|  | | CompleteGreen| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse)  
+Create an [experimental Plugin Marketplace](https://stash.centro.net/projects/CEN/repos/ai-council/pull-requests/2/overview)|  | | complete| [link](https://stash.centro.net/projects/CEN/repos/ai-council/browse/plugins/react-best-practices)  
+Create an official Plugin Marketplace - Dedicated repo|  | | Complete| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse)  
 Create a Contributing and Usage How-to guide for Claude Code|  | | not started|   
-~~Investigate multi-platform feasibility. Using with Copilot (Gemini etc.)~~|  | | CancelledRed|   
-~~Create a How-to guide for Github Copilot~~| | |  CancelledRed|   
-Add [AGENTS.md files to centro-media-manager](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30144/overview)|  | | CompleteGreen| [link](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30144/overview)  
-Add a `Create Jira ticket` [Command](https://stash.centro.net/projects/CEN/repos/ai-council/browse/.claude/commands/create-ticket.md)|  | | completeGreen| [link](https://stash.centro.net/projects/CEN/repos/ai-council/browse/.claude/commands/create-ticket.md)  
-Add a `Code Review` Agent|  | | in progressYellow| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/pull-requests/3/overview)  
+~~Investigate multi-platform feasibility. Using with Copilot (Gemini etc.)~~|  | | Cancelled|   
+~~Create a How-to guide for Github Copilot~~| | |  Cancelled|   
+Add [AGENTS.md files to centro-media-manager](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30144/overview)|  | | Complete| [link](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30144/overview)  
+Add a `Create Jira ticket` [Command](https://stash.centro.net/projects/CEN/repos/ai-council/browse/.claude/commands/create-ticket.md)|  | | complete| [link](https://stash.centro.net/projects/CEN/repos/ai-council/browse/.claude/commands/create-ticket.md)  
+Add a `Code Review` Agent|  | | in progress| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/pull-requests/3/overview)  
 Add a Hook example|  | | not started|   
-Add a Skill example|  | | completeGreen| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse/plugins/commit-commands/skills/jira-commit-format/SKILL.md)  
-Get confirmation of Claude Code org access|  | | completeGreen| Rolled out around   
-Define requirements for submitting PRs to the AI-tools repo| | | in progressYellow|   
-Add ai-council as required-reviewers for the ai-tools repo|  | | completeGreen|   
+Add a Skill example|  | | complete| [link](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse/plugins/commit-commands/skills/jira-commit-format/SKILL.md)  
+Get confirmation of Claude Code org access|  | | complete| Rolled out around   
+Define requirements for submitting PRs to the AI-tools repo| | | in progress|   
+Add ai-council as required-reviewers for the ai-tools repo|  | | complete|   
 Add namespacing to plugin marketplace resources| | | not started|   
   
 ##  Related links

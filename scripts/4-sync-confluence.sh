@@ -85,7 +85,7 @@ for line in lines:
     # Remove trailing UUIDs from lines
     line = re.sub(r'\s+[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\s*$', '', line)
     # Remove unnecessary backslash escapes
-    line = re.sub(r'\\([*._~])', r'\1', line)
+    line = re.sub(r'\\\\([*._~])', r'\\1', line)
     # Skip duplicate consecutive lines
     if stripped and stripped == prev_line:
         continue

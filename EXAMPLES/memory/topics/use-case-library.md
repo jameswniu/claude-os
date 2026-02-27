@@ -1,6 +1,6 @@
 # AI Development Tools: Use-Case Library
 
-Source: https://basis.atlassian.net/wiki/rest/api/content/1559166979/view
+Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1559166979
 
 
 [Use-case submission form](https://docs.google.com/forms/d/e/1FAIpQLSdQy40q2uqHJWTFw2ofaONQAS_8qe6bwOvKR7YWHonLvA9sAA/viewform)
@@ -15,9 +15,6 @@ This library contains**** examples of using GitHub Copilot and Claude Code to so
 
   * Actual prompts that work
 
-
-
-
   **How this helps you:**
 
   * Skip the trial-and-error phase
@@ -27,9 +24,6 @@ This library contains**** examples of using GitHub Copilot and Claude Code to so
   * Get productive with AI tools faster
 
   * Discover new ways to use these tools
-
-
-
 
 > Note: Examples for some use-cases in Claude Code only. Same can be done with copilot with similar prompts. 
 
@@ -57,24 +51,15 @@ Claude Code1800
 
   * Includes unit tests with mocks
 
-
-
-
   Write the controller, service, route, types, and test files.
 
 **Prompting Best Practices**
 
   1. Be explicit with your instructions. 
 
-
-
-
 Less Effective Prompt: `Create a new REST endpoint GET /api/users/:userId/orders`
 
   2. Add Context to improve results, it helps AI tools to better understand your goals and deliver more targeted responses. 
-
-
-
 
 More Effective Prompt, to add: `Follows the existing pattern in src/controllers/userController.ts` or `Follow patterns in current codebase` , etc. 
 
@@ -108,9 +93,6 @@ I'm getting this error when creating a line item:
 
   3. Show me the bug and suggest a fix
 
-
-
-
 **What Claude will do:**
 
   * Read all files mentioned in stack trace
@@ -120,9 +102,6 @@ I'm getting this error when creating a line item:
   * Identify the root cause
 
   * Suggest a specific fix
-
-
-
 
 **Additional Tips for Prompt**
 
@@ -141,9 +120,6 @@ I'm getting this error when creating a line item:
     * whats in an array/object at failure point 
 
     * etc. 
-
-
-
 
 ### Debug Failing Tests
 
@@ -166,9 +142,6 @@ For the failing tests:
   3. Fix the issue
 
   4. Rerun tests to verify
-
-
-
 
 Keep iterating until all tests pass
 
@@ -198,9 +171,6 @@ Include:
 
   * use the same test pattern as src/services/__tests__/userService.test.ts
 
-
-
-
 Create the test file at src/services/__tests__/orderService.test.ts
 
 # Documentation
@@ -226,9 +196,6 @@ Read the actual code in the directory and document:
   * Using examples from the real API 
 
   * include sections for Tests, Code Linting, etc. 
-
-
-
 
 save to src/auth/README.md
 
@@ -260,9 +227,6 @@ Include:
 
   * @example with actual usage
 
-
-
-
 # Code Review & Refactoring 
 
 ### Reviewing Your Changes Before Committing
@@ -287,9 +251,6 @@ Review my uncommitted changes for:
 
   * Breaking changes
 
-
-
-
   Run: git diff
 
   Then analyze the changes and provide feedback.
@@ -299,9 +260,6 @@ Review my uncommitted changes for:
 Code Review Feedback Best Practices1800
 
   1. Be explicit for High Quality Code Review 
-
-
-
 
 Bad: 
 
@@ -317,13 +275,7 @@ Good:
 
      1. Require line references, concrete examples, why this matters - AI tools can drift into opinions unless told otherwise 
 
-
-
-
   4. Enforce Design Principles Explicitly
-
-
-
 
 **SOLID**
 
@@ -339,17 +291,9 @@ etc…
 
      1. instead of confident but wrong statements 
 
-
-
-
   6. Use Step Based Reviews
 
-
-
   * instead of one big prompt
-
-
-
 
 **Step 1**
 
@@ -379,9 +323,6 @@ This dramatically reduces misunderstandings.
 
         1.      4. Write a Claude.md (instructions.md, Agent.md, etc.) or relevant file about Design Principles code follows. This will allow AI tools to give better code reviews. 
 
-
-
-
 Code Review Prompt Template1800
 
 You are a senior <language> engineer performing a rigorous code review.
@@ -395,9 +336,6 @@ Context:
   * Performance/security constraints:
 
   * Team conventions (if any):
-
-
-
 
 Review goals:
 
@@ -413,9 +351,6 @@ Review goals:
 
     * <principle 3>
 
-
-
-
 Instructions:
 
   * Identify concrete issues only (no speculative concerns).
@@ -430,9 +365,6 @@ Instructions:
 
     3. Propose a specific improvement
 
-
-
-
 Output format:
 
   * Critical issues (must fix)
@@ -440,9 +372,6 @@ Output format:
   * Non-critical issues (should fix)
 
   * Optional improvements (nice to have)
-
-
-
 
 Here is the code:
 
@@ -472,9 +401,6 @@ Review this commit for:
 Return actionable feedback.  
 "
 
-
-
-
 ### Refactor a Complex Function
 
 **Problem**
@@ -496,9 +422,6 @@ The processOrder function in src/services/orderService.ts is too complex (200+ l
   * Maintaining the same behavior
 
   * Updating tests if needed
-
-
-
 
   Then run the test suite to ensure nothing broke.
 
@@ -533,9 +456,6 @@ Create a pull request for my current branch.
   * Testing done
 
   * Any breaking changes
-
-
-
 
   Then run: gh pr create
 

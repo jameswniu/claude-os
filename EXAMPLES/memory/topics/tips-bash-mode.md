@@ -1,23 +1,23 @@
 # 01/26/2026 Using Bash mode
 
-Source: https://basis.atlassian.net/wiki/rest/api/content/1588723799/view
+Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1588723799
 
 
 Say you need to run a command, and that command results in an error. You want AI (Claude Code or Copilot CLI) to help you troubleshoot the error, so you want the AI to see the output of that command. You have 3 options in order of least efficient to most efficient:
 
-### 1\. You can run the command in your terminal and paste the output into the AI (least efficient) 
+### 1. You can run the command in your terminal and paste the output into the AI (least efficient) 
 
 then paste:
 
 It works, but it's cumbersome.
 
-### 2\. You can ask the AI to run the specific command (medium efficiency)
+### 2. You can ask the AI to run the specific command (medium efficiency)
 
 However, doing this requires the AI to reason about your request and ask for confirmation to run the command.
 
 It may also misinterpret what the command is based on your prompt. Say you wanted it to run `bundle install` safely. You give it the following prompt `run bundle install safely`. How does it know whether `safely` should be part of the bundle install command (ex. `bundle install safely`), or if you're telling it you want it to be careful how it runs the command? There's a use-case for being able to run exactly the command you want to run.
 
-### 3\. You can run the specific command in the AI's context using _Bash mode_ (most efficient)
+### 3. You can run the specific command in the AI's context using _Bash mode_ (most efficient)
 
 Using the `!` Shortcut ([Claude Code](https://code.claude.com/docs/en/interactive-mode#quick-commands), [Github Copilot CLI](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli#run-shell-commands)) you can enable _Bash mode,_ which lets you run commands directly within the AI's context.
 
@@ -26,9 +26,6 @@ Using the `!` Shortcut ([Claude Code](https://code.claude.com/docs/en/interactiv
   2. Review the output. If successful, then you're done
 
   3. If there's a failure, you can then ask the AI to investigate it with a simple "fix" prompt. "fix" is not a special keyword; any natural language way of asking it to solve the issue should work.
-
-
-
 
 This also allows you to efficiently run multiple commands in sequence without errors. When you encounter an error, then engage the AI to help you resolve it:
 
