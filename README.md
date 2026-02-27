@@ -473,7 +473,7 @@ launchctl unload ~/Library/LaunchAgents/com.claude.memory-*.plist
 
 For testing, use 3x speed: 1200 / 28800 / 198720 seconds.
 
-### Option B: Cloud (Recommended for Teams)
+### Option B: Cloud (Phase 4, Subject to Approval)
 
 Best for shared infrastructure. Runs even when individual machines are off.
 
