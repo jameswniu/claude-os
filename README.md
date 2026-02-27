@@ -453,8 +453,8 @@ Best for individual use. Runs when your Mac is on, catches up on missed runs aft
 **Install:**
 ```bash
 # Clone the repo
-git clone https://github.com/jameswniu/claude-os.git ~/scripts/claude-memory
-cd ~/scripts/claude-memory && mkdir -p output
+git clone https://github.com/jameswniu/claude-os.git ~/claude-os
+cd ~/claude-os && mkdir -p output
 chmod +x scripts/*.sh
 
 # Edit scripts: update PROJECT_DIR and MEMORY_DIR paths for your project
@@ -476,7 +476,7 @@ launchctl list | grep com.claude
 
 **Monitor:**
 ```bash
-cat ~/scripts/claude-memory/output/*.log
+cat ~/claude-os/output/*.log
 ```
 
 **Stop:**
@@ -580,6 +580,7 @@ claude-os/
     ├── 2-distill.sh
     ├── 3-promote.sh
     ├── 4-sync-confluence.sh
+    ├── 5-checkpoint.sh
     ├── update-readme.sh
 ├── tests
     ├── test.sh

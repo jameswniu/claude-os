@@ -6,7 +6,7 @@ PROJECT_DIR="/Users/james.niu/media-strategy-generator"
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
 HISTORY="/Users/james.niu/.claude/history.jsonl"
 LAST_RUN_FILE="$MEMORY_DIR/.last-log-run"
-LOG_DIR="/Users/james.niu/scripts/claude-memory/output"
+LOG_DIR="/Users/james.niu/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 

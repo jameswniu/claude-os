@@ -33,7 +33,7 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 
 - 98% of sessions are code review, not code writing
 - Two PR types: config-only (version bumps, YAML changes) and feature PRs (multi-file, complex)
-- Config PRs are low-risk but still get full test suite runs - could be optimized with a lightweight profile
+- Config PRs are low-risk but still get full test suite runs — could be optimized with a lightweight profile
 - Feature PRs (e.g., BP-29421 streaming orchestrator, 21+ files) often need multiple review sessions as PR evolves
 - Tool usage is overwhelmingly read-only: Bash >> Read >> Grep >> Edit >> Write
 
@@ -54,21 +54,22 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 - Hybrid memory system: MEMORY.md (topical lookup) + logs.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
 
-## Topic Files
+## Topic Files (on demand, read when relevant)
 
-Reference docs in `topics/` subfolder. Read on demand (zero tokens until opened).
+Reference docs in `topics/` subfolder. Zero tokens until read.
 
-- `topics/claudehub.md` - ClaudeHub onboarding page, quick start, resources
-- `topics/use-case-library.md` - Proven prompts for code gen, debugging, testing, code review
-- `topics/tips-bash-mode.md` - Using `!` bash mode for efficient command execution
-- `topics/plugin-marketplace.md` - Plugin marketplace plan, repos, task status
+- `topics/claudehub.md` — ClaudeHub main page: onboarding, quick links, key concepts, marketplace info, code examples
+- `topics/use-case-library.md` — Proven prompts for code generation, debugging, testing, documentation, code review
+- `topics/tips-bash-mode.md` — Tip: using `!` bash mode for efficient command execution
+- `topics/plugin-marketplace.md` — Plugin marketplace plan: repos, current plugins, status, architecture
+- Source: Confluence (BET space). Synced every 24h, may be slightly stale.
 
 ## Claude Code File System
 
-- `/CLAUDE.md` - Team instructions, checked into git
-- `/.claude/CLAUDE.md` - Personal instructions, gitignored
-- `/.claude/commands/review.md` - /review slash command
-- `/.claude/settings.local.json` - Permission auto-approvals
-- `~/.claude/projects/{project}/memory/MEMORY.md` - This file, auto-loaded
-- `~/.claude/projects/{project}/memory/logs.md` - Session log, read on demand
-- `~/.claude/projects/{project}/memory/topics/` - Topic files, read on demand
+- `/CLAUDE.md` — Team instructions, checked into git
+- `/.claude/CLAUDE.md` — Personal instructions, gitignored
+- `/.claude/commands/review.md` — /review slash command
+- `/.claude/settings.local.json` — Permission auto-approvals
+- `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
+- `~/.claude/projects/{project}/memory/logs.md` — Session log, read on demand
+- `~/.claude/projects/{project}/memory/topics/` — Topic files, read on demand

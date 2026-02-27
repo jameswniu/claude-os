@@ -5,7 +5,7 @@
 PROJECT_DIR="/Users/james.niu/media-strategy-generator"
 MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
 CLAUDE_MD="$PROJECT_DIR/.claude/CLAUDE.md"
-LOG_DIR="/Users/james.niu/scripts/claude-memory/output"
+LOG_DIR="/Users/james.niu/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 

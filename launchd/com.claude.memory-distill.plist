@@ -7,14 +7,14 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>$HOME/scripts/claude-memory/2-distill.sh</string>
+		<string>$HOME/claude-os/2-distill.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>86400</integer>
 	<key>StandardOutPath</key>
-	<string>$HOME/scripts/claude-memory/output/2-distill-stdout.log</string>
+	<string>$HOME/claude-os/output/2-distill-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>$HOME/scripts/claude-memory/output/2-distill-stderr.log</string>
+	<string>$HOME/claude-os/output/2-distill-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
