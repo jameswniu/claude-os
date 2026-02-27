@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create required directories
+        run: mkdir -p output
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
+
+      - name: Run tests
+        run: bash test.sh

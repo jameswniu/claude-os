@@ -64,7 +64,7 @@ grep -q "3+" "$SCRIPT_DIR/3-promote.sh" && pass "requires 3+ occurrences for pro
 echo ""
 
 # ----------------------------
-echo "## Integration checks"
+echo "## Repo checks"
 # ----------------------------
 
 # Test: output directory exists
@@ -73,19 +73,37 @@ echo "## Integration checks"
 # Test: .gitignore excludes output
 grep -q "output/" "$SCRIPT_DIR/.gitignore" && pass ".gitignore excludes output/" || fail "output/ not in .gitignore"
 
-# Test: memory directory exists
-MEMORY_DIR="/Users/james.niu/.claude/projects/-Users-james-niu-media-strategy-generator/memory"
-[ -d "$MEMORY_DIR" ] && pass "memory directory exists" || fail "memory directory missing"
-[ -f "$MEMORY_DIR/MEMORY.md" ] && pass "MEMORY.md exists" || fail "MEMORY.md missing"
-[ -f "$MEMORY_DIR/log.md" ] && pass "log.md exists" || fail "log.md missing"
-
-# Test: launchd agents loaded
-launchctl list | grep -q "com.claude.memory-log" && pass "log agent loaded" || fail "log agent not loaded"
-launchctl list | grep -q "com.claude.memory-distill" && pass "distill agent loaded" || fail "distill agent not loaded"
-launchctl list | grep -q "com.claude.memory-promote" && pass "promote agent loaded" || fail "promote agent not loaded"
-
 # Test: no em dashes in README
 grep -q "—" "$SCRIPT_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
+
+# Test: plist files are valid XML
+for PLIST in "$SCRIPT_DIR"/com.claude.memory-*.plist; do
+  NAME=$(basename "$PLIST")
+  xmllint --noout "$PLIST" 2>/dev/null && pass "$NAME is valid XML" || fail "$NAME is invalid XML"
+done
+
+# ----------------------------
+echo ""
+echo "## Local integration checks (skipped in CI)"
+# ----------------------------
+
+if [ -z "$CI" ]; then
+  # Test: memory directory exists
+  # Claude Code encodes project paths: /Users/name/repo -> -Users-name-repo
+  PROJECT_SLUG=$(echo "$HOME/media-strategy-generator" | tr '/.' '-' | sed 's/^//')
+  MEMORY_DIR="$HOME/.claude/projects/${PROJECT_SLUG}/memory"
+  [ -d "$MEMORY_DIR" ] && pass "memory directory exists" || fail "memory directory missing"
+  [ -f "$MEMORY_DIR/MEMORY.md" ] && pass "MEMORY.md exists" || fail "MEMORY.md missing"
+  [ -f "$MEMORY_DIR/log.md" ] && pass "log.md exists" || fail "log.md missing"
+
+  # Test: launchd agents loaded
+  launchctl list | grep -q "com.claude.memory-log" && pass "log agent loaded" || fail "log agent not loaded"
+  launchctl list | grep -q "com.claude.memory-distill" && pass "distill agent loaded" || fail "distill agent not loaded"
+  launchctl list | grep -q "com.claude.memory-promote" && pass "promote agent loaded" || fail "promote agent not loaded"
+else
+  echo "  SKIP: memory directory (CI)"
+  echo "  SKIP: launchd agents (CI)"
+fi
 
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
