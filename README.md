@@ -25,11 +25,12 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
-bash ~/claude-os/install.sh
+cd ~/your-project
+bash ~/claude-os/scripts/6-bootstrap.sh
 ```
 
-`install.sh` sets up:
-- `checkpoint` and `bootstrap` shell commands
+Bootstrap auto-runs `install.sh` on first use, which sets up:
+- `checkpoint` and `bootstrap` shell aliases (so next time just type `bootstrap`)
 - Pre-push git hook (runs tests before every push to this repo)
 - `~/.local/bin` on PATH
 
