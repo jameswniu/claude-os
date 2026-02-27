@@ -102,9 +102,9 @@ No setup needed. Just follow this rhythm as you work:
 Replace the manual loop with scheduled scripts.
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project:
-- `~/claude-os/scripts/1-log.sh` — session logger (every 1h)
-- `~/claude-os/scripts/2-distill.sh` — pattern distiller (every 24h)
-- `~/claude-os/scripts/3-promote.sh` — rule promoter (every 7d)
+- `~/claude-os/scripts/1-log.sh` - session logger (every 1h)
+- `~/claude-os/scripts/2-distill.sh` - pattern distiller (every 24h)
+- `~/claude-os/scripts/3-promote.sh` - rule promoter (every 7d)
 
 Then install and verify:
 ```bash
@@ -249,15 +249,15 @@ Set up the four core files that give Claude persistent context across sessions.
 
 ### Setup
 
-1. **Team CLAUDE.md** - should already exist in your repo root. If not, create one with build commands, architecture overview, testing requirements, and code style rules.
+1. **Team CLAUDE.md** -  should already exist in your repo root. If not, create one with build commands, architecture overview, testing requirements, and code style rules.
 
-2. **Personal CLAUDE.md** - create `/.claude/CLAUDE.md` for your own rules. Examples:
+2. **Personal CLAUDE.md** -  create `/.claude/CLAUDE.md` for your own rules. Examples:
    - PR review workflow preferences
    - Comment style (no em dashes, no verdicts, etc.)
    - Environment constraints (missing CLI tools, API endpoints)
    - Behavior rules (no unsolicited edits, which config file to use for what)
 
-3. **Settings** - `/.claude/settings.local.json` accumulates automatically as you approve tool calls. You can also edit it directly:
+3. **Settings** -  `/.claude/settings.local.json` accumulates automatically as you approve tool calls. You can also edit it directly:
    ```json
    {
      "permissions": {
@@ -270,7 +270,7 @@ Set up the four core files that give Claude persistent context across sessions.
    }
    ```
 
-4. **Memory** - Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
+4. **Memory** -  Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
 
 5. **Topic files** (optional) - Create a `topics/` subfolder in the memory directory. Drop markdown files there for reference material too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Add one-line hints in `MEMORY.md` pointing to `topics/filename.md` so Claude knows they exist and when to read them.
 
@@ -316,7 +316,7 @@ The first three steps are personal. The last step is a team activity: during spr
 
 ### Setup
 
-1. **Add logs.md** - create `~/.claude/projects/{project}/memory/logs.md`:
+1. **Add logs.md** -  create `~/.claude/projects/{project}/memory/logs.md`:
    ```markdown
    # Session Log
 
@@ -334,21 +334,21 @@ The first three steps are personal. The last step is a team activity: during spr
    - Update MEMORY.md topics only when stable new patterns are confirmed.
    ```
 
-3. **Distill (daily)** - at the end of each day, tell Claude:
+3. **Distill (daily)** -  at the end of each day, tell Claude:
    ```
    Read memory/logs.md and memory/MEMORY.md.
    Distill any new patterns from today's logs into MEMORY.md.
    Do not duplicate existing entries.
    ```
 
-4. **Promote to personal rules (weekly)** - at the end of each week, tell Claude:
+4. **Promote to personal rules (weekly)** -  at the end of each week, tell Claude:
    ```
    Read memory/MEMORY.md and .claude/CLAUDE.md.
    If any pattern in MEMORY.md appeared 3+ times and is not yet a rule,
    add it to .claude/CLAUDE.md under the appropriate section.
    ```
 
-5. **Promote to team rules (sprint review)** - during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example: *"Claude keeps trying to use gh CLI." "Same here, three times this sprint."* → Add to CLAUDE.md: `gh CLI is NOT installed. Do not attempt to use it.`
+5. **Promote to team rules (sprint review)** -  during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example: *"Claude keeps trying to use gh CLI." "Same here, three times this sprint."* → Add to CLAUDE.md: `gh CLI is NOT installed. Do not attempt to use it.`
 
 ### Tutorials: Three Roles, Three Workflows
 
@@ -366,20 +366,20 @@ Monday, she asks Claude to generate a new `/api/campaigns/:id/metrics` endpoint.
 
 She logs it manually:
 
-> **logs.md** — `## 2026-03-03`
+> **logs.md** - `## 2026-03-03`
 > - Generated metrics endpoint. Claude put validation in controller instead of service layer.
 > - Had to move validation to CampaignService.validate_metrics_params().
 > - Claude also tried to import from `src.utils.validators` which doesn't exist.
 
 End of day, she tells Claude to distill. MEMORY.md gets:
 
-> **MEMORY.md** — `## Code Patterns`
+> **MEMORY.md** - `## Code Patterns`
 > - Validation logic belongs in the service layer, not controllers.
 > - No `src.utils.validators` module exists. Validation helpers are in each service file.
 
 By Friday, the same issue came up 3 more times. She promotes to her personal rules:
 
-> **.claude/CLAUDE.md** — `## Code Patterns`
+> **.claude/CLAUDE.md** - `## Code Patterns`
 > - Always put validation logic in the service layer, never in controllers.
 > - There is no shared validators module. Each service handles its own validation.
 
@@ -403,21 +403,21 @@ Tuesday, a client sends an RFP asking about real-time reporting capabilities. De
 
 He logs it:
 
-> **logs.md** — `## 2026-03-04`
+> **logs.md** - `## 2026-03-04`
 > - Drafted RFP response for real-time reporting. Claude used "dashboard" instead of "Insights Hub."
 > - Included predictive analytics as a feature. That's on the roadmap, not shipped.
 > - Had to rewrite 60% of the response to match our product language.
 
 End of day, he distills to MEMORY.md:
 
-> **MEMORY.md** — `## Product Language`
+> **MEMORY.md** - `## Product Language`
 > - Real-time reporting product is called "Insights Hub," not "dashboard" or "reporting tool."
 > - Predictive analytics is roadmap only (Q3 2026). Do not reference as a current feature.
 > - Standard RFP responses use "Basis platform" not "our system" or "the tool."
 
 By Friday, the naming issue came up in two more RFP sections and a client email. He promotes:
 
-> **.claude/CLAUDE.md** — `## RFP Rules`
+> **.claude/CLAUDE.md** - `## RFP Rules`
 > - Use official product names: "Insights Hub" (reporting), "Basis DSP" (buying), "Campaign Manager" (planning).
 > - Never reference roadmap features as current capabilities. Check with Product if unsure.
 > - Use "Basis platform" as the default product reference, not "our system/tool/software."
@@ -442,21 +442,21 @@ Wednesday, a campaign shows zero impressions. She asks Claude to help diagnose. 
 
 She logs it:
 
-> **logs.md** — `## 2026-03-05`
+> **logs.md** - `## 2026-03-05`
 > - Debugged zero-impression campaign. Claude suggested "line item" checks (GAM term). We use "ad group."
 > - Missed the #1 cause: flight start date timezone is UTC, campaign was set to EST.
 > - Had to manually check timezone offset before Claude's other suggestions were useful.
 
 End of day, she distills:
 
-> **MEMORY.md** — `## Ad Ops Terminology`
+> **MEMORY.md** - `## Ad Ops Terminology`
 > - Basis uses "ad group" not "line item" (Google), "placement" not "ad unit" (DFP).
 > - Flight dates are stored in UTC. Always convert to the campaign's local timezone first.
 > - Zero-impression triage order: (1) timezone mismatch, (2) budget cap, (3) targeting overlap, (4) creative approval status.
 
 By Friday, the terminology issue appeared twice more. She promotes:
 
-> **.claude/CLAUDE.md** — `## Ad Ops`
+> **.claude/CLAUDE.md** - `## Ad Ops`
 > - Use Basis terminology: "ad group" (not line item), "placement" (not ad unit), "flight" (not campaign period).
 > - Flight dates are UTC. Always check timezone offset as first troubleshooting step.
 > - Zero-impression triage: timezone > budget > targeting > creative status. Follow this order.
@@ -475,15 +475,15 @@ Claude uses correct Basis terminology and follows the triage order every time. W
 
 After a few weeks, your `.claude/CLAUDE.md` should contain rules that were earned through repeated experience, not guessed upfront. Example progression:
 
-> `logs.md` — "02-18: Claude tried gh CLI, not installed" ... "02-19: again" ... "02-20: a third time"
+> `logs.md` -"02-18: Claude tried gh CLI, not installed" ... "02-19: again" ... "02-20: a third time"
 >
 > ↓ distill
 >
-> `MEMORY.md` — "gh CLI is not installed, recurring friction (3x)"
+> `MEMORY.md` -"gh CLI is not installed, recurring friction (3x)"
 >
 > ↓ promote
 >
-> `.claude/CLAUDE.md` — "gh CLI is NOT installed. Do not attempt to use it."
+> `.claude/CLAUDE.md` -"gh CLI is NOT installed. Do not attempt to use it."
 
 ---
 
@@ -619,9 +619,9 @@ client = anthropic.Anthropic()
 ```
 
 **Suggested platforms:**
-- **Bitbucket Pipelines** - scheduled pipelines, already in your toolchain
-- **AWS Lambda + EventBridge** - serverless, pay-per-invocation
-- **GitHub Actions** - cron schedules, free tier available
+- **Bitbucket Pipelines** -  scheduled pipelines, already in your toolchain
+- **AWS Lambda + EventBridge** -  serverless, pay-per-invocation
+- **GitHub Actions** -  cron schedules, free tier available
 
 ---
 
@@ -630,37 +630,37 @@ client = anthropic.Anthropic()
 **Your repo (Phase 1 & 2):**
 
 - `/your-repo/`
-  - `CLAUDE.md` — Team rules (git tracked)
+  - `CLAUDE.md` - Team rules (git tracked)
   - `.claude/`
-    - `CLAUDE.md` — Personal rules (gitignored)
-    - `settings.local.json` — Permission auto-approvals (gitignored)
-    - `commands/review.md` — Custom slash commands
+    - `CLAUDE.md` - Personal rules (gitignored)
+    - `settings.local.json` - Permission auto-approvals (gitignored)
+    - `commands/review.md` - Custom slash commands
 - `~/.claude/projects/{project}/memory/`
-  - `MEMORY.md` — Topical patterns (auto-loaded)
-  - `logs.md` — Session history (on demand)
-  - `topics/` — On-demand reference files (zero tokens until read)
-    - `claudehub.md` — Synced from Confluence
-    - `use-case-library.md` — Synced from Confluence
-    - `api-specs.md` — Manual or synced
-  - `archive/YYYY-MM.md` — Rolled-off old logs
+  - `MEMORY.md` - Topical patterns (auto-loaded)
+  - `logs.md` - Session history (on demand)
+  - `topics/` - On-demand reference files (zero tokens until read)
+    - `claudehub.md` - Synced from Confluence
+    - `use-case-library.md` - Synced from Confluence
+    - `api-specs.md` - Manual or synced
+  - `archive/YYYY-MM.md` - Rolled-off old logs
 
 **This repo (Phase 3 automation):**
 
 - `claude-os/`
-  - `.github/workflows/test.yml` — CI test runner
-  - `EXAMPLES/` — Snapshot templates (CLAUDE.md, .claude/, memory/)
+  - `.github/workflows/test.yml` - CI test runner
+  - `EXAMPLES/` - Snapshot templates (CLAUDE.md, .claude/, memory/)
   - `README.md`
-  - `install.sh` — Installs `checkpoint` and `bootstrap` commands
-  - `launchd/` — macOS scheduler plists (log, distill, promote, sync)
+  - `install.sh` - Installs `checkpoint` and `bootstrap` commands
+  - `launchd/` - macOS scheduler plists (log, distill, promote, sync)
   - `scripts/`
-    - `1-log.sh` — Session logger (every 1h)
-    - `2-distill.sh` — Pattern distiller (every 24h)
-    - `3-promote.sh` — Rule promoter (every 7d)
-    - `4-sync-confluence.sh` — Confluence page syncer (every 24h)
-    - `5-checkpoint.sh` — Snapshot workspace to this repo
-    - `6-init.sh` — Bootstrap new project workspace
-    - `update-readme.sh` — Regenerate file tree in README
-  - `tests/test.sh` — Validation tests
+    - `1-log.sh` - Session logger (every 1h)
+    - `2-distill.sh` - Pattern distiller (every 24h)
+    - `3-promote.sh` - Rule promoter (every 7d)
+    - `4-sync-confluence.sh` - Confluence page syncer (every 24h)
+    - `5-checkpoint.sh` - Snapshot workspace to this repo
+    - `6-init.sh` - Bootstrap new project workspace
+    - `update-readme.sh` - Regenerate file tree in README
+  - `tests/test.sh` - Validation tests
 
 ---
 
@@ -670,7 +670,10 @@ client = anthropic.Anthropic()
 > Yes. launchd agents run as long as you're logged in. Lock screen does not stop them.
 
 **What about sleep?**
-> launchd catches up on missed runs when the Mac wakes. No data is lost.
+> Sleep pauses launchd jobs. Missed intervals are skipped, not queued. To prevent this, disable system sleep while keeping display sleep: `sudo pmset -a displaysleep 15 sleep 0 disksleep 0`. The display turns off after 15 minutes, but the system stays awake and launchd keeps firing on schedule.
+
+**Does this only work on Mac?**
+> Phase 3 automation (launchd) is macOS only. On Linux, replace the plist files with cron jobs. Phases 1 and 2 (static context and manual loop) work on any OS that runs Claude Code.
 
 **How much does the automation cost?**
 > Each script run is capped with `--max-budget-usd`. Default: $0.05 for log, $0.25 for distill, $0.25 for promote. The Confluence sync uses no LLM (just curl), so it's free. At production frequency: ~$4/week.
