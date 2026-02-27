@@ -4,18 +4,18 @@ An enterprise standards personalized assistant for Claude Code. A layered contex
 
 ## What Teams Are Asking
 
-| Department | # | Without Memory System (Stock Claude) | Evals |
-|------------|---|--------------------------------------|-------|
-| **Engineering** | 42 | Puts validation in wrong layer (no architecture rules) / Uses CLI tools that aren't installed (no env constraints) / Ignores team test patterns and helpers (no convention memory) | Architecture compliance rate / Env constraint adherence / Test pattern accuracy |
-| **Data & Analytics** | 36 | Queries tables that don't exist in our schema (no schema memory) / Uses wrong join patterns for our data model (no convention rules) / Generates tests without our fixture helpers (no test pattern memory) | Schema accuracy rate / Join pattern compliance / Fixture usage rate |
-| **Product & Design** | 24 | Drafts specs in wrong format (no template rules) / References deprecated fields (no freshness from sync) / Misses team changelog conventions (no style memory) | Template compliance rate / Field accuracy / Style adherence |
-| **IT & ProdOps** | 24 | Suggests unavailable tools (no env constraints) / Generates infra configs without module conventions (no pattern rules) / Doesn't reference existing runbooks (no topic file access) | Tool availability accuracy / Config convention compliance / Runbook reference rate |
-| **Ad Operations** | 23 | Doesn't know our tag naming conventions (no naming rules) / References fields renamed last quarter (no freshness) / Generates reports in wrong client format (no template memory) | Naming accuracy / Field freshness / Report format compliance |
-| **Sales** | 45 | Uses outdated product features in RFP responses (no freshness) / Mixes competitor terminology with ours (no brand rules) / Doesn't know current pricing or packaging (no business context) | Feature accuracy / Terminology compliance / Pricing accuracy |
-| **Investment & Buying** | 31 | Uses wrong pacing formulas (no calculation rules) / Misapplies budget categories (no taxonomy memory) / Maps billing fields incorrectly (no schema memory) | Formula accuracy / Category compliance / Field mapping accuracy |
-| **Integrated Planners** | 23 | Builds plans without our template structure (no template rules) / Uses industry benchmarks instead of our historicals (no data memory) / Doesn't know our vendor rate cards (no business context) | Template compliance / Benchmark accuracy / Rate card awareness |
+| Department | # | Top 3 Pain Points | Evals |
+|------------|---|-------------------|-------|
+| **Engineering** | 42 | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" | Review time (-30-50%) / Debug-to-fix time (-20-40%) / Refactoring time (-25-50%) |
+| **Data & Analytics** | 36 | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" | Time-to-resolution (-30-50%) / Query gen time (-50-70%) / Test scaffolding time (-50-80%) |
+| **Product & Design** | 24 | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" | First-draft time (-50-70%) / Impact analysis time (-40-60%) / Summarization time (-70-85%) |
+| **IT & ProdOps** | 24 | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" | Incident triage time (-40-60%) / IaC gen time (-40-60%) / Investigation time (-50-75%) |
+| **Ad Operations** | 23 | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" | Troubleshooting time (-30-50%) / Validation time (-50-70%) / Report gen time (-50-70%) |
+| **Sales** | 45 | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" | RFP drafting time (-50-70%) / Summarization time (-60-80%) / Analysis time (-50-65%) |
+| **Investment & Buying** | 31 | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" | Calculation time (-50-70%) / Audit time (-60-80%) / Reconciliation time (-60-80%) |
+| **Integrated Planners** | 23 | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" | Plan drafting time (-40-60%) / Scenario analysis time (-50-70%) / Research time (-50-70%) |
 
-Stock Claude Code has no team context, no org standards, no learning, and no grounding in enterprise resources. The memory system below closes these gaps, so output is personalized, standardized, and grounded from the first prompt.
+Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
 
 ---
 
