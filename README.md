@@ -93,7 +93,7 @@ flowchart TD
 | `log.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand |
 | `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked |
 
-Example templates for all files are in the [`examples/`](examples/) directory.
+Example templates for all files are in the [`EXAMPLES/`](EXAMPLES/) directory.
 
 ---
 
