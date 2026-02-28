@@ -206,6 +206,49 @@
 
 ---
 
+## 2026-02-28 (Day 11) — Bug Fix from PR Review + UI Smoke Test
+
+### PR Review & Bug Discovery (BP-29577)
+- Reviewed PR #208 (`BP-29577-demo-capture-test`), originally a test comment on ToolCallExpander.tsx
+- Read all PR comments, found documented bug: tool card names show clean during SSE streaming but revert to raw prefixed names ("Media Strategies Create Strategy") after page refresh
+- Root cause: `/history` endpoint returns `tool_name` with MCP server prefix but no `display_name`, frontend falls back to title-casing the raw name
+- Three fix options proposed in PR comments. Recommended Option 2 (frontend strip), user asked about new MCP server scalability, pivoted to Option 1 (backend `display_name`)
+
+### Bug Fix Implementation
+- Added `display_name` field to `ChatHistoryToolOutput` model (models.py)
+- `ChatHistoryService` now accepts `server_names`, calls existing `strip_server_prefix()` when building tool outputs (chat_history_service.py)
+- Route passes `request.app.state.mcp_server_names` into service (routes.py)
+- Frontend uses `display_name` from history response when reconstructing tool markers (chat.ts)
+- Also hardened `HIDDEN_TOOLS` filter to check both raw and stripped names (future-proofing if agent tools migrate to MCP)
+- Removed test comment from ToolCallExpander.tsx
+- All tests pass (16 history + 33 routes + 670 frontend), lint clean (ruff, mypy strict, ESLint)
+
+### UI Smoke Test
+- Ran automated UI smoke test via Chrome extension on localhost:3001
+- Sent strategy creation prompt, verified both streaming and persisted states show clean tool names
+- Confirmed `/history` API returns both `tool_name` (prefixed) and `display_name` (stripped)
+- Exported before/after GIF recordings, stored on orphan tag `BP-29577-ui-test-evidence`
+
+### Artifact Management
+- Found demo files (Playwright recordings) committed to PR branch that would merge into main
+- Moved all artifacts to git tag, updated PR comment links from `refs/heads/` to `refs/tags/`
+- Recovered orphaned annotated bug GIFs after tag force-update lost them
+- Added raw before/after GIFs from Downloads to tag for PR evidence
+- Updated 4 PR comments to use correct `raw/` URLs pointing to tag
+
+### PR Comments Posted
+- UI smoke test results (before state with bug evidence)
+- UI smoke test results (after state with fix verification)
+- Code review summary (changes, regression scan, test results)
+
+### Key Learnings
+- Force-updating a git tag orphans the old commit and loses files not carried forward
+- When moving artifacts between refs, verify all linked files exist on the new ref before pushing
+- Option 1 (backend `display_name`) is better than Option 2 (frontend strip) because server names are dynamic, not hardcoded
+- Review should not flag theoretical issues that can't happen in practice (e.g., agent tools getting MCP prefixes)
+
+---
+
 ## Cumulative Friction Log
 
 | Date | Friction | Resolution |
