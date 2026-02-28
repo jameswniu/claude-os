@@ -47,8 +47,6 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in `topics/` subfolder. Zero tokens until read.
-- `topics/claudehub.md` -- ClaudeHub overview
-- `topics/code-reviews.md` -- Code review best practices
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
 
 ## Claude OS Repo
