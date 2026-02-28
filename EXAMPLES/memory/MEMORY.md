@@ -22,6 +22,10 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 - Tech stack: (learned per project)
 - Test suite: (learned per project)
 
+## PR Comment Style
+
+- When PR comments reference supporting evidence (GIF recordings, screenshots, artifact tags, etc.), always include direct links to the specific files, not just the parent folder or tag page.
+
 ## PR Review Patterns
 
 - Two PR types: config-only (version bumps, YAML changes) and feature PRs (multi-file, complex)
@@ -42,6 +46,7 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 - Wants timestamped memory for future learning loop / rolling window implementation.
 - Hybrid memory system: MEMORY.md (topical lookup) + logs.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
+- PR comments must include direct Bitbucket links when referencing tags, branches, or other repo resources (not just plain text names)
 - Interested in pre-push hooks or CI gates to enforce test runs before pushing
 
 ## Topic Files (on demand, read when relevant)
