@@ -25,7 +25,13 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
-cd ~/your-project
+```
+
+```bash
+cd ~/<repo-name>
+```
+
+```bash
 bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh
 ```
 
@@ -81,7 +87,7 @@ bootstrap
 Run the init script from any project directory. It copies template files only if they don't already exist.
 
 ```bash
-cd ~/<your-project>
+cd ~/<repo-name>
 bootstrap
 ```
 
@@ -689,7 +695,13 @@ Best for individual use. Runs when your Mac is on, catches up on missed runs aft
 Clone and set up:
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
+```
+
+```bash
 cd ~/claude-os && mkdir -p output
+```
+
+```bash
 chmod +x <repo-name>/.claude/scripts/*.sh
 ```
 
@@ -765,7 +777,7 @@ client = anthropic.Anthropic()
 
 **Your repo (Phase 1 & 2):**
 
-- `/your-repo/`
+- `<repo-name>/`
   - `CLAUDE.md` - Team rules (git tracked)
   - `.claude/`
     - `CLAUDE.md` - Personal rules (gitignored)
