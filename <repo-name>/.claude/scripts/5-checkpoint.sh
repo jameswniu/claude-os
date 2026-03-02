@@ -198,10 +198,12 @@ for TOPIC in "$MEM"/*.md; do
     [ "$NAME" = "logs.md" ] && continue
 
     python3 -c "
-import re
+import re, sys
 
 with open('$TOPIC') as f:
-    content = f.read()
+    original = f.read()
+
+content = original
 
 # Strip Confluence page IDs
 content = re.sub(r'\(confluence:\d+\)', '', content)
@@ -220,8 +222,14 @@ content = content.rstrip() + '\n'
 
 with open('$MEM_TMPL/$NAME', 'w') as f:
     f.write(content)
+
+sys.exit(0 if content != original else 2)
 " 2>/dev/null
-    echo "  FILTERED $NAME  → $MEM_TMPL/$NAME"
+    if [ $? -eq 0 ]; then
+        echo "  FILTERED $NAME  → $MEM_TMPL/$NAME"
+    else
+        echo "  SKIPPED  $NAME  → $MEM_TMPL/$NAME"
+    fi
 done
 
 # ============================================================
