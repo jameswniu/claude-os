@@ -27,9 +27,10 @@ mkdir -p "$EX/memory" "$EX/.claude"
 # ============================================================
 # 1. Filter MEMORY.md (existing logic + flat topic index)
 # ============================================================
-# Skip MEMORY.md filter if source is empty (prevents overwriting good template with blank)
-if [ ! -s "$MEM/MEMORY.md" ]; then
-    echo "Warning: $MEM/MEMORY.md is empty or missing, skipping MEMORY.md filter"
+# Skip MEMORY.md filter if source is empty or near-empty (prevents overwriting good template with blank)
+MEMLINES=$(wc -l < "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+if [ "$MEMLINES" -lt 5 ]; then
+    echo "Warning: $MEM/MEMORY.md has only $MEMLINES lines, skipping MEMORY.md filter"
 else
 python3 -c "
 import re, sys
