@@ -58,14 +58,6 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in the memory directory. Zero tokens until read.
-- `ai-code-reviewer-project.md` -- when planning AI code review integrations
-- `ai-development-tools-use-case-library.md` -- when exploring AI tool use cases or writing prompts
-- `archived-git-branching-and-pull-request-guidelines.md` -- historical reference for legacy branching rules
-- `claudehub.md` -- when onboarding to Claude Code or finding internal resources
-- `code-reviews.md` -- when reviewing PRs or discussing review practices
-- `informal-tech-mentorship.md` -- when mentoring or structuring knowledge transfer
-- `scalable-applications-and-architecture.md` -- when designing services or making architecture decisions
-- `tickets-branching-and-pull-requests-oh-my.md` -- when setting up git workflows or branching strategies
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
 
 ## Claude OS Repo
@@ -94,19 +86,6 @@ Reference docs in the memory directory. Zero tokens until read.
 - Automated UI smoke tests via browser extension on localhost
 - Export before/after GIF recordings as PR evidence
 - Store test artifacts on orphan git tags (not PR branches) to avoid merging demo files into main
-- PR comment links should use raw URLs pointing to tags for GIF/image display
-
-## Claude Code File System
-
-- `/CLAUDE.md` — Team instructions, checked into git
-- `/.claude/` — Gitignored as of 02-27 (removed from tracking, added to `.gitignore`)
-- `/.claude/CLAUDE.md` — Personal instructions, gitignored
-- `/.claude/commands/review.md` — /review slash command
-- `/.claude/settings.local.json` — Permission auto-approvals
-- `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
-- `~/.claude/projects/{project}/memory/logs.md` — Session log, read on demand
-- `~/.claude/projects/{project}/memory/*.md` — Topic files, read on demand
-phan git tags (not PR branches) to avoid merging demo files into main
 - PR comment links should use raw URLs pointing to tags for GIF/image display
 
 ## Claude Code File System
