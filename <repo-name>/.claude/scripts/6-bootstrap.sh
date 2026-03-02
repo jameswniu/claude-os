@@ -172,34 +172,44 @@ export MEMORY_FILE="$MEM/MEMORY.md"
 
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
     BEFORE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+    CONF_MARKER=$(mktemp)
     if bash "$PROJECT/.claude/scripts/4-sync-confluence.sh"; then
         AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
-            echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)  → $MEM/"
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)"
         else
-            echo "  SYNCED   Confluence ($AFTER_COUNT topics)  → $MEM/"
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics)"
         fi
+        for f in $(find "$MEM" -maxdepth 1 -name "*.md" -newer "$CONF_MARKER" | sort); do
+            echo "           → $f"
+        done
     else
         echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
     fi
+    rm -f "$CONF_MARKER"
 else
     echo "  SKIPPED  Confluence (see README for setup)"
 fi
 
 if [ -n "$NOTION_TOKEN" ]; then
     BEFORE_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+    NOTION_MARKER=$(mktemp)
     if bash "$PROJECT/.claude/scripts/5-sync-notion.sh"; then
         AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
-            echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)  → $MEM/"
+            echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)"
         else
-            echo "  SYNCED   Notion ($AFTER_COUNT topics)  → $MEM/"
+            echo "  SYNCED   Notion ($AFTER_COUNT topics)"
         fi
+        for f in $(find "$MEM" -maxdepth 1 -name "*.md" -newer "$NOTION_MARKER" | sort); do
+            echo "           → $f"
+        done
     else
         echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
     fi
+    rm -f "$NOTION_MARKER"
 else
     echo "  SKIPPED  Notion (see README for setup)"
 fi
