@@ -216,6 +216,8 @@ content = re.sub(r'https?://basis\.atlassian\.net[^\s\n)]*', '(internal URL)', c
 # Strip internal project/team names that are Basis-specific
 content = re.sub(r'\bCEN\b(?=/)', '(PROJECT)', content)
 content = re.sub(r'media-strategy-generator', '(project-name)', content)
+# Check if project-specific content was actually stripped (before cleanup)
+filtered = content != original
 # Clean up
 content = re.sub(r'\n{3,}', '\n\n', content)
 content = content.rstrip() + '\n'
@@ -223,7 +225,7 @@ content = content.rstrip() + '\n'
 with open('$MEM_TMPL/$NAME', 'w') as f:
     f.write(content)
 
-sys.exit(0 if content != original else 2)
+sys.exit(0 if filtered else 2)
 " 2>/dev/null
     if [ $? -eq 0 ]; then
         echo "  FILTERED $NAME  → $MEM_TMPL/$NAME"
