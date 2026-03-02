@@ -1,6 +1,6 @@
 # Memory
 
-Topical reference for quick lookup. See `logs.md` for chronological session history.
+Topical reference for quick lookup. See `history/logs.md` for chronological session history.
 
 ## Bitbucket API
 
@@ -50,7 +50,7 @@ Topical reference for quick lookup. See `logs.md` for chronological session hist
 - Hands-off, delegation-oriented. Issues a command and lets Claude run autonomously.
 - Brief corrective nudges when things go wrong, not lengthy re-explanations.
 - Wants timestamped memory for future learning loop / rolling window implementation.
-- Hybrid memory system: MEMORY.md (topical lookup) + logs.md (chronological sessions).
+- Hybrid memory system: MEMORY.md (topical lookup) + history/logs.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
 - PR comments must include direct Bitbucket links when referencing tags, branches, or other repo resources (not just plain text names)
 - Interested in pre-push hooks or CI gates to enforce test runs before pushing
@@ -104,5 +104,5 @@ Reference docs in the memory directory. Zero tokens until read.
 - `/.claude/commands/review.md` — /review slash command
 - `/.claude/settings.local.json` — Permission auto-approvals
 - `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
-- `~/.claude/projects/{project}/memory/logs.md` — Session log, read on demand
+- `~/.claude/projects/{project}/memory/history/logs.md` — Session log, read on demand
 - `~/.claude/projects/{project}/memory/*.md` — Topic files, read on demand

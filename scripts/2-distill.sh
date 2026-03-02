@@ -21,7 +21,7 @@ cd "$PROJECT_DIR"
 unset CLAUDECODE
 
 (claude -p "You are a memory distiller. Read both files:
-1. $MEMORY_DIR/logs.md (session history)
+1. $MEMORY_DIR/history/logs.md (session history)
 2. $MEMORY_DIR/MEMORY.md (topical patterns)
 
 Your job:

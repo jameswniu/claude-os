@@ -28,7 +28,7 @@ cp -r "$REAL_REPO/scripts" "$CO/"
 echo "# Seed" > "$CO/EXAMPLES/.claude/CLAUDE.md"
 echo '{}' > "$CO/EXAMPLES/.claude/settings.local.json"
 echo "# Seed" > "$CO/EXAMPLES/memory/MEMORY.md"
-echo "# Seed" > "$CO/EXAMPLES/memory/logs.md"
+mkdir -p "$CO/EXAMPLES/memory/history" && echo "# Seed" > "$CO/EXAMPLES/memory/history/logs.md"
 
 cd "$CO"
 git init -q
@@ -113,7 +113,8 @@ Reference docs in the memory directory.
 - Brief, direct communication
 EOF
 
-cat > "$MEM/logs.md" << 'EOF'
+mkdir -p "$MEM/history"
+cat > "$MEM/history/logs.md" << 'EOF'
 # Logs
 - 2024-01-01: Did some work
 EOF

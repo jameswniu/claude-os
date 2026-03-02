@@ -21,12 +21,14 @@ echo "Project: $PROJECT"
 echo ""
 
 # Phase 1: Sync all files from production EXAMPLES
-mkdir -p .claude "$MEM"
+mkdir -p .claude "$MEM/history"
 
 [ ! -f .claude/CLAUDE.md ] && cp "$EX/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"
 [ ! -f .claude/settings.local.json ] && cp "$EX/.claude/settings.local.json" .claude/settings.local.json && echo "  CREATED  .claude/settings.local.json" || echo "  EXISTS   .claude/settings.local.json"
 [ ! -f "$MEM/MEMORY.md" ] && cp "$EX/memory/MEMORY.md" "$MEM/MEMORY.md" && echo "  CREATED  MEMORY.md" || echo "  EXISTS   MEMORY.md"
-[ ! -f "$MEM/logs.md" ] && cp "$EX/memory/logs.md" "$MEM/logs.md" && echo "  CREATED  logs.md" || echo "  EXISTS   logs.md"
+# Migrate old logs.md to history/ subfolder
+[ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md"
+[ ! -f "$MEM/history/logs.md" ] && cp "$EX/memory/history/logs.md" "$MEM/history/logs.md" && echo "  CREATED  history/logs.md" || echo "  EXISTS   history/logs.md"
 
 # Slash commands (always overwrite with latest)
 for FILE in "$EX/.claude/commands"/*.md; do
@@ -42,7 +44,6 @@ for FILE in "$EX/memory"/*.md; do
     [ -f "$FILE" ] || continue
     NAME=$(basename "$FILE")
     [ "$NAME" = "MEMORY.md" ] && continue
-    [ "$NAME" = "logs.md" ] && continue
     cp "$FILE" "$MEM/$NAME"
     echo "  SYNCED   $NAME"
 done

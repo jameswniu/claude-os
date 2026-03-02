@@ -5,14 +5,14 @@
 # Reads from (running project):
 #   - $PROJECT/.claude/CLAUDE.md            Personal rules with promoted learnings
 #   - $MEM/MEMORY.md                        Accumulated knowledge
-#   - $MEM/logs.md                          Session history
+#   - $MEM/history/logs.md                   Session history
 #   - $MEM/*.md (topic files)               Confluence-synced reference docs
 #
 # Writes to (filtered templates in EXAMPLES/):
 #   - EXAMPLES/.claude/CLAUDE.md            Universal rules, project values replaced
 #   - EXAMPLES/memory/MEMORY.md             Filtered + situation-based topic index
 #   - EXAMPLES/memory/*.md (topic files)    Distilled, 1:1 with source
-#   - EXAMPLES/memory/logs.md               Copy as-is
+#   - EXAMPLES/memory/history/logs.md        Copy as-is
 
 CLAUDE_OS="$HOME/claude-os"
 EX="$CLAUDE_OS/EXAMPLES"
@@ -217,7 +217,7 @@ done
 # ============================================================
 # 4. Copy logs.md as-is
 # ============================================================
-cp "$MEM/logs.md" "$EX/memory/" 2>/dev/null
+mkdir -p "$EX/memory/history" && cp "$MEM/history/logs.md" "$EX/memory/history/" 2>/dev/null
 
 # ============================================================
 # 5. Update MEMORY.md template with situation-based topic index
@@ -246,7 +246,7 @@ topic_hints = {
 # Get actual topic files in EXAMPLES
 topic_files = sorted([
     f for f in os.listdir(ex_memory)
-    if f.endswith('.md') and f not in ('MEMORY.md', 'logs.md')
+    if f.endswith('.md') and f != 'MEMORY.md'
 ])
 
 # Build index lines

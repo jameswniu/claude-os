@@ -45,7 +45,7 @@ When you `cd` into a new repo and start Claude Code:
 | `.claude/CLAUDE.md` | No | Gitignored, lives only in that repo |
 | `.claude/settings.local.json` | No | Gitignored, lives only in that repo |
 | `.claude/commands/` | No | Gitignored, lives only in that repo |
-| `MEMORY.md`, `logs.md`, topic files | No | Stored per project path, new repo = empty |
+| `MEMORY.md`, `history/logs.md`, topic files | No | Stored per project path, new repo = empty |
 
 To bootstrap a new repo with your templates:
 ```bash
@@ -70,10 +70,10 @@ bootstrap
 
 | Feature | What it does |
 |---------|-------------|
-| `logs.md` | Chronological session history (Claude Code only creates MEMORY.md) |
+| `history/logs.md` | Chronological session history (Claude Code only creates MEMORY.md) |
 | Topic files | On-demand reference files synced from Confluence/Notion |
 | Learning loop | log (1h) -> distill (24h) -> promote (7d) automation scripts |
-| `checkpoint` | Filter and push live workspace files to this repo (CLAUDE.md, .claude/CLAUDE.md, MEMORY.md, topic files, logs.md) |
+| `checkpoint` | Filter and push live workspace files to this repo (CLAUDE.md, .claude/CLAUDE.md, MEMORY.md, topic files, history/logs.md) |
 | `bootstrap` | Pull templates from this repo into a new project |
 
 ### Phase 1: Static Context
@@ -256,7 +256,7 @@ flowchart TD
 | `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
-| `logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/logs.md) |
+| `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/history/logs.md) |
 | Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/) |
 | `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
@@ -331,7 +331,7 @@ The first three steps are personal. The last step is a team activity: during spr
 
 | File | Purpose |
 |------|---------|
-| `~/.claude/projects/{project}/memory/logs.md` | Append-only chronological session history |
+| `~/.claude/projects/{project}/memory/history/logs.md` | Append-only chronological session history |
 
 ### The Loop
 
@@ -344,7 +344,7 @@ The first three steps are personal. The last step is a team activity: during spr
 
 ### Setup
 
-1. **Add logs.md** -  create `~/.claude/projects/{project}/memory/logs.md`:
+1. **Add logs.md** -  create `~/.claude/projects/{project}/memory/history/logs.md`:
    ```markdown
    # Session Log
 
@@ -357,14 +357,14 @@ The first three steps are personal. The last step is a team activity: during spr
    ```markdown
    ## Memory
 
-   - Hybrid approach: MEMORY.md for topical lookup, logs.md for chronological history.
-   - At the end of each session, append a dated entry to logs.md.
+   - Hybrid approach: MEMORY.md for topical lookup, history/logs.md for chronological history.
+   - At the end of each session, append a dated entry to history/logs.md.
    - Update MEMORY.md topics only when stable new patterns are confirmed.
    ```
 
 3. **Distill (daily)** -  at the end of each day, tell Claude:
    ```
-   Read memory/logs.md and memory/MEMORY.md.
+   Read memory/history/logs.md and memory/MEMORY.md.
    Distill any new patterns from today's logs into MEMORY.md.
    Do not duplicate existing entries.
    ```
@@ -667,7 +667,7 @@ Snapshots live workspace files into `EXAMPLES/`, filtering project-specific cont
 | `.claude/CLAUDE.md` (personal) | `EXAMPLES/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
 | `MEMORY.md` | `EXAMPLES/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
 | Topic files (`*.md`) | `EXAMPLES/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
-| `logs.md` | `EXAMPLES/memory/logs.md` | Copied as-is |
+| `history/logs.md` | `EXAMPLES/memory/history/logs.md` | Copied as-is |
 
 **Filtering rules:**
 - Universal sections (PR Comment Style, Behavior Rules, Memory, Claude OS) are kept verbatim
@@ -768,11 +768,11 @@ client = anthropic.Anthropic()
     - `commands/review.md` - Custom slash commands
 - `~/.claude/projects/{project}/memory/`
   - `MEMORY.md` - Topical patterns (auto-loaded)
-  - `logs.md` - Session history (on demand)
+  - `history/logs.md` - Session history (on demand)
+  - `history/archive/YYYY-MM.md` - Rolled-off old logs
   - `claudehub.md` - Topic file, synced from Confluence (on demand)
   - `use-case-library.md` - Topic file, synced from Confluence (on demand)
   - `api-specs.md` - Topic file, manual or synced (on demand)
-  - `archive/YYYY-MM.md` - Rolled-off old logs
 
 **This repo (Phase 3 automation):**
 

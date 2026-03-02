@@ -61,7 +61,7 @@ echo "$(date): New sessions found, summarizing..." >> "$LOG_DIR/1-log.log"
 cd "$PROJECT_DIR"
 unset CLAUDECODE
 
-(claude -p "You are a memory logger. Read the file at $MEMORY_DIR/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
+(claude -p "You are a memory logger. Read the file at $MEMORY_DIR/history/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
 
 Recent user messages from this project:
 $NEW_ENTRIES

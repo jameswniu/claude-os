@@ -45,7 +45,7 @@ head -1 "$SCRIPT_DIR/2-distill.sh" | grep -q "#!/bin/bash" && pass "has bash she
 grep -q "MEMORY_DIR" "$SCRIPT_DIR/2-distill.sh" && pass "references MEMORY_DIR" || fail "missing MEMORY_DIR"
 grep -q "claude -p" "$SCRIPT_DIR/2-distill.sh" && pass "calls claude headless mode" || fail "missing claude -p call"
 grep -q "max-budget-usd" "$SCRIPT_DIR/2-distill.sh" && pass "has budget cap" || fail "missing budget cap"
-grep -q "logs.md" "$SCRIPT_DIR/2-distill.sh" && pass "reads logs.md" || fail "missing logs.md reference"
+grep -q "history/logs.md" "$SCRIPT_DIR/2-distill.sh" && pass "reads history/logs.md" || fail "missing history/logs.md reference"
 grep -q "MEMORY.md" "$SCRIPT_DIR/2-distill.sh" && pass "writes MEMORY.md" || fail "missing MEMORY.md reference"
 grep -q "200 lines" "$SCRIPT_DIR/2-distill.sh" && pass "enforces 200 line limit" || fail "missing line limit rule"
 
@@ -139,7 +139,6 @@ TOPIC_HAS_CONFLUENCE_ID=0
 for TOPIC in "$EX/memory"/*.md; do
   NAME=$(basename "$TOPIC")
   [ "$NAME" = "MEMORY.md" ] && continue
-  [ "$NAME" = "logs.md" ] && continue
   grep -q "(confluence:[0-9]" "$TOPIC" && TOPIC_HAS_CONFLUENCE_ID=1
 done
 [ "$TOPIC_HAS_CONFLUENCE_ID" -eq 0 ] && pass "distilled topic files have no Confluence IDs" || fail "distilled topic files still have Confluence IDs"
@@ -149,7 +148,6 @@ TOPIC_HAS_BASIS_URL=0
 for TOPIC in "$EX/memory"/*.md; do
   NAME=$(basename "$TOPIC")
   [ "$NAME" = "MEMORY.md" ] && continue
-  [ "$NAME" = "logs.md" ] && continue
   grep -q "stash.centro.net\|basis.atlassian.net" "$TOPIC" && TOPIC_HAS_BASIS_URL=1
 done
 [ "$TOPIC_HAS_BASIS_URL" -eq 0 ] && pass "distilled topic files have no Basis-specific URLs" || fail "distilled topic files still have Basis-specific URLs"
@@ -174,7 +172,7 @@ if [ -z "$CI" ]; then
   MEMORY_DIR="$HOME/.claude/projects/${PROJECT_SLUG}/memory"
   [ -d "$MEMORY_DIR" ] && pass "memory directory exists" || fail "memory directory missing"
   [ -f "$MEMORY_DIR/MEMORY.md" ] && pass "MEMORY.md exists" || fail "MEMORY.md missing"
-  [ -f "$MEMORY_DIR/logs.md" ] && pass "logs.md exists" || fail "logs.md missing"
+  [ -f "$MEMORY_DIR/history/logs.md" ] && pass "history/logs.md exists" || fail "history/logs.md missing"
 
   # Test: launchd agents loaded (per-project or legacy names)
   launchctl list | grep -q "com\.claude\..*log" && pass "log agent loaded" || fail "log agent not loaded"
