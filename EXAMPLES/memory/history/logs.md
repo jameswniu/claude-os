@@ -195,7 +195,6 @@
   - Generic patterns preserved (PR types, tool usage, merge-base)
 - Checkpoint no longer overwrites template files (CLAUDE.md, .claude/CLAUDE.md, commands, settings). Only syncs MEMORY.md (filtered), logs.md, and topic files.
 - Templatized all EXAMPLES files:
-  - EXAMPLES/CLAUDE.md: generic skeleton with placeholder sections
   - EXAMPLES/.claude/CLAUDE.md: generic PR review/behavior rules, project-specific URLs removed
   - EXAMPLES/.claude/commands/review.md: replaced BP-29xxx with PROJ-123 placeholders
   - EXAMPLES/.claude/settings.local.json: stripped to common permissions only
