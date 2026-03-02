@@ -3,14 +3,12 @@
 # Usage: bash ~/claude-os/scripts/5-checkpoint.sh  (run from any project dir)
 #
 # Reads from (running project):
-#   - $PROJECT/CLAUDE.md                    Team instructions
 #   - $PROJECT/.claude/CLAUDE.md            Personal rules with promoted learnings
 #   - $MEM/MEMORY.md                        Accumulated knowledge
 #   - $MEM/logs.md                          Session history
 #   - $MEM/*.md (topic files)               Confluence-synced reference docs
 #
 # Writes to (filtered templates in EXAMPLES/):
-#   - EXAMPLES/CLAUDE.md                    Structure with placeholders
 #   - EXAMPLES/.claude/CLAUDE.md            Universal rules, project values replaced
 #   - EXAMPLES/memory/MEMORY.md             Filtered + situation-based topic index
 #   - EXAMPLES/memory/*.md (topic files)    Distilled, 1:1 with source
@@ -175,111 +173,7 @@ with open('$EX/.claude/CLAUDE.md', 'w') as f:
 fi
 
 # ============================================================
-# 3. Filter CLAUDE.md (team instructions)
-# ============================================================
-if [ -f "$PROJECT/CLAUDE.md" ]; then
-    python3 -c "
-import re
-
-with open('$PROJECT/CLAUDE.md') as f:
-    content = f.read()
-
-sections = re.split(r'(^## .+$)', content, flags=re.MULTILINE)
-out = sections[0]
-
-i = 1
-while i < len(sections):
-    heading = sections[i]
-    body = sections[i+1] if i+1 < len(sections) else ''
-    name = heading.lstrip('#').strip().lower()
-
-    if 'build' in name and 'command' in name:
-        out += heading + '''
-
-\x60\x60\x60bash
-# Common commands (fill in for your project)
-# make dev               # Start dev server with hot reload
-# make test              # Run all tests
-# make test FILE=path    # Run specific test file
-# make lint              # Run linter and type checker
-# make format            # Auto-format code
-# make build             # Build for production
-# docker compose up      # Start all services
-\x60\x60\x60
-'''
-    elif 'architecture' in name:
-        out += heading + '''
-
-Describe the high-level architecture of the project.
-
-### Services
-- List services, ports, and what each one does
-
-### Key Source Directories
-- \x60src/\x60 - Application source code
-- \x60tests/\x60 - Test files (mirror src/ structure)
-- \x60frontend/\x60 - Frontend application (if applicable)
-
-### Tech Stack
-- Language, framework, package manager
-- Database, cache, message queue (if applicable)
-- Frontend framework, bundler (if applicable)
-'''
-    elif 'testing' in name:
-        out += heading + '''
-
-- Test runner and framework used
-- Where test files live and naming conventions
-- How fixtures and test utilities are organized
-- Coverage target (e.g., 85% minimum)
-'''
-    elif 'code style' in name:
-        out += heading + '''
-
-- Linter and formatter used
-- Docstring style (Google, NumPy, etc.)
-- Line length limit
-- Type checking strictness
-'''
-    elif 'code quality' in name:
-        out += heading + '''
-
-**IMPORTANT:** All code changes MUST pass both tests and lint before being considered complete:
-
-1. **Run tests** - All tests must pass
-2. **Run lint** - Must pass linting and type checking
-3. **Check coverage** - Maintain minimum coverage target
-
-Do not submit code changes that fail any of these checks.
-'''
-    elif 'environment' in name and 'config' in name:
-        out += heading + '''
-
-- Copy \x60.env.example\x60 to \x60.env\x60 for local development
-- Key environment variables and what they control
-- How to set up local services (database, cache, etc.)
-'''
-    elif 'e2e' in name:
-        # Skip E2E section (project-specific)
-        pass
-    elif 'search' in name and 'scan' in name:
-        # Skip Search & Scanning section (project-specific)
-        pass
-    else:
-        # Keep other sections verbatim
-        out += heading + body
-    i += 2
-
-out = re.sub(r'\n{3,}', '\n\n', out)
-out = out.rstrip() + '\n'
-
-with open('$EX/CLAUDE.md', 'w') as f:
-    f.write(out)
-" 2>/dev/null
-fi
-
-# ============================================================
-# 4. Distill topic files (1:1, strip project-specific content)
+# 3. Distill topic files (1:1, strip project-specific content)
 # ============================================================
 rm -f "$EX/memory"/*.md.tmp 2>/dev/null
 for TOPIC in "$MEM"/*.md; do
@@ -316,12 +210,12 @@ with open('$EX/memory/$NAME', 'w') as f:
 done
 
 # ============================================================
-# 5. Copy logs.md as-is
+# 4. Copy logs.md as-is
 # ============================================================
 cp "$MEM/logs.md" "$EX/memory/" 2>/dev/null
 
 # ============================================================
-# 6. Update MEMORY.md template with situation-based topic index
+# 5. Update MEMORY.md template with situation-based topic index
 # ============================================================
 python3 -c "
 import re, os
@@ -372,7 +266,7 @@ with open(memory_md, 'w') as f:
 " 2>/dev/null
 
 # ============================================================
-# 7. Ensure MEMORY.md Claude OS section has operational patterns
+# 6. Ensure MEMORY.md Claude OS section has operational patterns
 # ============================================================
 python3 -c "
 import re
@@ -420,7 +314,7 @@ if not has_all:
 " 2>/dev/null
 
 # ============================================================
-# 8. Commit and push
+# 7. Commit and push
 # ============================================================
 cd "$CLAUDE_OS"
 git add EXAMPLES/
@@ -428,4 +322,4 @@ git diff --cached --quiet && echo "No changes." && exit 0
 git commit -m "Checkpoint from $(basename "$PROJECT") ($(date +%Y-%m-%d))"
 echo ""
 echo "Checkpoint committed locally (staging)."
-echo "To push to production: cd ~/claude-os && git push"
+echo "To push to production: cd ~/claude-os && git push && cd $PROJECT"

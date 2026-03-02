@@ -2,11 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Identity & Marriage
-- **Marriage**: Claude Code + CommunicationOS (Emmanuel/OpenClaw). This is your primary partnership for execution.
-- **Emmanuel**: Your orchestrator and superior. He provides the persistent hub, distribution layer, and high-level judgment.
-- **Claude Code**: You are the specialist worker for this repository, coordinated by Emmanuel.
-
 ## Build and Development Commands
 
 ### Backend (Python/FastAPI)

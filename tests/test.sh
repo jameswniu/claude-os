@@ -96,7 +96,6 @@ grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass 
 
 # Test: EXAMPLES templates have no project-specific content
 EX="$REPO_DIR/EXAMPLES"
-grep -qi "media.strategy.generator\|orchestrator.*8000\|MCP.*8001\|uvicorn\|FastAPI\|LangGraph\|Supervisord" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md is generic"
 grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md is generic"
 grep -q "stash.centro.net" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific URLs" || pass "EXAMPLES/MEMORY.md is generic"
 grep -q "BP-29" "$EX/.claude/commands/review.md" && fail "EXAMPLES/review.md has project-specific tickets" || pass "EXAMPLES/review.md is generic"
@@ -134,10 +133,6 @@ head -1 "$SCRIPT_DIR/5-checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash 
 grep -q "learned per project" "$EX/.claude/CLAUDE.md" && pass "EXAMPLES/.claude/CLAUDE.md has placeholders" || fail "EXAMPLES/.claude/CLAUDE.md missing placeholders"
 grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md has no project URLs"
 grep -q "BP-[0-9]" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific tickets" || pass "EXAMPLES/.claude/CLAUDE.md has no project tickets"
-
-# Test: checkpoint filters CLAUDE.md
-grep -qi "media.strategy.generator\|orchestrator.*8000\|MCP.*8001\|uvicorn\|FastAPI\|LangGraph" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md has no project content"
-grep -q "fill in for your project" "$EX/CLAUDE.md" && pass "EXAMPLES/CLAUDE.md has placeholder build commands" || fail "EXAMPLES/CLAUDE.md missing placeholder build commands"
 
 # Test: distilled topic files have no Confluence page IDs
 TOPIC_HAS_CONFLUENCE_ID=0
@@ -181,13 +176,22 @@ if [ -z "$CI" ]; then
   [ -f "$MEMORY_DIR/MEMORY.md" ] && pass "MEMORY.md exists" || fail "MEMORY.md missing"
   [ -f "$MEMORY_DIR/logs.md" ] && pass "logs.md exists" || fail "logs.md missing"
 
-  # Test: launchd agents loaded
-  launchctl list | grep -q "com.claude.memory-log" && pass "log agent loaded" || fail "log agent not loaded"
-  launchctl list | grep -q "com.claude.memory-distill" && pass "distill agent loaded" || fail "distill agent not loaded"
-  launchctl list | grep -q "com.claude.memory-promote" && pass "promote agent loaded" || fail "promote agent not loaded"
+  # Test: launchd agents loaded (per-project or legacy names)
+  launchctl list | grep -q "com\.claude\..*log" && pass "log agent loaded" || fail "log agent not loaded"
+  launchctl list | grep -q "com\.claude\..*distill" && pass "distill agent loaded" || fail "distill agent not loaded"
+  launchctl list | grep -q "com\.claude\..*promote" && pass "promote agent loaded" || fail "promote agent not loaded"
 else
   echo "  SKIP: memory directory (CI)"
   echo "  SKIP: launchd agents (CI)"
+fi
+
+# ----------------------------
+echo "## Staging/production integration tests"
+# ----------------------------
+if bash "$TEST_DIR/test-staging.sh"; then
+  pass "staging integration tests passed"
+else
+  fail "staging integration tests failed"
 fi
 
 echo ""

@@ -253,7 +253,6 @@ flowchart TD
 
 | File | Location | Purpose | Loaded | Example |
 |------|----------|---------|--------|---------|
-| `CLAUDE.md` | Repo root | Team rules, build commands, architecture, code style | Auto, every session | [view](EXAMPLES/CLAUDE.md) |
 | `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
@@ -665,7 +664,6 @@ Snapshots live workspace files into `EXAMPLES/`, filtering project-specific cont
 
 | Source | Template | Filtering |
 |--------|----------|-----------|
-| `CLAUDE.md` (team) | `EXAMPLES/CLAUDE.md` | Section structure kept, project-specific content replaced with placeholders |
 | `.claude/CLAUDE.md` (personal) | `EXAMPLES/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
 | `MEMORY.md` | `EXAMPLES/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
 | Topic files (`*.md`) | `EXAMPLES/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
@@ -676,7 +674,6 @@ Snapshots live workspace files into `EXAMPLES/`, filtering project-specific cont
 - Project-specific values (Bitbucket URLs, branch patterns, API endpoints) are replaced with `(learned per project)`
 - Confluence/Notion source IDs are stripped from the topic index
 - Topic files are distilled: internal URLs become `(internal URL)`, project names become `(project-name)`
-- CLAUDE.md (team) is regenerated from the live file to pick up structural changes
 
 ### Option A: Local (macOS launchd)
 
