@@ -1,6 +1,6 @@
 #!/bin/bash
-# 5-checkpoint.sh — Snapshot live config/memory files into claude-os EXAMPLES
-# Usage: bash ~/claude-os/scripts/5-checkpoint.sh  (run from any project dir)
+# 5-checkpoint.sh — Snapshot live config/memory files into claude-os {repo}
+# Usage: bash ~/claude-os/{repo}/.claude/scripts/5-checkpoint.sh  (run from any project dir)
 #
 # Reads from (running project):
 #   - $PROJECT/.claude/CLAUDE.md            Personal rules with promoted learnings
@@ -8,21 +8,22 @@
 #   - $MEM/history/logs.md                   Session history
 #   - $MEM/*.md (topic files)               Confluence-synced reference docs
 #
-# Writes to (filtered templates in EXAMPLES/):
-#   - EXAMPLES/.claude/CLAUDE.md            Universal rules, project values replaced
-#   - EXAMPLES/memory/MEMORY.md             Filtered + situation-based topic index
-#   - EXAMPLES/memory/*.md (topic files)    Distilled, 1:1 with source
-#   - EXAMPLES/memory/history/logs.md        Copy as-is
+# Writes to (filtered templates):
+#   - {repo}/.claude/CLAUDE.md                                      Universal rules, project values replaced
+#   - .claude/projects/-Users-{username}-{repo}/memory/MEMORY.md    Filtered + situation-based topic index
+#   - .claude/projects/-Users-{username}-{repo}/memory/*.md          Distilled, 1:1 with source
+#   - .claude/projects/-Users-{username}-{repo}/memory/history/logs.md  Copy as-is
 
 CLAUDE_OS="$HOME/claude-os"
-EX="$CLAUDE_OS/EXAMPLES"
+REPO_TMPL="$CLAUDE_OS/{repo}"
+MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-{username}-{repo}/memory"
 PROJECT=$(pwd)
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 [ ! -d "$MEM" ] && echo "No memory dir for $(basename "$PROJECT")" && exit 1
 
-mkdir -p "$EX/memory" "$EX/.claude"
+mkdir -p "$MEM_TMPL/history" "$REPO_TMPL/.claude"
 
 # ============================================================
 # 1. Filter MEMORY.md (existing logic + flat topic index)
@@ -113,7 +114,7 @@ while i < len(sections):
 # Clean up trailing whitespace and ensure single newline at end
 out = re.sub(r'\n{3,}', '\n\n', out)
 out = out.rstrip() + '\n'
-with open('$EX/memory/MEMORY.md', 'w') as f:
+with open('$MEM_TMPL/MEMORY.md', 'w') as f:
     f.write(out)
 " 2>/dev/null
 fi
@@ -173,7 +174,7 @@ out = re.sub(r'Project: \x60CEN\x60, Repo: \x60[^\x60]+\x60', 'Project and repo:
 out = re.sub(r'\n{3,}', '\n\n', out)
 out = out.rstrip() + '\n'
 
-with open('$EX/.claude/CLAUDE.md', 'w') as f:
+with open('$REPO_TMPL/.claude/CLAUDE.md', 'w') as f:
     f.write(out)
 " 2>/dev/null
 fi
@@ -181,7 +182,7 @@ fi
 # ============================================================
 # 3. Distill topic files (1:1, strip project-specific content)
 # ============================================================
-rm -f "$EX/memory"/*.md.tmp 2>/dev/null
+rm -f "$MEM_TMPL"/*.md.tmp 2>/dev/null
 for TOPIC in "$MEM"/*.md; do
     [ -f "$TOPIC" ] || continue
     NAME=$(basename "$TOPIC")
@@ -210,7 +211,7 @@ content = re.sub(r'media-strategy-generator', '(project-name)', content)
 content = re.sub(r'\n{3,}', '\n\n', content)
 content = content.rstrip() + '\n'
 
-with open('$EX/memory/$NAME', 'w') as f:
+with open('$MEM_TMPL/$NAME', 'w') as f:
     f.write(content)
 " 2>/dev/null
 done
@@ -218,7 +219,7 @@ done
 # ============================================================
 # 4. Copy logs.md as-is
 # ============================================================
-mkdir -p "$EX/memory/history" && cp "$MEM/history/logs.md" "$EX/memory/history/" 2>/dev/null
+mkdir -p "$MEM_TMPL/history" && cp "$MEM/history/logs.md" "$MEM_TMPL/history/" 2>/dev/null
 
 # ============================================================
 # 5. Update MEMORY.md template with situation-based topic index
@@ -226,7 +227,7 @@ mkdir -p "$EX/memory/history" && cp "$MEM/history/logs.md" "$EX/memory/history/"
 python3 -c "
 import re, os
 
-ex_memory = '$EX/memory'
+ex_memory = '$MEM_TMPL'
 memory_md = os.path.join(ex_memory, 'MEMORY.md')
 
 with open(memory_md) as f:
@@ -244,7 +245,7 @@ topic_hints = {
     'claudehub.md': 'when onboarding to Claude Code or finding internal resources',
 }
 
-# Get actual topic files in EXAMPLES
+# Get actual topic files in {repo}
 topic_files = sorted([
     f for f in os.listdir(ex_memory)
     if f.endswith('.md') and f != 'MEMORY.md'
@@ -277,7 +278,7 @@ with open(memory_md, 'w') as f:
 python3 -c "
 import re
 
-with open('$EX/memory/MEMORY.md') as f:
+with open('$MEM_TMPL/MEMORY.md') as f:
     content = f.read()
 
 # Check if Claude OS section has the operational patterns
@@ -315,7 +316,7 @@ if not has_all:
 
     out = re.sub(r'\n{3,}', '\n\n', out)
     out = out.rstrip() + '\n'
-    with open('$EX/memory/MEMORY.md', 'w') as f:
+    with open('$MEM_TMPL/MEMORY.md', 'w') as f:
         f.write(out)
 " 2>/dev/null
 
@@ -323,7 +324,7 @@ if not has_all:
 # 7. Commit and push
 # ============================================================
 cd "$CLAUDE_OS"
-git add EXAMPLES/
+git add '{repo}/' '.claude/'
 git diff --cached --quiet && echo "No changes." && exit 0
 git commit -m "Checkpoint from $(basename "$PROJECT") ($(date +%Y-%m-%d))"
 echo ""

@@ -20,15 +20,16 @@ export HOME="$SANDBOX/home"
 export SKIP_LAUNCHD=1
 mkdir -p "$HOME"
 
-# Fake claude-os git repo with scripts + minimal EXAMPLES seed
+# Fake claude-os git repo with {repo} template + scripts
 CO="$HOME/claude-os"
-mkdir -p "$CO/EXAMPLES/memory" "$CO/EXAMPLES/.claude/commands" "$CO/output"
-cp -r "$REAL_REPO/scripts" "$CO/"
+MEM_TMPL_DIR="$CO/.claude/projects/-Users-{username}-{repo}/memory"
+mkdir -p "$CO/{repo}/.claude/commands" "$CO/{repo}/.claude/scripts" "$MEM_TMPL_DIR/history" "$CO/output"
+cp -r "$REAL_REPO/{repo}/.claude/scripts/"* "$CO/{repo}/.claude/scripts/"
 
-echo "# Seed" > "$CO/EXAMPLES/.claude/CLAUDE.md"
-echo '{}' > "$CO/EXAMPLES/.claude/settings.local.json"
-echo "# Seed" > "$CO/EXAMPLES/memory/MEMORY.md"
-mkdir -p "$CO/EXAMPLES/memory/history" && echo "# Seed" > "$CO/EXAMPLES/memory/history/logs.md"
+echo "# Seed" > "$CO/{repo}/.claude/CLAUDE.md"
+echo '{}' > "$CO/{repo}/.claude/settings.local.json"
+echo "# Seed" > "$MEM_TMPL_DIR/MEMORY.md"
+echo "# Seed" > "$MEM_TMPL_DIR/history/logs.md"
 
 cd "$CO"
 git init -q
@@ -130,7 +131,7 @@ echo "## 1. Checkpoint → staging → push → production"
 # ═══════════════════════════════════════════════════════════════
 
 cd "$PROJECT"
-OUT=$(bash "$CO/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/5-checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "checkpoint exits 0" || fail "checkpoint exits $RC"
@@ -150,12 +151,12 @@ git push -q origin "$BRANCH" 2>&1
 AHEAD=$(git rev-list --count "origin/$BRANCH..$BRANCH" 2>/dev/null)
 [ "$AHEAD" -eq 0 ] && pass "push syncs to production" || fail "still ahead after push"
 
-# Verify EXAMPLES filtering
-grep -q "stash.centro.net" "$CO/EXAMPLES/.claude/CLAUDE.md" && fail ".claude/CLAUDE.md has project URLs" || pass ".claude/CLAUDE.md filtered"
-grep -q "learned per project" "$CO/EXAMPLES/memory/MEMORY.md" && pass "MEMORY.md has placeholders" || fail "MEMORY.md missing placeholders"
-grep -q "confluence:" "$CO/EXAMPLES/memory/MEMORY.md" && fail "MEMORY.md has confluence IDs" || pass "MEMORY.md IDs stripped"
-grep -q "confluence:" "$CO/EXAMPLES/memory/code-reviews.md" && fail "topic file has confluence IDs" || pass "topic file IDs stripped"
-grep -q "stash.centro.net" "$CO/EXAMPLES/memory/code-reviews.md" && fail "topic file has project URLs" || pass "topic file URLs filtered"
+# Verify template filtering
+grep -q "stash.centro.net" "$CO/{repo}/.claude/CLAUDE.md" && fail ".claude/CLAUDE.md has project URLs" || pass ".claude/CLAUDE.md filtered"
+grep -q "learned per project" "$MEM_TMPL_DIR/MEMORY.md" && pass "MEMORY.md has placeholders" || fail "MEMORY.md missing placeholders"
+grep -q "confluence:" "$MEM_TMPL_DIR/MEMORY.md" && fail "MEMORY.md has confluence IDs" || pass "MEMORY.md IDs stripped"
+grep -q "confluence:" "$MEM_TMPL_DIR/code-reviews.md" && fail "topic file has confluence IDs" || pass "topic file IDs stripped"
+grep -q "stash.centro.net" "$MEM_TMPL_DIR/code-reviews.md" && fail "topic file has project URLs" || pass "topic file URLs filtered"
 
 echo ""
 
@@ -164,14 +165,14 @@ echo "## 2. Bootstrap pulls latest"
 # ═══════════════════════════════════════════════════════════════
 
 # Structural check: git pull runs before file copies
-PULL_LINE=$(grep -n "git pull" "$CO/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
-COPY_LINE=$(grep -n "cp.*CLAUDE.md" "$CO/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
+PULL_LINE=$(grep -n "git pull" "$CO/{repo}/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
+COPY_LINE=$(grep -n "cp.*CLAUDE.md" "$CO/{repo}/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
 [ "$PULL_LINE" -lt "$COPY_LINE" ] && pass "git pull precedes file copies" || fail "git pull does not precede copies"
 
 # Run bootstrap on fresh project
 BP="$SANDBOX/bootstrap-project"
 mkdir -p "$BP" && cd "$BP" && git init -q
-OUT=$(bash "$CO/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/6-bootstrap.sh" 2>&1)
 [ -f "$BP/.claude/CLAUDE.md" ] && pass "bootstrap creates .claude/CLAUDE.md" || fail "missing .claude/CLAUDE.md"
 echo "$OUT" | grep -q "CREATED.*CLAUDE.md" && pass "bootstrap creates (not overwrites) files" || fail "bootstrap not creating files"
 
@@ -182,7 +183,7 @@ echo "## 3. Checkpoint no changes"
 # ═══════════════════════════════════════════════════════════════
 
 cd "$PROJECT"
-OUT=$(bash "$CO/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/5-checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "no-change exits 0" || fail "no-change exits $RC"
@@ -196,7 +197,7 @@ echo "## 4. Bootstrap cd handling"
 
 CD_TEST="$SANDBOX/cd-test"
 mkdir -p "$CD_TEST" && cd "$CD_TEST" && git init -q
-OUT=$(bash "$CO/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/6-bootstrap.sh" 2>&1)
 
 echo "$OUT" | grep -q "Project: $CD_TEST" && pass "PROJECT is caller's pwd" || fail "PROJECT is wrong"
 [ -f "$CD_TEST/.claude/CLAUDE.md" ] && pass "files in caller's dir" || fail "files in wrong dir"
@@ -209,7 +210,7 @@ echo "## 5. Checkpoint from bad dir"
 
 BAD=$(mktemp -d)
 cd "$BAD"
-OUT=$(bash "$CO/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/5-checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 1 ] && pass "bad-dir exits 1" || fail "bad-dir exits $RC (expected 1)"
@@ -224,7 +225,7 @@ echo "## 6. Bootstrap git pull already up-to-date"
 
 UP="$SANDBOX/uptodate"
 mkdir -p "$UP" && cd "$UP" && git init -q
-OUT=$(bash "$CO/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/6-bootstrap.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "up-to-date bootstrap exits 0" || fail "exits $RC"
@@ -239,7 +240,7 @@ cd "$CO" && git remote remove origin 2>/dev/null
 
 NR="$SANDBOX/no-remote"
 mkdir -p "$NR" && cd "$NR" && git init -q
-OUT=$(bash "$CO/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{repo}/.claude/scripts/6-bootstrap.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "no-remote bootstrap exits 0" || fail "exits $RC"

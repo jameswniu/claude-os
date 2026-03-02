@@ -1,6 +1,6 @@
 #!/bin/bash
 # 6-bootstrap.sh — Pull claude-os repo config into a live workspace
-# Usage: cd ~/some-repo && bash ~/claude-os/scripts/6-bootstrap.sh
+# Usage: cd ~/some-repo && bash ~/claude-os/{repo}/.claude/scripts/6-bootstrap.sh
 
 CLAUDE_OS="$HOME/claude-os"
 PROJECT=$(pwd)
@@ -13,25 +13,26 @@ fi
 
 cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null
 cd "$PROJECT"
-EX="$CLAUDE_OS/EXAMPLES"
+REPO_TMPL="$CLAUDE_OS/{repo}"
+MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-{username}-{repo}/memory"
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 echo "Project: $PROJECT"
 echo ""
 
-# Phase 1: Sync all files from production EXAMPLES
+# Phase 1: Sync all files from {repo} template
 mkdir -p .claude "$MEM/history"
 
-[ ! -f .claude/CLAUDE.md ] && cp "$EX/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"
-[ ! -f .claude/settings.local.json ] && cp "$EX/.claude/settings.local.json" .claude/settings.local.json && echo "  CREATED  .claude/settings.local.json" || echo "  EXISTS   .claude/settings.local.json"
-[ ! -f "$MEM/MEMORY.md" ] && cp "$EX/memory/MEMORY.md" "$MEM/MEMORY.md" && echo "  CREATED  MEMORY.md" || echo "  EXISTS   MEMORY.md"
+[ ! -f .claude/CLAUDE.md ] && cp "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"
+[ ! -f .claude/settings.local.json ] && cp "$REPO_TMPL/.claude/settings.local.json" .claude/settings.local.json && echo "  CREATED  .claude/settings.local.json" || echo "  EXISTS   .claude/settings.local.json"
+[ ! -f "$MEM/MEMORY.md" ] && cp "$MEM_TMPL/MEMORY.md" "$MEM/MEMORY.md" && echo "  CREATED  MEMORY.md" || echo "  EXISTS   MEMORY.md"
 # Migrate old logs.md to history/ subfolder
 [ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md"
-[ ! -f "$MEM/history/logs.md" ] && cp "$EX/memory/history/logs.md" "$MEM/history/logs.md" && echo "  CREATED  history/logs.md" || echo "  EXISTS   history/logs.md"
+[ ! -f "$MEM/history/logs.md" ] && cp "$MEM_TMPL/history/logs.md" "$MEM/history/logs.md" && echo "  CREATED  history/logs.md" || echo "  EXISTS   history/logs.md"
 
 # Slash commands (always overwrite with latest)
-for FILE in "$EX/.claude/commands"/*.md; do
+for FILE in "$REPO_TMPL/.claude/commands"/*.md; do
     [ -f "$FILE" ] || continue
     mkdir -p .claude/commands
     NAME=$(basename "$FILE")
@@ -40,7 +41,7 @@ for FILE in "$EX/.claude/commands"/*.md; do
 done
 
 # Topic files (always overwrite with latest)
-for FILE in "$EX/memory"/*.md; do
+for FILE in "$MEM_TMPL"/*.md; do
     [ -f "$FILE" ] || continue
     NAME=$(basename "$FILE")
     [ "$NAME" = "MEMORY.md" ] && continue
@@ -72,7 +73,7 @@ NOTION_COUNT=0
 export MEMORY_FILE="$MEM/MEMORY.md"
 
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
-    if bash "$CLAUDE_OS/scripts/4-sync-confluence.sh"; then
+    if bash "$REPO_TMPL/.claude/scripts/4-sync-confluence.sh"; then
         CONFLUENCE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         echo "  SYNCED   Confluence ($CONFLUENCE_COUNT topics)"
     else
@@ -83,7 +84,7 @@ else
 fi
 
 if [ -n "$NOTION_TOKEN" ]; then
-    if bash "$CLAUDE_OS/scripts/5-sync-notion.sh"; then
+    if bash "$REPO_TMPL/.claude/scripts/5-sync-notion.sh"; then
         NOTION_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         echo "  SYNCED   Notion ($NOTION_COUNT topics)"
     else
@@ -121,7 +122,7 @@ if [ -z "$SKIP_LAUNCHD" ] && [ -d "$HOME/Library" ]; then
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>$CLAUDE_OS/scripts/$script</string>
+		<string>$REPO_TMPL/.claude/scripts/$script</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>$interval</integer>

@@ -16,7 +16,7 @@ jobs:
         run: mkdir -p output
 
       - name: Make scripts executable
-        run: chmod +x scripts/*.sh tests/*.sh
+        run: chmod +x '{repo}'/.claude/scripts/*.sh tests/*.sh
 
       - name: Run tests
         run: bash tests/test.sh

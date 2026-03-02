@@ -6,7 +6,7 @@ PASS=0
 FAIL=0
 TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$TEST_DIR/.." && pwd)"
-SCRIPT_DIR="$REPO_DIR/scripts"
+SCRIPT_DIR="$REPO_DIR/{repo}/.claude/scripts"
 LAUNCHD_DIR="$REPO_DIR/launchd"
 
 pass() { echo "  PASS: $1"; PASS=$((PASS + 1)); }
@@ -94,13 +94,14 @@ grep -q "output/" "$REPO_DIR/.gitignore" && pass ".gitignore excludes output/" |
 # Test: no em dashes in README
 grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
 
-# Test: EXAMPLES templates have no project-specific content
-EX="$REPO_DIR/EXAMPLES"
-grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md is generic"
-grep -q "stash.centro.net" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific URLs" || pass "EXAMPLES/MEMORY.md is generic"
-grep -q "BP-29" "$EX/.claude/commands/review.md" && fail "EXAMPLES/review.md has project-specific tickets" || pass "EXAMPLES/review.md is generic"
-grep -q "REDACTED\|ATATT" "$EX/.claude/settings.local.json" && fail "EXAMPLES/settings.local.json has secrets" || pass "EXAMPLES/settings.local.json is clean"
-grep -q "(confluence:" "$EX/memory/MEMORY.md" && fail "EXAMPLES/MEMORY.md has project-specific topic entries" || pass "EXAMPLES/MEMORY.md topic entries are clean"
+# Test: templates have no project-specific content
+REPO_TMPL="$REPO_DIR/{repo}"
+MEM_TMPL="$REPO_DIR/.claude/projects/-Users-{username}-{repo}/memory"
+grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific URLs" || pass "{repo}/.claude/CLAUDE.md is generic"
+grep -q "stash.centro.net" "$MEM_TMPL/MEMORY.md" && fail "memory/MEMORY.md has project-specific URLs" || pass "memory/MEMORY.md is generic"
+grep -q "BP-29" "$REPO_TMPL/.claude/commands/review.md" && fail "review.md has project-specific tickets" || pass "review.md is generic"
+grep -q "REDACTED\|ATATT" "$REPO_TMPL/.claude/settings.local.json" && fail "settings.local.json has secrets" || pass "settings.local.json is clean"
+grep -q "(confluence:" "$MEM_TMPL/MEMORY.md" && fail "memory/MEMORY.md has project-specific topic entries" || pass "memory/MEMORY.md topic entries are clean"
 
 # Test: plist files are valid XML
 for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
@@ -130,13 +131,13 @@ echo "## 5-checkpoint.sh"
 head -1 "$SCRIPT_DIR/5-checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
 
 # Test: checkpoint filters .claude/CLAUDE.md
-grep -q "learned per project" "$EX/.claude/CLAUDE.md" && pass "EXAMPLES/.claude/CLAUDE.md has placeholders" || fail "EXAMPLES/.claude/CLAUDE.md missing placeholders"
-grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md has no project URLs"
-grep -q "BP-[0-9]" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific tickets" || pass "EXAMPLES/.claude/CLAUDE.md has no project tickets"
+grep -q "learned per project" "$REPO_TMPL/.claude/CLAUDE.md" && pass "{repo}/.claude/CLAUDE.md has placeholders" || fail "{repo}/.claude/CLAUDE.md missing placeholders"
+grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific URLs" || pass "{repo}/.claude/CLAUDE.md has no project URLs"
+grep -q "BP-[0-9]" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific tickets" || pass "{repo}/.claude/CLAUDE.md has no project tickets"
 
 # Test: distilled topic files have no Confluence page IDs
 TOPIC_HAS_CONFLUENCE_ID=0
-for TOPIC in "$EX/memory"/*.md; do
+for TOPIC in "$MEM_TMPL"/*.md; do
   NAME=$(basename "$TOPIC")
   [ "$NAME" = "MEMORY.md" ] && continue
   grep -q "(confluence:[0-9]" "$TOPIC" && TOPIC_HAS_CONFLUENCE_ID=1
@@ -145,15 +146,15 @@ done
 
 # Test: distilled topic files have no Basis-specific URLs
 TOPIC_HAS_BASIS_URL=0
-for TOPIC in "$EX/memory"/*.md; do
+for TOPIC in "$MEM_TMPL"/*.md; do
   NAME=$(basename "$TOPIC")
   [ "$NAME" = "MEMORY.md" ] && continue
   grep -q "stash.centro.net\|basis.atlassian.net" "$TOPIC" && TOPIC_HAS_BASIS_URL=1
 done
 [ "$TOPIC_HAS_BASIS_URL" -eq 0 ] && pass "distilled topic files have no Basis-specific URLs" || fail "distilled topic files still have Basis-specific URLs"
 
-# Test: no topics/ subfolder in EXAMPLES
-[ -d "$EX/memory/topics" ] && fail "EXAMPLES still has topics/ subfolder" || pass "EXAMPLES has flat topic structure"
+# Test: no topics/ subfolder in {repo}
+[ -d "$MEM_TMPL/topics" ] && fail "{repo} still has topics/ subfolder" || pass "{repo} has flat topic structure"
 
 # Test: scripts have no topics/ subfolder references
 grep -q "topics/" "$SCRIPT_DIR/4-sync-confluence.sh" && fail "4-sync-confluence.sh still references topics/" || pass "4-sync-confluence.sh has no topics/ refs"
