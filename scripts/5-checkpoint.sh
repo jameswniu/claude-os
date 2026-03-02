@@ -426,4 +426,6 @@ cd "$CLAUDE_OS"
 git add EXAMPLES/
 git diff --cached --quiet && echo "No changes." && exit 0
 git commit -m "Checkpoint from $(basename "$PROJECT") ($(date +%Y-%m-%d))"
-git push
+echo ""
+echo "Checkpoint committed locally (staging)."
+echo "To push to production: cd ~/claude-os && git push"

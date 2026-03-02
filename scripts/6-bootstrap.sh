@@ -3,8 +3,10 @@
 # Usage: cd ~/some-repo && bash ~/claude-os/scripts/6-bootstrap.sh
 
 CLAUDE_OS="$HOME/claude-os"
-EX="$CLAUDE_OS/EXAMPLES"
 PROJECT=$(pwd)
+cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null
+cd "$PROJECT"
+EX="$CLAUDE_OS/EXAMPLES"
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
