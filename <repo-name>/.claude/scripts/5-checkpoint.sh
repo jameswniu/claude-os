@@ -136,9 +136,10 @@ def parse_sections(text):
         i += 2
     return preamble, secs
 
+existing = ''
 if os.path.exists(tmpl_path):
     with open(tmpl_path) as f:
-        tmpl = f.read()
+        existing = tmpl = f.read()
     t_pre, t_secs = parse_sections(tmpl)
     f_pre, f_secs = parse_sections(out)
     f_map = {n: (h, b) for n, h, b in f_secs}
@@ -157,8 +158,14 @@ if os.path.exists(tmpl_path):
 
 with open(tmpl_path, 'w') as f:
     f.write(out)
+import sys
+sys.exit(0 if out != existing else 2)
 " 2>/dev/null
-    echo "  FILTERED  $MEM_TMPL/MEMORY.md"
+    if [ $? -eq 0 ]; then
+        echo "  FILTERED  $MEM_TMPL/MEMORY.md"
+    else
+        echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
+    fi
 fi
 
 # ============================================================
@@ -232,9 +239,10 @@ def parse_sections(text):
         i += 2
     return preamble, secs
 
+existing = ''
 if os.path.exists(tmpl_path):
     with open(tmpl_path) as f:
-        tmpl = f.read()
+        existing = tmpl = f.read()
     t_pre, t_secs = parse_sections(tmpl)
     f_pre, f_secs = parse_sections(out)
     f_map = {n: (h, b) for n, h, b in f_secs}
@@ -253,8 +261,14 @@ if os.path.exists(tmpl_path):
 
 with open(tmpl_path, 'w') as f:
     f.write(out)
+import sys
+sys.exit(0 if out != existing else 2)
 " 2>/dev/null
-    echo "  FILTERED  $REPO_TMPL/.claude/CLAUDE.md"
+    if [ $? -eq 0 ]; then
+        echo "  FILTERED  $REPO_TMPL/.claude/CLAUDE.md"
+    else
+        echo "  SKIPPED   $REPO_TMPL/.claude/CLAUDE.md"
+    fi
 fi
 
 # ============================================================
@@ -287,16 +301,23 @@ content = re.sub(r'https?://basis\.atlassian\.net[^\s\n)]*', '(internal URL)', c
 # Strip internal project/team names that are Basis-specific
 content = re.sub(r'\bCEN\b(?=/)', '(PROJECT)', content)
 content = re.sub(r'media-strategy-generator', '(project-name)', content)
-# Check if project-specific content was actually stripped (before cleanup)
-filtered = content != original
 # Clean up
 content = re.sub(r'\n{3,}', '\n\n', content)
 content = content.rstrip() + '\n'
 
-with open('$MEM_TMPL/$NAME', 'w') as f:
+# Compare against existing template to decide FILTERED vs SKIPPED
+import os
+tmpl_path = '$MEM_TMPL/$NAME'
+existing = ''
+if os.path.exists(tmpl_path):
+    with open(tmpl_path) as f:
+        existing = f.read()
+
+changed = content != existing
+with open(tmpl_path, 'w') as f:
     f.write(content)
 
-sys.exit(0 if filtered else 2)
+sys.exit(0 if changed else 2)
 " 2>/dev/null
     if [ $? -eq 0 ]; then
         echo "  FILTERED  $MEM_TMPL/$NAME"
