@@ -36,7 +36,7 @@ echo ""
 # Skip MEMORY.md filter if source is empty or near-empty (prevents overwriting good template with blank)
 MEMLINES=$(wc -l < "$MEM/MEMORY.md" 2>/dev/null || echo 0)
 if [ "$MEMLINES" -lt 5 ]; then
-    echo "  SKIPPED  MEMORY.md (only $MEMLINES lines, too short to filter)"
+    echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
 else
 python3 -c "
 import re, sys
@@ -116,13 +116,49 @@ while i < len(sections):
     out += heading + body
     i += 2
 
-# Clean up trailing whitespace and ensure single newline at end
+# Clean up filtered content
 out = re.sub(r'\n{3,}', '\n\n', out)
 out = out.rstrip() + '\n'
-with open('$MEM_TMPL/MEMORY.md', 'w') as f:
+
+# Merge with existing template (accumulate-only)
+import os
+tmpl_path = '$MEM_TMPL/MEMORY.md'
+
+def parse_sections(text):
+    parts = re.split(r'(^## .+$)', text, flags=re.MULTILINE)
+    preamble = parts[0]
+    secs = []
+    i = 1
+    while i < len(parts):
+        h = parts[i]
+        b = parts[i+1] if i+1 < len(parts) else ''
+        secs.append((h.lstrip('#').strip().lower(), h, b))
+        i += 2
+    return preamble, secs
+
+if os.path.exists(tmpl_path):
+    with open(tmpl_path) as f:
+        tmpl = f.read()
+    t_pre, t_secs = parse_sections(tmpl)
+    f_pre, f_secs = parse_sections(out)
+    f_map = {n: (h, b) for n, h, b in f_secs}
+    t_names = {n for n, _, _ in t_secs}
+    merged = f_pre
+    for n, h, b in t_secs:
+        if n in f_map:
+            merged += f_map[n][0] + f_map[n][1]
+        else:
+            merged += h + b
+    for n, h, b in f_secs:
+        if n not in t_names:
+            merged += h + b
+    out = re.sub(r'\n{3,}', '\n\n', merged)
+    out = out.rstrip() + '\n'
+
+with open(tmpl_path, 'w') as f:
     f.write(out)
 " 2>/dev/null
-    echo "  FILTERED MEMORY.md  → $MEM_TMPL/MEMORY.md"
+    echo "  FILTERED  $MEM_TMPL/MEMORY.md"
 fi
 
 # ============================================================
@@ -180,10 +216,45 @@ out = re.sub(r'Project: \x60CEN\x60, Repo: \x60[^\x60]+\x60', 'Project and repo:
 out = re.sub(r'\n{3,}', '\n\n', out)
 out = out.rstrip() + '\n'
 
-with open('$REPO_TMPL/.claude/CLAUDE.md', 'w') as f:
+# Merge with existing template (accumulate-only)
+import os
+tmpl_path = '$REPO_TMPL/.claude/CLAUDE.md'
+
+def parse_sections(text):
+    parts = re.split(r'(^## .+$)', text, flags=re.MULTILINE)
+    preamble = parts[0]
+    secs = []
+    i = 1
+    while i < len(parts):
+        h = parts[i]
+        b = parts[i+1] if i+1 < len(parts) else ''
+        secs.append((h.lstrip('#').strip().lower(), h, b))
+        i += 2
+    return preamble, secs
+
+if os.path.exists(tmpl_path):
+    with open(tmpl_path) as f:
+        tmpl = f.read()
+    t_pre, t_secs = parse_sections(tmpl)
+    f_pre, f_secs = parse_sections(out)
+    f_map = {n: (h, b) for n, h, b in f_secs}
+    t_names = {n for n, _, _ in t_secs}
+    merged = f_pre
+    for n, h, b in t_secs:
+        if n in f_map:
+            merged += f_map[n][0] + f_map[n][1]
+        else:
+            merged += h + b
+    for n, h, b in f_secs:
+        if n not in t_names:
+            merged += h + b
+    out = re.sub(r'\n{3,}', '\n\n', merged)
+    out = out.rstrip() + '\n'
+
+with open(tmpl_path, 'w') as f:
     f.write(out)
 " 2>/dev/null
-    echo "  FILTERED .claude/CLAUDE.md  → $REPO_TMPL/.claude/CLAUDE.md"
+    echo "  FILTERED  $REPO_TMPL/.claude/CLAUDE.md"
 fi
 
 # ============================================================
@@ -238,7 +309,7 @@ done
 # 4. Copy logs.md as-is
 # ============================================================
 mkdir -p "$MEM_TMPL/history" && cp "$MEM/history/logs.md" "$MEM_TMPL/history/" 2>/dev/null
-echo "  COPIED   history/logs.md  → $MEM_TMPL/history/logs.md"
+echo "  SKIPPED   $MEM_TMPL/history/logs.md"
 
 # ============================================================
 # 5. Update MEMORY.md template with situation-based topic index
@@ -290,7 +361,6 @@ content = content.rstrip() + '\n'
 with open(memory_md, 'w') as f:
     f.write(content)
 " 2>/dev/null
-echo "  INDEXED  topic files in MEMORY.md  → $MEM_TMPL/MEMORY.md"
 
 # ============================================================
 # 6. Ensure MEMORY.md Claude OS section has operational patterns
@@ -339,7 +409,6 @@ if not has_all:
     with open('$MEM_TMPL/MEMORY.md', 'w') as f:
         f.write(out)
 " 2>/dev/null
-echo "  ENSURED  operational patterns  → $MEM_TMPL/MEMORY.md"
 
 # ============================================================
 # 7. Commit and push
