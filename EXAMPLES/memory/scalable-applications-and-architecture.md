@@ -1,6 +1,6 @@
 # Scalable Applications and Architecture
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/505544931
+Source: (internal URL)
 
 _This exercise focuses on web application design and architecture. No coding should be required. The candidate should be asked to create documentation/diagrams to support their solutions._
 
@@ -248,4 +248,3 @@ Imagine after some time has passed, we find that a lot of users are trying to ge
 ### Interviewer - Things to look for:
 
 ... TBD
-

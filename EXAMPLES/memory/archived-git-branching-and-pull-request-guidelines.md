@@ -1,6 +1,6 @@
 # Archived: Git Branching and Pull Request Guidelines
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/35815542
+Source: (internal URL)
 
 # DEPRECATED: Refer to 
 
@@ -25,5 +25,3 @@ When submitting pull requests for code review, please do the following:
   11. **Rebase and squash your commits** before merging whenever possible. Squashing isn't always necessary if commits are well organized. ('WIP', 'PR feedback', 'Rubocop fix', 'Fix spec', 'Test fix', Fix issue', 'Fix linting issue', 'Revert change', 'Specs', 'Add specs', 'Cleanup', 'Lint', 'Fixed up', Modify spec' or similar messages are **not**  good commit descriptions.) Also, don't merge dev/master/rc into your feature branch. Rebase instead. All commits should also include the ticket id.
   12. **Only the Author  (or someone designated by the author) of the PR should click the merge button** The author of the PR is responsible for determining that the change is acceptable to merge. This includes verifying QA, Product and Release Management have signed off (if necessary) and all necessary reviews are received.
   13. **Make sure your brach is forked from the right branch**. If you are doing feature work it should be off dev, if it's a release fix it should be off the rc branch and if it's a hotfix fix it should be off the hotfix branch. Be sure to rebase if you decide to change the branch it will be merged to. Also, don't base a branch off master or point a PR to master.
-
-

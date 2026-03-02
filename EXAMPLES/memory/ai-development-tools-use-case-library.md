@@ -1,7 +1,6 @@
 # AI Development Tools: Use-Case Library
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1559166979
-
+Source: (internal URL)
 
 [Use-case submission form](https://docs.google.com/forms/d/e/1FAIpQLSdQy40q2uqHJWTFw2ofaONQAS_8qe6bwOvKR7YWHonLvA9sAA/viewform)
 
@@ -458,4 +457,3 @@ Create a pull request for my current branch.
   * Any breaking changes
 
   Then run: gh pr create
-

@@ -1,6 +1,6 @@
 # Informal Tech Mentorship
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/35815632
+Source: (internal URL)
 
 ## Introduction
 
@@ -27,4 +27,3 @@ A few of these match the more formal Mentorship parent document:
 ## Summary
 
 This mentorship process is a flexible, ever-changing thing that should be adapted over time. How that will look will depend on the interests of both participants, but also be beneficial to both.
-

@@ -1,6 +1,6 @@
 # Tickets, Branching and Pull Requests Oh My!
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/35815828
+Source: (internal URL)
 
 This guide is intended to provide a general workflow for those making contributions to the codebase.  
 
@@ -12,7 +12,7 @@ This guide is intended to provide a general workflow for those making contributi
         1. This will help to streamline the review process, as well as ensure there is a permanent record of these decisions and artifacts in a well known place.
      3. **Create a RFC if this feature has multiple tickets or contains a major change (or if it is part of a Milestone)**
         1. It's helpful to run your approach by the team before executing
-        2. [RFC Guidelines](https://stash.centro.net/projects/CEN/repos/apps_eng_docs/browse/rfcs/README.md)
+        2. [RFC Guidelines]((internal URL))
   2. **Create a branch with the JIRA ticket in the name**
      1. Example: BP-1234_my-short-description
      2. **Make sure your branch is forked from the right branch**.
@@ -101,5 +101,3 @@ This guide is intended to provide a general workflow for those making contributi
     * Do the changes meet the intended purpose described in the feature or story?
     * Does the code work as intended?
     * Is the code clear and easy to understand?
-
-

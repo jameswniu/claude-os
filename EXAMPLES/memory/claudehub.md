@@ -1,17 +1,16 @@
 # ClaudeHub
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1597341723
-
-
-**📣 Announcement of the Week**  
-💡 **Tip:** [Using Bash mode](https://basis.atlassian.net/wiki/spaces/BET/pages/edit-v2/1588723799) - Learn the most efficient way to run commands with Claude Code
+Source: (internal URL)
 
 **📣 Announcement of the Week**  
-💡 **Tip:** [Using Bash mode](https://basis.atlassian.net/wiki/spaces/BET/pages/edit-v2/1588723799) - Learn the most efficient way to run commands with Claude Code
+💡 **Tip:** [Using Bash mode]((internal URL)) - Learn the most efficient way to run commands with Claude Code
+
+**📣 Announcement of the Week**  
+💡 **Tip:** [Using Bash mode]((internal URL)) - Learn the most efficient way to run commands with Claude Code
 
 Welcome to Basis Applications Engineering ClaudeHub! Your central resource for onboarding to Claude Code. This page provides everything you need to get started, from official documentation to our custom Plugin Marketplace and Quick Start resources.
 
-If you are running into usage limits on the standard seat - [Request upgrade](https://basis.atlassian.net/wiki/x/LwDRXw) to Claude Premium
+If you are running into usage limits on the standard seat - [Request upgrade]((internal URL)) to Claude Premium
 
 ##  What is Claude Code?
 
@@ -47,7 +46,7 @@ Clear explanations to help you understand Claude Code's extensibility model.
 
   * Slack Channel: [#tools-ai](https://centro.slack.com/archives/C0A6ZEML1KN)
 
-  * <https://basis.atlassian.net/wiki/x/LwDRXw>
+  * <(internal URL)
 
   * Internal Docs
 
@@ -55,7 +54,7 @@ Clear explanations to help you understand Claude Code's extensibility model.
 
     * [Use Case submission form](https://docs.google.com/forms/d/e/1FAIpQLSdQy40q2uqHJWTFw2ofaONQAS_8qe6bwOvKR7YWHonLvA9sAA/viewform)
 
-    * [Tips of the Week](https://basis.atlassian.net/wiki/spaces/BET/folder/1588723798?atlOrigin=eyJpIjoiYWE5MjFmODc5ZDEzNGQxMWE3MjE4MWY2M2ZmZDVhYzQiLCJwIjoiYyJ9)
+    * [Tips of the Week]((internal URL))
 
     * [Basis Security: Approved AI Tools](https://centrohub.sharepoint.com/sites/BasisSecurity/SitePages/Approved-AI.aspx)
 
@@ -63,9 +62,9 @@ Clear explanations to help you understand Claude Code's extensibility model.
 
   * Claude Components
 
-    * [Apps Engineering Plugin Marketplace](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse)
+    * [Apps Engineering Plugin Marketplace]((internal URL))
 
-    * [Centro-Media-Manager AGENTS.md](https://stash.centro.net/projects/CEN/repos/centro-media-manager/browse/AGENTS.md) referenced by [CLAUDE.md](https://stash.centro.net/projects/CEN/repos/centro-media-manager/browse/CLAUDE.md)
+    * [Centro-Media-Manager AGENTS.md]((internal URL)) referenced by [CLAUDE.md]((internal URL))
 
   * Official Docs
 
@@ -131,7 +130,7 @@ notef2077ba4-9594-4e94-af64-a0e02690a8c2
 
 🛒 **Install Plugin Marketplace**
 
-Install the [Basis Apps Engineering Plugin Marketplace](https://basis.atlassian.net/wiki/spaces/BET/pages/1597341723#6cd8ac83-1e4e-400d-bb75-f2436ceb3ad3) to access custom skills, commands, and tools built specifically for our codebase and workflows.
+Install the [Basis Apps Engineering Plugin Marketplace]((internal URL)) to access custom skills, commands, and tools built specifically for our codebase and workflows.
 
 * * *
 
@@ -151,7 +150,7 @@ A shared repository of AI-powered tools for our organization:
 
   * **MCP Servers** \- External service connections
 
--> [Installation Instructions in README: apps-eng-ai-dev-tools](https://stash.centro.net/projects/CEN/repos/apps-eng-ai-dev-tools/browse). 
+-> [Installation Instructions in README: apps-eng-ai-dev-tools]((internal URL)). 
 
 **Note:** This marketplace isn't just for Apps Engineering! We welcome teams across Basis to contribute and use these plugins. If your org has built something useful, we'd love to have you share it with us.
 
@@ -187,7 +186,7 @@ Structured resources to help you get productive with AI tools quickly:
 
     * How LLMs work + How Emerging AI Tools Are Becoming More Reliable
 
-  * [**Tips of the Week**](https://basis.atlassian.net/wiki/spaces/BET/folder/1588723798?atlOrigin=eyJpIjoiYWE5MjFmODc5ZDEzNGQxMWE3MjE4MWY2M2ZmZDVhYzQiLCJwIjoiYyJ9) \- Weekly curated tips in #tools-ai
+  * [**Tips of the Week**]((internal URL)) \- Weekly curated tips in #tools-ai
 
 * * *
 
@@ -251,34 +250,33 @@ Real examples of Code Changes built with assistance from Claude Code.
 
 #### In Production
 
-  * [Upgrade @faker-js/faker from v5.5.3 to v9.x](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30285/overview) | 
+  * [Upgrade @faker-js/faker from v5.5.3 to v9.x]((internal URL)) | 
 
-  * [Upgrade nodejs to version 22](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30003/overview) | 
+  * [Upgrade nodejs to version 22]((internal URL)) | 
 
-  * [Upgrade react from 16.9.0 to 17.0.2](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30280/overview) | 
+  * [Upgrade react from 16.9.0 to 17.0.2]((internal URL)) | 
 
-  * [Adding new endpoint to Auth Service](https://stash.centro.net/projects/CEN/repos/auth-service/pull-requests/64/overview) | 
+  * [Adding new endpoint to Auth Service]((internal URL)) | 
 
-  * [Refactor client to use ResourceKit](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/29742/overview) | 
+  * [Refactor client to use ResourceKit]((internal URL)) | 
 
-  * [Performance Improvements for Catalog::Contacts#index](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30187/diff#app%2Fcontrollers%2Fcatalog%2Fcontacts_controller.rb) | 
+  * [Performance Improvements for Catalog::Contacts#index]((internal URL)) | 
 
-  * [Prevent stack traces from showing during outages](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30328/overview) | 
+  * [Prevent stack traces from showing during outages]((internal URL)) | 
 
 ####   
 Internal Tools
 
-  * [Add Improvado Logs to DataGenV2](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/29997/overview) | 
+  * [Add Improvado Logs to DataGenV2]((internal URL)) | 
 
-  * [Cross Project CMM Jira Releases](https://stash.centro.net/projects/CEN/repos/release_management/pull-requests/185/overview) | 
+  * [Cross Project CMM Jira Releases]((internal URL)) | 
 
-  * [Fetch Auth0 Realm for DataGen](https://stash.centro.net/projects/CEN/repos/py_data_generation/pull-requests/385/overview) | 
+  * [Fetch Auth0 Realm for DataGen]((internal URL)) | 
 
 #### In Development
 
-  * [Upgrade MSW to v2 and fix test suite](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30260/overview) | 
+  * [Upgrade MSW to v2 and fix test suite]((internal URL)) | 
 
-  * [API Wrapper for Planning Service in CMM](https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/30093/overview) | 
+  * [API Wrapper for Planning Service in CMM]((internal URL)) | 
 
 * * *
-

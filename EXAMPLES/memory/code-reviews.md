@@ -34,6 +34,4 @@ Your PR descriptions should be an extension of your commit messages. Write about
 var commentCount = 0;
 ```
 
-You might suggest that this be a `let` instead of `var`. 
-
-
+You might suggest that this be a `let` instead of `var`.
