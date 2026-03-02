@@ -40,13 +40,17 @@ for FILE in "$REPO_TMPL/.claude/commands"/*.md; do
     echo "  SYNCED   commands/$NAME"
 done
 
-# Topic files (always overwrite with latest)
+# Topic files (seed only, don't overwrite — sync scripts fetch raw content)
 for FILE in "$MEM_TMPL"/*.md; do
     [ -f "$FILE" ] || continue
     NAME=$(basename "$FILE")
     [ "$NAME" = "MEMORY.md" ] && continue
-    cp "$FILE" "$MEM/$NAME"
-    echo "  SYNCED   $NAME"
+    if [ ! -f "$MEM/$NAME" ]; then
+        cp "$FILE" "$MEM/$NAME"
+        echo "  CREATED  $NAME"
+    else
+        echo "  EXISTS   $NAME"
+    fi
 done
 
 # Add .claude/ to .gitignore if not already there

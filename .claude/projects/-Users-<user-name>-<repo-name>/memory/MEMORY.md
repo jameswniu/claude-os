@@ -51,6 +51,29 @@ Topical reference for quick lookup. See `log.md` for chronological session histo
 - When moving artifacts between refs, verify all linked files exist on the new ref before pushing
 - PR comment links to artifacts use `raw/` URLs pointing to tag refs
 
+## Topic Files (on demand, read when relevant)
+
+Reference docs in the memory directory. Zero tokens until read.
+- `ai-code-reviewer-project.md` -- when planning AI code review integrations
+- `ai-development-tools-use-case-library.md` -- when exploring AI tool use cases or writing prompts
+- `ai-pr-summaries.md` -- reference material
+- `ai-tools-quickstart.md` -- reference material
+- `ai-updates-q4-2025.md` -- reference material
+- `apps-engineering-growth-framework.md` -- reference material
+- `apps-engineering-pad-skills-assessment-supplement.md` -- reference material
+- `apps-engineering-resource-library-formerly-onboarding.md` -- reference material
+- `apps-engineering-team.md` -- reference material
+- `archived-git-branching-and-pull-request-guidelines.md` -- historical reference for legacy branching rules
+- `claude-code-pricing.md` -- reference material
+- `claudehub.md` -- when onboarding to Claude Code or finding internal resources
+- `code-reviews.md` -- when reviewing PRs or discussing review practices
+- `informal-tech-mentorship.md` -- when mentoring or structuring knowledge transfer
+- `plugin-marketplace.md` -- reference material
+- `scalable-applications-and-architecture.md` -- when designing services or making architecture decisions
+- `tickets-branching-and-pull-requests-oh-my.md` -- when setting up git workflows or branching strategies
+- `tips-bash-mode.md` -- reference material
+- Synced every 24h. Scripts auto-discover relevant new pages and add them here.
+
 ## Claude Code File System
 
 - `/CLAUDE.md` - Team instructions, checked into git
