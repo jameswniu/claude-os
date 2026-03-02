@@ -3,7 +3,7 @@
 # Installed by: bash ~/claude-os/install.sh
 
 echo "Running tests before push..."
-bash "$(dirname "$(dirname "$(readlink -f "$0")")")/tests/test.sh"
+bash "$HOME/claude-os/tests/test.sh"
 
 if [ $? -ne 0 ]; then
     echo ""
