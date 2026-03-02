@@ -7,7 +7,7 @@ FAIL=0
 TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$TEST_DIR/.." && pwd)"
 SCRIPT_DIR="$REPO_DIR/{repo}/.claude/scripts"
-LAUNCHD_DIR="$REPO_DIR/launchd"
+LAUNCHD_DIR="$REPO_DIR/Library/LaunchAgents"
 
 pass() { echo "  PASS: $1"; PASS=$((PASS + 1)); }
 fail() { echo "  FAIL: $1"; FAIL=$((FAIL + 1)); }
