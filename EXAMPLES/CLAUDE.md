@@ -14,7 +14,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # make build             # Build for production
 # docker compose up      # Start all services
 ```
-
 ## Architecture
 
 Describe the high-level architecture of the project.
@@ -31,21 +30,18 @@ Describe the high-level architecture of the project.
 - Language, framework, package manager
 - Database, cache, message queue (if applicable)
 - Frontend framework, bundler (if applicable)
-
 ## Testing
 
 - Test runner and framework used
 - Where test files live and naming conventions
 - How fixtures and test utilities are organized
 - Coverage target (e.g., 85% minimum)
-
 ## Code Style
 
 - Linter and formatter used
 - Docstring style (Google, NumPy, etc.)
 - Line length limit
 - Type checking strictness
-
 ## Code Quality Requirements
 
 **IMPORTANT:** All code changes MUST pass both tests and lint before being considered complete:
@@ -55,7 +51,6 @@ Describe the high-level architecture of the project.
 3. **Check coverage** - Maintain minimum coverage target
 
 Do not submit code changes that fail any of these checks.
-
 ## Environment Configuration
 
 - Copy `.env.example` to `.env` for local development

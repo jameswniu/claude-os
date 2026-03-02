@@ -1,6 +1,6 @@
 # AI Code Reviewer Project
 
-Source: https://basis.atlassian.net/wiki/spaces/BET/pages/1583513725
+Source: (internal URL)
 
 **Driver**|  Primary: Secondary:   
 ---|---  
@@ -58,6 +58,4 @@ Analyze previous code reviews to identify best practices to bake into Claude.md|
   
 # 📊 Success Metrics
 
-  * 
-
-
+  *
