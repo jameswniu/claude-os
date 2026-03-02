@@ -228,9 +228,9 @@ with open('$MEM_TMPL/$NAME', 'w') as f:
 sys.exit(0 if filtered else 2)
 " 2>/dev/null
     if [ $? -eq 0 ]; then
-        echo "  FILTERED $NAME  → $MEM_TMPL/$NAME"
+        echo "  FILTERED  $MEM_TMPL/$NAME"
     else
-        echo "  SKIPPED  $NAME  → $MEM_TMPL/$NAME"
+        echo "  SKIPPED   $MEM_TMPL/$NAME"
     fi
 done
 
