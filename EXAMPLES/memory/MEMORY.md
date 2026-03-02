@@ -106,3 +106,16 @@ Reference docs in the memory directory. Zero tokens until read.
 - `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
 - `~/.claude/projects/{project}/memory/logs.md` — Session log, read on demand
 - `~/.claude/projects/{project}/memory/*.md` — Topic files, read on demand
+phan git tags (not PR branches) to avoid merging demo files into main
+- PR comment links should use raw URLs pointing to tags for GIF/image display
+
+## Claude Code File System
+
+- `/CLAUDE.md` — Team instructions, checked into git
+- `/.claude/` — Gitignored as of 02-27 (removed from tracking, added to `.gitignore`)
+- `/.claude/CLAUDE.md` — Personal instructions, gitignored
+- `/.claude/commands/review.md` — /review slash command
+- `/.claude/settings.local.json` — Permission auto-approvals
+- `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
+- `~/.claude/projects/{project}/memory/logs.md` — Session log, read on demand
+- `~/.claude/projects/{project}/memory/*.md` — Topic files, read on demand
