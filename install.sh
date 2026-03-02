@@ -5,13 +5,24 @@ mkdir -p ~/.local/bin
 
 cat > ~/.local/bin/checkpoint << 'EOF'
 #!/bin/bash
-bash "$HOME/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh"
+if [ -f .claude/scripts/5-checkpoint.sh ]; then
+    bash .claude/scripts/5-checkpoint.sh
+else
+    echo "Run from a bootstrapped project directory."
+    exit 1
+fi
 EOF
 chmod +x ~/.local/bin/checkpoint
 
 cat > ~/.local/bin/bootstrap << 'EOF'
 #!/bin/bash
-bash "$HOME/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh"
+if [ -f .claude/scripts/6-bootstrap.sh ]; then
+    bash .claude/scripts/6-bootstrap.sh
+else
+    echo "Run from a bootstrapped project directory. First-time setup:"
+    echo '  bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh'
+    exit 1
+fi
 EOF
 chmod +x ~/.local/bin/bootstrap
 

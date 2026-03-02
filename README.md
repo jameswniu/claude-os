@@ -35,6 +35,8 @@ cd ~/<repo-name>
 bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh
 ```
 
+> **Note:** `<repo-name>` is a literal directory in the claude-os repo, not a placeholder. Type it exactly as shown (with angle brackets).
+
 Bootstrap auto-runs `install.sh` on first use, which sets up:
 - `checkpoint` and `bootstrap` shell aliases (so next time just type `bootstrap`)
 - Pre-push git hook (runs tests before every push to this repo)

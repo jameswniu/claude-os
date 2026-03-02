@@ -131,12 +131,9 @@ else
     echo "  CREATED  .gitignore (with .claude/)  → $PROJECT/.gitignore"
 fi
 
-# Ensure install.sh has run (commands + PATH + pre-push hook)
-if ! command -v checkpoint &>/dev/null; then
-    bash "$CLAUDE_OS/install.sh"
-    export PATH="$HOME/.local/bin:$PATH"
-    echo "  INSTALLED commands (bootstrap, checkpoint)"
-fi
+# Always run install.sh to keep commands current (fixes stale paths from old installs)
+bash "$CLAUDE_OS/install.sh"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Reconcile orphaned topic files into MEMORY.md
 RECONCILED=0
@@ -171,10 +168,12 @@ NOTION_COUNT=0
 export MEMORY_FILE="$MEM/MEMORY.md"
 
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
-    BEFORE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+    BEFORE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null)
+    BEFORE_COUNT=${BEFORE_COUNT:-0}
     CONF_MARKER=$(mktemp)
     if bash "$PROJECT/.claude/scripts/4-sync-confluence.sh"; then
-        AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null)
+        AFTER_COUNT=${AFTER_COUNT:-0}
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
             echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)"
@@ -193,10 +192,12 @@ else
 fi
 
 if [ -n "$NOTION_TOKEN" ]; then
-    BEFORE_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+    BEFORE_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null)
+    BEFORE_COUNT=${BEFORE_COUNT:-0}
     NOTION_MARKER=$(mktemp)
     if bash "$PROJECT/.claude/scripts/5-sync-notion.sh"; then
-        AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null)
+        AFTER_COUNT=${AFTER_COUNT:-0}
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
             echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)"
@@ -218,7 +219,7 @@ fi
 if [ -z "$SKIP_LAUNCHD" ] && [ -d "$HOME/Library" ]; then
     echo ""
     echo "  Setting up automation..."
-    PROJ_NAME=$(basename "$PROJECT")
+    PROJ_NAME=$(basename "$PROJECT" | sed 's/^\.//')
     LAUNCH_DIR="$HOME/Library/LaunchAgents"
     mkdir -p "$LAUNCH_DIR"
 
