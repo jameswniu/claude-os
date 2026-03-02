@@ -8,18 +8,18 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/{username}/claude-os/{repo}/.claude/scripts/5-sync-notion.sh</string>
+		<string>/Users/&lt;user-name&gt;/claude-os/&lt;repo-name&gt;/.claude/scripts/5-sync-notion.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>86400</integer>
 	<key>StandardOutPath</key>
-	<string>/Users/{username}/claude-os/output/5-sync-notion-stdout.log</string>
+	<string>/Users/&lt;user-name&gt;/claude-os/output/5-sync-notion-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/{username}/claude-os/output/5-sync-notion-stderr.log</string>
+	<string>/Users/&lt;user-name&gt;/claude-os/output/5-sync-notion-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/Users/{username}/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>/Users/&lt;user-name&gt;/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
 		<key>NOTION_TOKEN</key>
 		<string>YOUR_TOKEN_HERE</string>
 	</dict>

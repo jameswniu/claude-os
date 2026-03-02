@@ -1,6 +1,6 @@
 #!/bin/bash
 # 6-bootstrap.sh — Pull claude-os repo config into a live workspace
-# Usage: cd ~/some-repo && bash ~/claude-os/{repo}/.claude/scripts/6-bootstrap.sh
+# Usage: cd ~/some-repo && bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh
 
 CLAUDE_OS="$HOME/claude-os"
 PROJECT=$(pwd)
@@ -13,15 +13,15 @@ fi
 
 cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null
 cd "$PROJECT"
-REPO_TMPL="$CLAUDE_OS/{repo}"
-MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-{username}-{repo}/memory"
+REPO_TMPL="$CLAUDE_OS/<repo-name>"
+MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-<user-name>-<repo-name>/memory"
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 echo "Project: $PROJECT"
 echo ""
 
-# Phase 1: Sync all files from {repo} template
+# Phase 1: Sync all files from <repo-name> template
 mkdir -p .claude "$MEM/history"
 
 [ ! -f .claude/CLAUDE.md ] && cp "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"

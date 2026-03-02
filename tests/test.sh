@@ -6,7 +6,7 @@ PASS=0
 FAIL=0
 TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$TEST_DIR/.." && pwd)"
-SCRIPT_DIR="$REPO_DIR/{repo}/.claude/scripts"
+SCRIPT_DIR="$REPO_DIR/<repo-name>/.claude/scripts"
 LAUNCHD_DIR="$REPO_DIR/Library/LaunchAgents"
 
 pass() { echo "  PASS: $1"; PASS=$((PASS + 1)); }
@@ -95,9 +95,9 @@ grep -q "output/" "$REPO_DIR/.gitignore" && pass ".gitignore excludes output/" |
 grep -q "—" "$REPO_DIR/README.md" && fail "README contains em dashes" || pass "README has no em dashes"
 
 # Test: templates have no project-specific content
-REPO_TMPL="$REPO_DIR/{repo}"
-MEM_TMPL="$REPO_DIR/.claude/projects/-Users-{username}-{repo}/memory"
-grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific URLs" || pass "{repo}/.claude/CLAUDE.md is generic"
+REPO_TMPL="$REPO_DIR/<repo-name>"
+MEM_TMPL="$REPO_DIR/.claude/projects/-Users-<user-name>-<repo-name>/memory"
+grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "<repo-name>/.claude/CLAUDE.md has project-specific URLs" || pass "<repo-name>/.claude/CLAUDE.md is generic"
 grep -q "stash.centro.net" "$MEM_TMPL/MEMORY.md" && fail "memory/MEMORY.md has project-specific URLs" || pass "memory/MEMORY.md is generic"
 grep -q "BP-29" "$REPO_TMPL/.claude/commands/review.md" && fail "review.md has project-specific tickets" || pass "review.md is generic"
 grep -q "REDACTED\|ATATT" "$REPO_TMPL/.claude/settings.local.json" && fail "settings.local.json has secrets" || pass "settings.local.json is clean"
@@ -131,9 +131,9 @@ echo "## 5-checkpoint.sh"
 head -1 "$SCRIPT_DIR/5-checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
 
 # Test: checkpoint filters .claude/CLAUDE.md
-grep -q "learned per project" "$REPO_TMPL/.claude/CLAUDE.md" && pass "{repo}/.claude/CLAUDE.md has placeholders" || fail "{repo}/.claude/CLAUDE.md missing placeholders"
-grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific URLs" || pass "{repo}/.claude/CLAUDE.md has no project URLs"
-grep -q "BP-[0-9]" "$REPO_TMPL/.claude/CLAUDE.md" && fail "{repo}/.claude/CLAUDE.md has project-specific tickets" || pass "{repo}/.claude/CLAUDE.md has no project tickets"
+grep -q "learned per project" "$REPO_TMPL/.claude/CLAUDE.md" && pass "<repo-name>/.claude/CLAUDE.md has placeholders" || fail "<repo-name>/.claude/CLAUDE.md missing placeholders"
+grep -q "stash.centro.net" "$REPO_TMPL/.claude/CLAUDE.md" && fail "<repo-name>/.claude/CLAUDE.md has project-specific URLs" || pass "<repo-name>/.claude/CLAUDE.md has no project URLs"
+grep -q "BP-[0-9]" "$REPO_TMPL/.claude/CLAUDE.md" && fail "<repo-name>/.claude/CLAUDE.md has project-specific tickets" || pass "<repo-name>/.claude/CLAUDE.md has no project tickets"
 
 # Test: distilled topic files have no Confluence page IDs
 TOPIC_HAS_CONFLUENCE_ID=0
@@ -153,8 +153,8 @@ for TOPIC in "$MEM_TMPL"/*.md; do
 done
 [ "$TOPIC_HAS_BASIS_URL" -eq 0 ] && pass "distilled topic files have no Basis-specific URLs" || fail "distilled topic files still have Basis-specific URLs"
 
-# Test: no topics/ subfolder in {repo}
-[ -d "$MEM_TMPL/topics" ] && fail "{repo} still has topics/ subfolder" || pass "{repo} has flat topic structure"
+# Test: no topics/ subfolder in <repo-name>
+[ -d "$MEM_TMPL/topics" ] && fail "<repo-name> still has topics/ subfolder" || pass "<repo-name> has flat topic structure"
 
 # Test: scripts have no topics/ subfolder references
 grep -q "topics/" "$SCRIPT_DIR/4-sync-confluence.sh" && fail "4-sync-confluence.sh still references topics/" || pass "4-sync-confluence.sh has no topics/ refs"
