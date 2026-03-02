@@ -41,7 +41,9 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
 - **Wrong config file**: Personal preferences go in `.claude/CLAUDE.md` (gitignored), never in root `CLAUDE.md` (shared).
-- **PR comment style**: Violated Feb 27 (BP-29423). Iterated 4 times from structured report to plain language. Must keep bite-sized: issue + before/after fix + whether rest looks good. No headers, categories, or impact labels.
+- **Stale files in copy-only sync**: When a script copies files to a target directory, always clean the target first if the source is the single source of truth. Copy-only accumulates stale files. Use delete-then-copy (or rsync --delete).
+- **Flagging theoretical issues**: Don't flag issues that can't happen in practice (e.g., hypothetical future scenarios). Focus on real, actionable findings.
+- **Force-updating git tags**: Orphans the old commit -- files not carried forward are lost. When moving artifacts between refs, verify all linked files exist on the new ref before pushing.
 
 ## User Preferences
 
@@ -50,6 +52,8 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - Wants timestamped memory for future learning loop / rolling window implementation.
 - Hybrid memory system: MEMORY.md (topical lookup) + history/logs.md (chronological sessions).
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
+- PR comments must include direct Bitbucket links when referencing tags, branches, or other repo resources (not just plain text names)
+- Interested in pre-push hooks or CI gates to enforce test runs before pushing
 
 ## Topic Files (on demand, read when relevant)
 
@@ -104,13 +108,26 @@ Reference docs in the memory directory. Zero tokens until read.
 
 ## Claude Code File System
 
-- `/CLAUDE.md` - Team instructions, checked into git
-- `/.claude/CLAUDE.md` - Personal instructions, gitignored
-- `/.claude/commands/review.md` - /review slash command
-- `/.claude/settings.local.json` - Permission auto-approvals
-- `~/.claude/projects/{project}/memory/MEMORY.md` - This file, auto-loaded
-- `~/.claude/projects/{project}/memory/history/logs.md` - Session log, read on demand
-- `code-reviews.md` -- reference material
+- `/CLAUDE.md` — Team instructions, checked into git
+- `/.claude/` — Gitignored as of 02-27 (removed from tracking, added to `.gitignore`)
+- `/.claude/CLAUDE.md` — Personal instructions, gitignored
+- `/.claude/commands/review.md` — /review slash command
+- `/.claude/settings.local.json` — Permission auto-approvals
+- `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded
+- `~/.claude/projects/{project}/memory/history/logs.md` — Session log, read on demand
+- `~/.claude/projects/{project}/memory/*.md` — Topic files, read on demand
+- `ai-pr-summaries.md` -- reference material
+- `ai-tools-quickstart.md` -- reference material
+- `ai-updates-q4-2025.md` -- reference material
+- `apps-engineering-growth-framework.md` -- reference material
+- `apps-engineering-pad-skills-assessment-supplement.md` -- reference material
+- `apps-engineering-resource-library-formerly-onboarding.md` -- reference material
+- `apps-engineering-team.md` -- reference material
+- `claude-code-pricing.md` -- reference material
+- `informal-tech-mentorship.md` -- reference material
+- `plugin-marketplace.md` -- reference material
+- `scalable-applications-and-architecture.md` -- reference material
+- `tips-bash-mode.md` -- reference material
 ## Artifact Management
 
 - Never store test artifacts, GIFs, or demo recordings on PR branches (merges into main)
