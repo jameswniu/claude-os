@@ -142,6 +142,18 @@ def parse_sections(text):
         i += 2
     return preamble, secs
 
+def merge_body(t_body, f_body):
+    \"\"\"Line-level union: keep all template lines, append new filtered lines.\"\"\"
+    def norm(line):
+        return line.replace('\u2014', '-').replace('\u2013', '-').lower().strip()
+    t_content = [l for l in t_body.split('\n') if l.strip()]
+    f_content = [l for l in f_body.split('\n') if l.strip()]
+    t_norms = {norm(l) for l in t_content}
+    new = [l for l in f_content if norm(l) not in t_norms]
+    if not new:
+        return t_body
+    return t_body.rstrip('\n') + '\n' + '\n'.join(new) + '\n'
+
 existing = ''
 if os.path.exists(tmpl_path):
     with open(tmpl_path) as f:
@@ -153,7 +165,7 @@ if os.path.exists(tmpl_path):
     merged = f_pre
     for n, h, b in t_secs:
         if n in f_map:
-            merged += f_map[n][0] + f_map[n][1]
+            merged += h + merge_body(b, f_map[n][1])
         else:
             merged += h + b
     for n, h, b in f_secs:
@@ -238,6 +250,18 @@ def parse_sections(text):
         i += 2
     return preamble, secs
 
+def merge_body(t_body, f_body):
+    \"\"\"Line-level union: keep all template lines, append new filtered lines.\"\"\"
+    def norm(line):
+        return line.replace('\u2014', '-').replace('\u2013', '-').lower().strip()
+    t_content = [l for l in t_body.split('\n') if l.strip()]
+    f_content = [l for l in f_body.split('\n') if l.strip()]
+    t_norms = {norm(l) for l in t_content}
+    new = [l for l in f_content if norm(l) not in t_norms]
+    if not new:
+        return t_body
+    return t_body.rstrip('\n') + '\n' + '\n'.join(new) + '\n'
+
 existing = ''
 if os.path.exists(tmpl_path):
     with open(tmpl_path) as f:
@@ -249,7 +273,7 @@ if os.path.exists(tmpl_path):
     merged = f_pre
     for n, h, b in t_secs:
         if n in f_map:
-            merged += f_map[n][0] + f_map[n][1]
+            merged += h + merge_body(b, f_map[n][1])
         else:
             merged += h + b
     for n, h, b in f_secs:

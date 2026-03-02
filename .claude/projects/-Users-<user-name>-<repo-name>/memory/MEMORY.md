@@ -44,7 +44,7 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - **Stale files in copy-only sync**: When a script copies files to a target directory, always clean the target first if the source is the single source of truth. Copy-only accumulates stale files. Use delete-then-copy (or rsync --delete).
 - **Flagging theoretical issues**: Don't flag issues that can't happen in practice (e.g., hypothetical future scenarios). Focus on real, actionable findings.
 - **Force-updating git tags**: Orphans the old commit -- files not carried forward are lost. When moving artifacts between refs, verify all linked files exist on the new ref before pushing.
-
+- **PR comment style**: Violated Feb 27 (BP-29423). Iterated 4 times from structured report to plain language. Must keep bite-sized: issue + before/after fix + whether rest looks good. No headers, categories, or impact labels.
 ## User Preferences
 
 - Hands-off, delegation-oriented. Issues a command and lets Claude run autonomously.
@@ -128,6 +128,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - `plugin-marketplace.md` -- reference material
 - `scalable-applications-and-architecture.md` -- reference material
 - `tips-bash-mode.md` -- reference material
+- `code-reviews.md` -- reference material
 ## Artifact Management
 
 - Never store test artifacts, GIFs, or demo recordings on PR branches (merges into main)
