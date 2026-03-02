@@ -81,6 +81,10 @@ skip_mistake_keywords = ['verdict in pr', 'gh cli', 'wrong branch', 'node_module
 with open('$MEM/MEMORY.md') as f:
     content = f.read()
 
+# Normalize stale log path references
+content = content.replace('\x60log.md\x60', '\x60history/logs.md\x60')
+content = re.sub(r'(?<![/\w])log\.md(?!\w)', 'history/logs.md', content)
+
 sections = re.split(r'(^## .+$)', content, flags=re.MULTILINE)
 out = sections[0]  # header before first ##
 
