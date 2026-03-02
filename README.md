@@ -28,11 +28,11 @@ git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 ```
 
 ```bash
-cd ~/<repo-name>
+cd ~/"<repo-name>"
 ```
 
 ```bash
-bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh
+bash ~/claude-os/"<repo-name>"/.claude/scripts/6-bootstrap.sh
 ```
 
 > **Note:** `<repo-name>` is a literal directory in the claude-os repo, not a placeholder. Type it exactly as shown (with angle brackets).
@@ -89,7 +89,7 @@ bootstrap
 Run the init script from any project directory. It copies template files only if they don't already exist.
 
 ```bash
-cd ~/<repo-name>
+cd ~/"<repo-name>"
 bootstrap
 ```
 
@@ -141,7 +141,7 @@ source ~/.zshrc
 Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
-bash ~/claude-os/<repo-name>/.claude/scripts/4-sync-confluence.sh
+bash ~/claude-os/"<repo-name>"/.claude/scripts/4-sync-confluence.sh
 ```
 
 **Notion sync (optional):**
@@ -157,7 +157,7 @@ Share each Notion page with the integration (page `...` menu > "Connections" > a
 Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
-bash ~/claude-os/<repo-name>/.claude/scripts/5-sync-notion.sh
+bash ~/claude-os/"<repo-name>"/.claude/scripts/5-sync-notion.sh
 ```
 
 **Verify scripts are running:**
@@ -582,7 +582,7 @@ Existing topic files are refreshed on every run, never deleted.
        <string>your-api-token</string>
    </dict>
    ```
-4. Test manually: `bash <repo-name>/.claude/scripts/4-sync-confluence.sh`
+4. Test manually: `bash "<repo-name>"/.claude/scripts/4-sync-confluence.sh`
 
 The script skips gracefully if credentials are not set. No errors, no data loss.
 
@@ -632,7 +632,7 @@ Existing topic files are refreshed on every run, never deleted.
        <string>ntn_your-token-here</string>
    </dict>
    ```
-6. Test manually: `bash <repo-name>/.claude/scripts/5-sync-notion.sh`
+6. Test manually: `bash "<repo-name>"/.claude/scripts/5-sync-notion.sh`
 
 The script skips gracefully if the token is not set. No errors, no data loss.
 
@@ -704,7 +704,7 @@ cd ~/claude-os && mkdir -p output
 ```
 
 ```bash
-chmod +x <repo-name>/.claude/scripts/*.sh
+chmod +x "<repo-name>"/.claude/scripts/*.sh
 ```
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project.
