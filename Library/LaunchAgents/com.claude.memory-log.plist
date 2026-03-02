@@ -7,18 +7,18 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/james.niu/claude-os/scripts/1-log.sh</string>
+		<string>/Users/{username}/claude-os/{repo}/.claude/scripts/1-log.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>3600</integer>
 	<key>StandardOutPath</key>
-	<string>/Users/james.niu/claude-os/output/1-log-stdout.log</string>
+	<string>/Users/{username}/claude-os/output/1-log-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/james.niu/claude-os/output/1-log-stderr.log</string>
+	<string>/Users/{username}/claude-os/output/1-log-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/Users/james.niu/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>/Users/{username}/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
 	</dict>
 </dict>
 </plist>

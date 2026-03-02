@@ -7,20 +7,20 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/james.niu/claude-os/scripts/4-sync-confluence.sh</string>
+		<string>/Users/{username}/claude-os/{repo}/.claude/scripts/4-sync-confluence.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>86400</integer>
 	<key>StandardOutPath</key>
-	<string>/Users/james.niu/claude-os/output/4-sync-stdout.log</string>
+	<string>/Users/{username}/claude-os/output/4-sync-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/james.niu/claude-os/output/4-sync-stderr.log</string>
+	<string>/Users/{username}/claude-os/output/4-sync-stderr.log</string>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/Users/james.niu/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>/Users/{username}/.local/bin:/usr/local/bin:/usr/bin:/bin</string>
 		<key>CONFLUENCE_EMAIL</key>
-		<string>james.niu@basis.com</string>
+		<string>YOUR_EMAIL_HERE</string>
 		<key>CONFLUENCE_TOKEN</key>
 		<string>YOUR_TOKEN_HERE</string>
 	</dict>
