@@ -26,7 +26,7 @@ Claude Code can do all of this out of the box. The memory system below makes it 
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 cd ~/your-project
-bash ~/claude-os/scripts/6-bootstrap.sh
+bash ~/claude-os/{repo}/.claude/scripts/6-bootstrap.sh
 ```
 
 Bootstrap auto-runs `install.sh` on first use, which sets up:
@@ -108,13 +108,13 @@ No setup needed. Just follow this rhythm as you work:
 Replace the manual loop with scheduled scripts.
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project:
-- `~/claude-os/scripts/1-log.sh` - session logger (every 1h)
-- `~/claude-os/scripts/2-distill.sh` - pattern distiller (every 24h)
-- `~/claude-os/scripts/3-promote.sh` - rule promoter (every 7d)
+- `~/claude-os/{repo}/.claude/scripts/1-log.sh` - session logger (every 1h)
+- `~/claude-os/{repo}/.claude/scripts/2-distill.sh` - pattern distiller (every 24h)
+- `~/claude-os/{repo}/.claude/scripts/3-promote.sh` - rule promoter (every 7d)
 
 Then install and verify:
 ```bash
-cp ~/claude-os/launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
+cp ~/claude-os/Library/LaunchAgents/com.claude.memory-*.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
@@ -133,7 +133,7 @@ source ~/.zshrc
 Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
-bash ~/claude-os/scripts/4-sync-confluence.sh
+bash ~/claude-os/{repo}/.claude/scripts/4-sync-confluence.sh
 ```
 
 **Notion sync (optional):**
@@ -149,7 +149,7 @@ Share each Notion page with the integration (page `...` menu > "Connections" > a
 Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
 launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
-bash ~/claude-os/scripts/5-sync-notion.sh
+bash ~/claude-os/{repo}/.claude/scripts/5-sync-notion.sh
 ```
 
 **Verify scripts are running:**
@@ -253,12 +253,12 @@ flowchart TD
 
 | File | Location | Purpose | Loaded | Example |
 |------|----------|---------|--------|---------|
-| `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](EXAMPLES/.claude/CLAUDE.md) |
-| `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
-| `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
-| `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/history/logs.md) |
-| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/) |
-| `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
+| `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view]({repo}/.claude/CLAUDE.md) |
+| `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view]({repo}/.claude/settings.local.json) |
+| `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](.claude/projects/-Users-{username}-{repo}/memory/MEMORY.md) |
+| `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](.claude/projects/-Users-{username}-{repo}/memory/history/logs.md) |
+| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](.claude/projects/-Users-{username}-{repo}/memory/) |
+| `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view]({repo}/.claude/commands/review.md) |
 
 ---
 
@@ -574,7 +574,7 @@ Existing topic files are refreshed on every run, never deleted.
        <string>your-api-token</string>
    </dict>
    ```
-4. Test manually: `bash scripts/4-sync-confluence.sh`
+4. Test manually: `bash {repo}/.claude/scripts/4-sync-confluence.sh`
 
 The script skips gracefully if credentials are not set. No errors, no data loss.
 
@@ -624,7 +624,7 @@ Existing topic files are refreshed on every run, never deleted.
        <string>ntn_your-token-here</string>
    </dict>
    ```
-6. Test manually: `bash scripts/5-sync-notion.sh`
+6. Test manually: `bash {repo}/.claude/scripts/5-sync-notion.sh`
 
 The script skips gracefully if the token is not set. No errors, no data loss.
 
@@ -651,23 +651,23 @@ OK use-case-library.md (461 lines)
 Sync complete. 2 synced, 0 failed.
 ```
 
-After syncing, run `checkpoint` to snapshot and filter the workspace files to the `EXAMPLES/` directory:
+After syncing, run `checkpoint` to snapshot and filter the workspace files to the `{repo}/` and `.claude/projects/` directories:
 ```bash
 checkpoint
 ```
 
 ### Checkpoint (5-checkpoint.sh)
 
-Snapshots live workspace files into `EXAMPLES/`, filtering project-specific content so templates are reusable across projects.
+Snapshots live workspace files into `{repo}/.claude/` and `.claude/projects/-Users-{username}-{repo}/memory/`, filtering project-specific content so templates are reusable across projects.
 
 **What it syncs:**
 
 | Source | Template | Filtering |
 |--------|----------|-----------|
-| `.claude/CLAUDE.md` (personal) | `EXAMPLES/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
-| `MEMORY.md` | `EXAMPLES/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
-| Topic files (`*.md`) | `EXAMPLES/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
-| `history/logs.md` | `EXAMPLES/memory/history/logs.md` | Copied as-is |
+| `.claude/CLAUDE.md` (personal) | `{repo}/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
+| `MEMORY.md` | `.claude/projects/-Users-{username}-{repo}/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
+| Topic files (`*.md`) | `.claude/projects/-Users-{username}-{repo}/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
+| `history/logs.md` | `.claude/projects/-Users-{username}-{repo}/memory/history/logs.md` | Copied as-is |
 
 **Filtering rules:**
 - Universal sections (PR Comment Style, Behavior Rules, Memory, Claude OS) are kept verbatim
@@ -685,14 +685,14 @@ Clone and set up:
 ```bash
 git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 cd ~/claude-os && mkdir -p output
-chmod +x scripts/*.sh
+chmod +x {repo}/.claude/scripts/*.sh
 ```
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project.
 
 Copy plists and load agents:
 ```bash
-cp launchd/com.claude.memory-*.plist ~/Library/LaunchAgents/
+cp Library/LaunchAgents/com.claude.memory-*.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
 launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
@@ -777,20 +777,17 @@ client = anthropic.Anthropic()
 **This repo (Phase 3 automation):**
 
 - `claude-os/`
+  - `.claude/projects/-Users-{username}-{repo}/memory/` - Memory templates
   - `.github/workflows/test.yml` - CI test runner
-  - `EXAMPLES/` - Snapshot templates (.claude/, memory/)
+  - `Library/LaunchAgents/` - macOS scheduler plists (reference templates)
   - `README.md`
   - `install.sh` - Installs `checkpoint` and `bootstrap` commands
-  - `launchd/` - macOS scheduler plists (log, distill, promote, sync)
-  - `scripts/`
-    - `1-log.sh` - Session logger (every 1h)
-    - `2-distill.sh` - Pattern distiller (every 24h)
-    - `3-promote.sh` - Rule promoter (every 7d)
-    - `4-sync-confluence.sh` - Confluence page syncer (every 24h)
-    - `5-checkpoint.sh` - Snapshot workspace to this repo
-    - `6-bootstrap.sh` - Pull repo config into live workspace
-    - `update-readme.sh` - Regenerate file tree in README
-  - `tests/test.sh` - Validation tests
+  - `tests/` - Validation tests
+  - `{repo}/` - Project config template
+    - `.claude/`
+      - `CLAUDE.md`, `settings.local.json`, `commands/review.md`
+      - `hooks/pre-push`
+      - `scripts/` - 1-log.sh through 6-bootstrap.sh, update-readme.sh
 
 ---
 
