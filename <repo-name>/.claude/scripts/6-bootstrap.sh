@@ -18,46 +18,91 @@ MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-<user-name>-<repo-name>/memory"
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
+git_cat() {
+    local relpath="${1#$CLAUDE_OS/}"
+    git -C "$CLAUDE_OS" show "origin/main:$relpath"
+}
+git_ls() {
+    local relpath="${1#$CLAUDE_OS/}"
+    git -C "$CLAUDE_OS" ls-tree --name-only "origin/main" "$relpath/"
+}
+
+file_age() {
+    local mtime=$(stat -f%m "$1" 2>/dev/null)
+    local now=$(date +%s)
+    local days=$(( (now - mtime) / 86400 ))
+    if [ $days -eq 0 ]; then echo "today"
+    elif [ $days -eq 1 ]; then echo "1d ago"
+    else echo "${days}d ago"
+    fi
+}
+
+seed_file() {
+    local dest=$1 src=$2 label=$3
+    if [ ! -f "$dest" ]; then
+        git_cat "$src" > "$dest"
+        local size=$(du -h "$dest" | cut -f1 | tr -d ' ')
+        echo "  CREATED  $label (copied ${size} from template)"
+    else
+        echo "  EXISTS   $label (last modified $(file_age "$dest"))"
+    fi
+}
+
 echo "Project: $PROJECT"
 echo ""
 
 # Phase 1: Sync all files from <repo-name> template
 mkdir -p .claude "$MEM/history"
 
-[ ! -f .claude/CLAUDE.md ] && cp "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"
-[ ! -f .claude/settings.local.json ] && cp "$REPO_TMPL/.claude/settings.local.json" .claude/settings.local.json && echo "  CREATED  .claude/settings.local.json" || echo "  EXISTS   .claude/settings.local.json"
-[ ! -f "$MEM/MEMORY.md" ] && cp "$MEM_TMPL/MEMORY.md" "$MEM/MEMORY.md" && echo "  CREATED  MEMORY.md" || echo "  EXISTS   MEMORY.md"
+seed_file .claude/CLAUDE.md "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md
+seed_file .claude/settings.local.json "$REPO_TMPL/.claude/settings.local.json" .claude/settings.local.json
+seed_file "$MEM/MEMORY.md" "$MEM_TMPL/MEMORY.md" MEMORY.md
 # Migrate old logs.md to history/ subfolder
 [ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md"
-[ ! -f "$MEM/history/logs.md" ] && cp "$MEM_TMPL/history/logs.md" "$MEM/history/logs.md" && echo "  CREATED  history/logs.md" || echo "  EXISTS   history/logs.md"
+seed_file "$MEM/history/logs.md" "$MEM_TMPL/history/logs.md" history/logs.md
 
 # Slash commands (always overwrite with latest)
-for FILE in "$REPO_TMPL/.claude/commands"/*.md; do
-    [ -f "$FILE" ] || continue
+git_ls "$REPO_TMPL/.claude/commands" | while read RELPATH; do
+    NAME=$(basename "$RELPATH")
+    [[ "$NAME" == *.md ]] || continue
     mkdir -p .claude/commands
-    NAME=$(basename "$FILE")
-    cp "$FILE" ".claude/commands/$NAME"
-    echo "  SYNCED   commands/$NAME"
+    DEST=".claude/commands/$NAME"
+    TMPFILE=$(mktemp)
+    git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
+    if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
+        echo "  EXISTS   commands/$NAME"
+    else
+        CHANGED_LINES=0
+        [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
+        cp "$TMPFILE" "$DEST"
+        if [ "$CHANGED_LINES" -gt 0 ]; then
+            echo "  SYNCED   commands/$NAME (updated, $CHANGED_LINES lines changed)"
+        else
+            echo "  SYNCED   commands/$NAME (new)"
+        fi
+    fi
+    rm -f "$TMPFILE"
 done
 
-# Topic files (seed only, don't overwrite — sync scripts fetch raw content)
-for FILE in "$MEM_TMPL"/*.md; do
-    [ -f "$FILE" ] || continue
-    NAME=$(basename "$FILE")
+# Topic files (seed only from origin/main templates, don't overwrite — sync scripts fetch raw content)
+git_ls "$MEM_TMPL" | while read RELPATH; do
+    NAME=$(basename "$RELPATH")
     [ "$NAME" = "MEMORY.md" ] && continue
-    if [ ! -f "$MEM/$NAME" ]; then
-        cp "$FILE" "$MEM/$NAME"
-        echo "  CREATED  $NAME"
-    else
-        echo "  EXISTS   $NAME"
-    fi
+    [[ "$NAME" == *.md ]] || continue
+    seed_file "$MEM/$NAME" "$MEM_TMPL/$NAME" "$NAME"
 done
 
 # Add .claude/ to .gitignore if not already there
 if [ -f .gitignore ]; then
-    grep -q "^\.claude/$" .gitignore || echo ".claude/" >> .gitignore && echo "  UPDATED  .gitignore"
+    if ! grep -q "^\.claude/$" .gitignore; then
+        echo ".claude/" >> .gitignore
+        echo "  UPDATED  .gitignore (appended .claude/)"
+    else
+        echo "  EXISTS   .gitignore (already has .claude/)"
+    fi
 else
-    echo ".claude/" > .gitignore && echo "  CREATED  .gitignore"
+    echo ".claude/" > .gitignore
+    echo "  CREATED  .gitignore (with .claude/)"
 fi
 
 # Ensure install.sh has run (commands + PATH + pre-push hook)
@@ -77,9 +122,15 @@ NOTION_COUNT=0
 export MEMORY_FILE="$MEM/MEMORY.md"
 
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
+    BEFORE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
     if bash "$REPO_TMPL/.claude/scripts/4-sync-confluence.sh"; then
-        CONFLUENCE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
-        echo "  SYNCED   Confluence ($CONFLUENCE_COUNT topics)"
+        AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
+        if [ "$NEW_COUNT" -gt 0 ]; then
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)"
+        else
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics)"
+        fi
     else
         echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
     fi
@@ -88,9 +139,15 @@ else
 fi
 
 if [ -n "$NOTION_TOKEN" ]; then
+    BEFORE_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
     if bash "$REPO_TMPL/.claude/scripts/5-sync-notion.sh"; then
-        NOTION_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
-        echo "  SYNCED   Notion ($NOTION_COUNT topics)"
+        AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+        NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
+        if [ "$NEW_COUNT" -gt 0 ]; then
+            echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)"
+        else
+            echo "  SYNCED   Notion ($AFTER_COUNT topics)"
+        fi
     else
         echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
     fi
@@ -105,6 +162,15 @@ if [ -z "$SKIP_LAUNCHD" ] && [ -d "$HOME/Library" ]; then
     PROJ_NAME=$(basename "$PROJECT")
     LAUNCH_DIR="$HOME/Library/LaunchAgents"
     mkdir -p "$LAUNCH_DIR"
+
+    human_interval() {
+        local s=$1
+        if [ $s -ge 604800 ]; then echo "every $((s/604800))w"
+        elif [ $s -ge 86400 ]; then echo "every $((s/86400))d"
+        elif [ $s -ge 3600 ]; then echo "every $((s/3600))h"
+        else echo "every ${s}s"
+        fi
+    }
 
     # Remove old single-project agents (replaced by per-project ones)
     for OLD in com.claude.memory-log com.claude.memory-distill com.claude.memory-promote com.claude.memory-sync com.claude.memory-notion; do
@@ -164,7 +230,7 @@ PEOF
 
         launchctl unload "$plist" 2>/dev/null
         launchctl load -w "$plist" 2>/dev/null
-        echo "  LOADED   $label"
+        echo "  LOADED   $label ($script, $(human_interval $interval))"
     }
 
     generate_plist log              1-log.sh              3600
