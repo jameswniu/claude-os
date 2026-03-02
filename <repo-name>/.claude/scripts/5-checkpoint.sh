@@ -33,11 +33,12 @@ echo ""
 # ============================================================
 # 1. Filter MEMORY.md (existing logic + flat topic index)
 # ============================================================
+# Capture template checksum before any MEMORY.md modifications (steps 1, 5, 6)
+MEM_TMPL_MD5=$(md5 -q "$MEM_TMPL/MEMORY.md" 2>/dev/null || echo "none")
+
 # Skip MEMORY.md filter if source is empty or near-empty (prevents overwriting good template with blank)
 MEMLINES=$(wc -l < "$MEM/MEMORY.md" 2>/dev/null || echo 0)
-if [ "$MEMLINES" -lt 5 ]; then
-    echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
-else
+if [ "$MEMLINES" -ge 5 ]; then
 python3 -c "
 import re, sys
 
@@ -158,14 +159,7 @@ if os.path.exists(tmpl_path):
 
 with open(tmpl_path, 'w') as f:
     f.write(out)
-import sys
-sys.exit(0 if out != existing else 2)
 " 2>/dev/null
-    if [ $? -eq 0 ]; then
-        echo "  FILTERED  $MEM_TMPL/MEMORY.md"
-    else
-        echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
-    fi
 fi
 
 # ============================================================
@@ -430,6 +424,14 @@ if not has_all:
     with open('$MEM_TMPL/MEMORY.md', 'w') as f:
         f.write(out)
 " 2>/dev/null
+
+# Report MEMORY.md status (deferred until after steps 1, 5, 6 all complete)
+MEM_TMPL_MD5_AFTER=$(md5 -q "$MEM_TMPL/MEMORY.md" 2>/dev/null || echo "none")
+if [ "$MEM_TMPL_MD5" != "$MEM_TMPL_MD5_AFTER" ]; then
+    echo "  FILTERED  $MEM_TMPL/MEMORY.md"
+else
+    echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
+fi
 
 # ============================================================
 # 7. Commit and push
