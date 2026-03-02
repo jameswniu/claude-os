@@ -25,13 +25,18 @@ MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 mkdir -p "$MEM_TMPL/history" "$REPO_TMPL/.claude"
 
+echo "Checkpoint: $(basename "$PROJECT")"
+echo "  Source: $MEM"
+echo "  Target: $REPO_TMPL"
+echo ""
+
 # ============================================================
 # 1. Filter MEMORY.md (existing logic + flat topic index)
 # ============================================================
 # Skip MEMORY.md filter if source is empty or near-empty (prevents overwriting good template with blank)
 MEMLINES=$(wc -l < "$MEM/MEMORY.md" 2>/dev/null || echo 0)
 if [ "$MEMLINES" -lt 5 ]; then
-    echo "Warning: $MEM/MEMORY.md has only $MEMLINES lines, skipping MEMORY.md filter"
+    echo "  SKIPPED  MEMORY.md (only $MEMLINES lines, too short to filter)"
 else
 python3 -c "
 import re, sys
@@ -117,6 +122,7 @@ out = out.rstrip() + '\n'
 with open('$MEM_TMPL/MEMORY.md', 'w') as f:
     f.write(out)
 " 2>/dev/null
+    echo "  FILTERED MEMORY.md  → $MEM_TMPL/MEMORY.md"
 fi
 
 # ============================================================
@@ -177,6 +183,7 @@ out = out.rstrip() + '\n'
 with open('$REPO_TMPL/.claude/CLAUDE.md', 'w') as f:
     f.write(out)
 " 2>/dev/null
+    echo "  FILTERED .claude/CLAUDE.md  → $REPO_TMPL/.claude/CLAUDE.md"
 fi
 
 # ============================================================
@@ -214,12 +221,14 @@ content = content.rstrip() + '\n'
 with open('$MEM_TMPL/$NAME', 'w') as f:
     f.write(content)
 " 2>/dev/null
+    echo "  FILTERED $NAME  → $MEM_TMPL/$NAME"
 done
 
 # ============================================================
 # 4. Copy logs.md as-is
 # ============================================================
 mkdir -p "$MEM_TMPL/history" && cp "$MEM/history/logs.md" "$MEM_TMPL/history/" 2>/dev/null
+echo "  COPIED   history/logs.md  → $MEM_TMPL/history/logs.md"
 
 # ============================================================
 # 5. Update MEMORY.md template with situation-based topic index
@@ -271,6 +280,7 @@ content = content.rstrip() + '\n'
 with open(memory_md, 'w') as f:
     f.write(content)
 " 2>/dev/null
+echo "  INDEXED  topic files in MEMORY.md  → $MEM_TMPL/MEMORY.md"
 
 # ============================================================
 # 6. Ensure MEMORY.md Claude OS section has operational patterns
@@ -319,6 +329,7 @@ if not has_all:
     with open('$MEM_TMPL/MEMORY.md', 'w') as f:
         f.write(out)
 " 2>/dev/null
+echo "  ENSURED  operational patterns  → $MEM_TMPL/MEMORY.md"
 
 # ============================================================
 # 7. Commit and push

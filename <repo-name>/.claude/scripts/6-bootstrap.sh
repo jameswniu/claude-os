@@ -39,12 +39,14 @@ file_age() {
 
 seed_file() {
     local dest=$1 src=$2 label=$3
+    local fullpath="$dest"
+    [[ "$fullpath" != /* ]] && fullpath="$PROJECT/$fullpath"
     if [ ! -f "$dest" ]; then
         git_cat "$src" > "$dest"
         local size=$(du -h "$dest" | cut -f1 | tr -d ' ')
-        echo "  CREATED  $label (copied ${size} from template)"
+        echo "  CREATED  $label (copied ${size} from template)  → $fullpath"
     else
-        echo "  EXISTS   $label (last modified $(file_age "$dest"))"
+        echo "  EXISTS   $label (last modified $(file_age "$dest"))  → $fullpath"
     fi
 }
 
@@ -58,7 +60,7 @@ seed_file .claude/CLAUDE.md "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md
 seed_file .claude/settings.local.json "$REPO_TMPL/.claude/settings.local.json" .claude/settings.local.json
 seed_file "$MEM/MEMORY.md" "$MEM_TMPL/MEMORY.md" MEMORY.md
 # Migrate old logs.md to history/ subfolder
-[ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md"
+[ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md  → $MEM/history/logs.md"
 seed_file "$MEM/history/logs.md" "$MEM_TMPL/history/logs.md" history/logs.md
 
 # Slash commands (always overwrite with latest)
@@ -70,15 +72,15 @@ git_ls "$REPO_TMPL/.claude/commands" | while read RELPATH; do
     TMPFILE=$(mktemp)
     git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
     if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
-        echo "  EXISTS   commands/$NAME"
+        echo "  EXISTS   commands/$NAME  → $PROJECT/$DEST"
     else
         CHANGED_LINES=0
         [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
         cp "$TMPFILE" "$DEST"
         if [ "$CHANGED_LINES" -gt 0 ]; then
-            echo "  SYNCED   commands/$NAME (updated, $CHANGED_LINES lines changed)"
+            echo "  SYNCED   commands/$NAME (updated, $CHANGED_LINES lines changed)  → $PROJECT/$DEST"
         else
-            echo "  SYNCED   commands/$NAME (new)"
+            echo "  SYNCED   commands/$NAME (new)  → $PROJECT/$DEST"
         fi
     fi
     rm -f "$TMPFILE"
@@ -93,16 +95,16 @@ git_ls "$REPO_TMPL/.claude/scripts" | while read RELPATH; do
     TMPFILE=$(mktemp)
     git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
     if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
-        echo "  EXISTS   scripts/$NAME"
+        echo "  EXISTS   scripts/$NAME  → $PROJECT/$DEST"
     else
         CHANGED_LINES=0
         [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
         cp "$TMPFILE" "$DEST"
         chmod +x "$DEST"
         if [ "$CHANGED_LINES" -gt 0 ]; then
-            echo "  SYNCED   scripts/$NAME (updated, $CHANGED_LINES lines changed)"
+            echo "  SYNCED   scripts/$NAME (updated, $CHANGED_LINES lines changed)  → $PROJECT/$DEST"
         else
-            echo "  SYNCED   scripts/$NAME (new)"
+            echo "  SYNCED   scripts/$NAME (new)  → $PROJECT/$DEST"
         fi
     fi
     rm -f "$TMPFILE"
@@ -120,13 +122,13 @@ done
 if [ -f .gitignore ]; then
     if ! grep -q "^\.claude/$" .gitignore; then
         echo ".claude/" >> .gitignore
-        echo "  UPDATED  .gitignore (appended .claude/)"
+        echo "  UPDATED  .gitignore (appended .claude/)  → $PROJECT/.gitignore"
     else
-        echo "  EXISTS   .gitignore (already has .claude/)"
+        echo "  EXISTS   .gitignore (already has .claude/)  → $PROJECT/.gitignore"
     fi
 else
     echo ".claude/" > .gitignore
-    echo "  CREATED  .gitignore (with .claude/)"
+    echo "  CREATED  .gitignore (with .claude/)  → $PROJECT/.gitignore"
 fi
 
 # Ensure install.sh has run (commands + PATH + pre-push hook)
@@ -277,7 +279,7 @@ PEOF
 
         launchctl unload "$plist" 2>/dev/null
         launchctl load -w "$plist" 2>/dev/null
-        echo "  LOADED   $label ($script, $(human_interval $interval))"
+        echo "  LOADED   $label ($script, $(human_interval $interval))  → $plist"
     }
 
     generate_plist log              1-log.sh              3600
