@@ -674,6 +674,11 @@ Snapshots live workspace files into `<repo-name>/.claude/` and `.claude/projects
 - Project-specific values (Bitbucket URLs, branch patterns, API endpoints) are replaced with `(learned per project)`
 - Confluence/Notion source IDs are stripped from the topic index
 - Topic files are distilled: internal URLs become `(internal URL)`, project names become `(project-name)`
+- Project-specific `log.md` references are normalized to `history/logs.md`
+
+**Accumulate-only merge behavior:**
+
+Checkpointing from different projects merges content at the line level (union), never subtracts. The template grows monotonically, so content contributed by project A survives when project B checkpoints later. Em-dash vs hyphen differences are normalized before comparison so identical concepts don't create duplicates. Output shows `FILTERED` (template changed) or `SKIPPED` (no change) with the full target path for each file.
 
 ### Option A: Local (macOS launchd)
 
