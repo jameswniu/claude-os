@@ -109,7 +109,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - `/.claude/commands/review.md` - /review slash command
 - `/.claude/settings.local.json` - Permission auto-approvals
 - `~/.claude/projects/{project}/memory/MEMORY.md` - This file, auto-loaded
-- `~/.claude/projects/{project}/memory/log.md` - Session log, read on demand
+- `~/.claude/projects/{project}/memory/history/logs.md` - Session log, read on demand
 - `code-reviews.md` -- reference material
 ## Artifact Management
 

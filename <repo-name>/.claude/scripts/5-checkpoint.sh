@@ -83,6 +83,7 @@ with open('$MEM/MEMORY.md') as f:
 
 # Normalize stale log path references
 content = content.replace('\x60log.md\x60', '\x60history/logs.md\x60')
+content = content.replace('memory/log.md', 'memory/history/logs.md')
 content = re.sub(r'(?<![/\w])log\.md(?!\w)', 'history/logs.md', content)
 
 sections = re.split(r'(^## .+$)', content, flags=re.MULTILINE)
