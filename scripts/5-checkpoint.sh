@@ -27,6 +27,10 @@ mkdir -p "$EX/memory" "$EX/.claude"
 # ============================================================
 # 1. Filter MEMORY.md (existing logic + flat topic index)
 # ============================================================
+# Skip MEMORY.md filter if source is empty (prevents overwriting good template with blank)
+if [ ! -s "$MEM/MEMORY.md" ]; then
+    echo "Warning: $MEM/MEMORY.md is empty or missing, skipping MEMORY.md filter"
+else
 python3 -c "
 import re, sys
 
@@ -111,6 +115,7 @@ out = out.rstrip() + '\n'
 with open('$EX/memory/MEMORY.md', 'w') as f:
     f.write(out)
 " 2>/dev/null
+fi
 
 # ============================================================
 # 2. Filter .claude/CLAUDE.md (personal rules)

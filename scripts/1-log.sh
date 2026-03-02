@@ -5,8 +5,8 @@
 HISTORY="$HOME/.claude/history.jsonl"
 LOG_DIR="$HOME/claude-os/output"
 
-# Auto-detect: find the first project with a MEMORY.md
-MEMORY_FILE=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)
+# Use MEMORY_FILE if passed (e.g. from launchd), otherwise auto-detect
+MEMORY_FILE="${MEMORY_FILE:-$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null | head -1)}"
 if [ -z "$MEMORY_FILE" ]; then
     echo "$(date): No MEMORY.md found, skipping" >> "$LOG_DIR/1-log.log"
     exit 0

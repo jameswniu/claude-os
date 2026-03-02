@@ -778,7 +778,7 @@ client = anthropic.Anthropic()
 
 - `claude-os/`
   - `.github/workflows/test.yml` - CI test runner
-  - `EXAMPLES/` - Snapshot templates (CLAUDE.md, .claude/, memory/)
+  - `EXAMPLES/` - Snapshot templates (.claude/, memory/)
   - `README.md`
   - `install.sh` - Installs `checkpoint` and `bootstrap` commands
   - `launchd/` - macOS scheduler plists (log, distill, promote, sync)
