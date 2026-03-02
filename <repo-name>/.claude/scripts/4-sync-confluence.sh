@@ -9,6 +9,44 @@ CONFLUENCE_BASE="https://basis.atlassian.net/wiki/rest/api/content"
 
 mkdir -p "$LOG_DIR"
 
+# --- Phase 0: Reconcile orphaned topic files into MEMORY.md ---
+MEMORY_FILES_ALL=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+RECONCILED_TOTAL=0
+
+while IFS= read -r MF; do
+    [ -z "$MF" ] && continue
+    MD=$(dirname "$MF")
+    RECONCILED=0
+
+    # Find the last topic entry line number
+    LAST_TOPIC_LINE=$(grep -n '`[^`]*\.md`' "$MF" | grep -v 'MEMORY\.md\|CLAUDE\.md\|logs\.md' | tail -1 | cut -d: -f1)
+    [ -z "$LAST_TOPIC_LINE" ] && continue
+
+    for TOPIC_FILE in "$MD"/*.md; do
+        [ -f "$TOPIC_FILE" ] || continue
+        BASENAME=$(basename "$TOPIC_FILE")
+        [ "$BASENAME" = "MEMORY.md" ] && continue
+
+        if ! grep -q "\`$BASENAME\`" "$MF"; then
+            # Insert after last topic entry
+            sed -i '' "${LAST_TOPIC_LINE}a\\
+- \`${BASENAME}\` -- reference material" "$MF"
+            LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
+            RECONCILED=$((RECONCILED + 1))
+        fi
+    done
+
+    if [ "$RECONCILED" -gt 0 ]; then
+        PROJ=$(echo "$MD" | sed 's|.*/projects/||; s|/memory||; s|-|/|g; s|^/||')
+        echo "$(date): [$PROJ] Reconciled $RECONCILED orphaned topic file(s)" >> "$LOG_DIR/4-sync-confluence.log"
+        RECONCILED_TOTAL=$((RECONCILED_TOTAL + RECONCILED))
+    fi
+done <<< "$MEMORY_FILES_ALL"
+
+if [ "$RECONCILED_TOTAL" -gt 0 ]; then
+    echo "$(date): Phase 0 reconciled $RECONCILED_TOTAL total orphaned topic file(s)" >> "$LOG_DIR/4-sync-confluence.log"
+fi
+
 if [ -z "$CONFLUENCE_EMAIL" ] || [ -z "$CONFLUENCE_TOKEN" ]; then
     echo "$(date): CONFLUENCE_EMAIL or CONFLUENCE_TOKEN not set, skipping" >> "$LOG_DIR/4-sync-confluence.log"
     exit 2

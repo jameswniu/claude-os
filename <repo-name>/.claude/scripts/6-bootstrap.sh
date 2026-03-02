@@ -84,6 +84,30 @@ git_ls "$REPO_TMPL/.claude/commands" | while read RELPATH; do
     rm -f "$TMPFILE"
 done
 
+# Scripts (always overwrite with latest)
+git_ls "$REPO_TMPL/.claude/scripts" | while read RELPATH; do
+    NAME=$(basename "$RELPATH")
+    [[ "$NAME" == *.sh ]] || continue
+    mkdir -p .claude/scripts
+    DEST=".claude/scripts/$NAME"
+    TMPFILE=$(mktemp)
+    git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
+    if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
+        echo "  EXISTS   scripts/$NAME"
+    else
+        CHANGED_LINES=0
+        [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
+        cp "$TMPFILE" "$DEST"
+        chmod +x "$DEST"
+        if [ "$CHANGED_LINES" -gt 0 ]; then
+            echo "  SYNCED   scripts/$NAME (updated, $CHANGED_LINES lines changed)"
+        else
+            echo "  SYNCED   scripts/$NAME (new)"
+        fi
+    fi
+    rm -f "$TMPFILE"
+done
+
 # Topic files (seed only from origin/main templates, don't overwrite — sync scripts fetch raw content)
 git_ls "$MEM_TMPL" | while read RELPATH; do
     NAME=$(basename "$RELPATH")
@@ -112,6 +136,29 @@ if ! command -v checkpoint &>/dev/null; then
     echo "  INSTALLED commands (bootstrap, checkpoint)"
 fi
 
+# Reconcile orphaned topic files into MEMORY.md
+RECONCILED=0
+LAST_TOPIC_LINE=$(grep -n '`[^`]*\.md`' "$MEM/MEMORY.md" | grep -v 'MEMORY\.md\|CLAUDE\.md\|logs\.md' | tail -1 | cut -d: -f1)
+if [ -n "$LAST_TOPIC_LINE" ]; then
+    for TOPIC_FILE in "$MEM"/*.md; do
+        [ -f "$TOPIC_FILE" ] || continue
+        BASENAME=$(basename "$TOPIC_FILE")
+        [ "$BASENAME" = "MEMORY.md" ] && continue
+
+        if ! grep -q "\`$BASENAME\`" "$MEM/MEMORY.md"; then
+            sed -i '' "${LAST_TOPIC_LINE}a\\
+- \`${BASENAME}\` -- reference material" "$MEM/MEMORY.md"
+            LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
+            RECONCILED=$((RECONCILED + 1))
+        fi
+    done
+fi
+if [ "$RECONCILED" -gt 0 ]; then
+    echo "  RECONCILED $RECONCILED orphaned topic file(s) into MEMORY.md"
+else
+    echo "  OK         All topic files indexed in MEMORY.md"
+fi
+
 # Phase 2: Run sync scripts to populate topic files from Confluence/Notion
 echo ""
 echo "  Syncing topic files..."
@@ -123,7 +170,7 @@ export MEMORY_FILE="$MEM/MEMORY.md"
 
 if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
     BEFORE_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
-    if bash "$REPO_TMPL/.claude/scripts/4-sync-confluence.sh"; then
+    if bash "$PROJECT/.claude/scripts/4-sync-confluence.sh"; then
         AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
@@ -140,7 +187,7 @@ fi
 
 if [ -n "$NOTION_TOKEN" ]; then
     BEFORE_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
-    if bash "$REPO_TMPL/.claude/scripts/5-sync-notion.sh"; then
+    if bash "$PROJECT/.claude/scripts/5-sync-notion.sh"; then
         AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
@@ -192,7 +239,7 @@ if [ -z "$SKIP_LAUNCHD" ] && [ -d "$HOME/Library" ]; then
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>$REPO_TMPL/.claude/scripts/$script</string>
+		<string>$PROJECT/.claude/scripts/$script</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>$interval</integer>

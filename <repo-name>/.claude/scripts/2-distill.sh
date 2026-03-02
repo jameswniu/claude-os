@@ -37,6 +37,7 @@ Your job:
 - If a new topic is needed, create a section for it
 - Do NOT delete existing entries unless they are contradicted by newer data
 - Do NOT add duplicate information
+- Do NOT remove or modify entries in the '## Topic Files' section — these are managed by sync scripts
 - Keep MEMORY.md under 200 lines total
 
 Output what you changed." \

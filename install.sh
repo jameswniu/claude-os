@@ -5,13 +5,13 @@ mkdir -p ~/.local/bin
 
 cat > ~/.local/bin/checkpoint << 'EOF'
 #!/bin/bash
-bash ~/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh
+bash "$HOME/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh"
 EOF
 chmod +x ~/.local/bin/checkpoint
 
 cat > ~/.local/bin/bootstrap << 'EOF'
 #!/bin/bash
-bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh
+bash "$HOME/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh"
 EOF
 chmod +x ~/.local/bin/bootstrap
 
@@ -24,15 +24,9 @@ if ! grep -q '\.local/bin' "$SHELL_RC" 2>/dev/null; then
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$SHELL_RC"
 fi
 
-# Add shell aliases
+# Clean up legacy aliases (commands are now in ~/.local/bin)
 grep -q 'alias checkpoint=' "$SHELL_RC" 2>/dev/null && sed -i '' '/alias checkpoint=/d' "$SHELL_RC"
 grep -q 'alias bootstrap=' "$SHELL_RC" 2>/dev/null && sed -i '' '/alias bootstrap=/d' "$SHELL_RC"
-cat >> "$SHELL_RC" << 'ALIASES'
-
-# Claude OS
-alias checkpoint="bash ~/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh"
-alias bootstrap="bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh"
-ALIASES
 
 # Install pre-push hook
 CLAUDE_OS="$HOME/claude-os"
