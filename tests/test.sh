@@ -109,6 +109,64 @@ for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
   xmllint --noout "$PLIST" 2>/dev/null && pass "$NAME is valid XML" || fail "$NAME is invalid XML"
 done
 
+# Test: plist source templates have ~/.local/bin in PATH
+for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
+  NAME=$(basename "$PLIST")
+  grep -q "\.local/bin" "$PLIST" && pass "$NAME has ~/.local/bin in PATH" || fail "$NAME missing ~/.local/bin in PATH"
+done
+
+# Test: plist source templates have no real tokens (only placeholders)
+for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
+  NAME=$(basename "$PLIST")
+  grep -q "ATATT\|ntn_" "$PLIST" && fail "$NAME has real token" || pass "$NAME has no real tokens"
+done
+
+echo ""
+
+# ----------------------------
+echo "## 5-checkpoint.sh"
+# ----------------------------
+
+[ -x "$SCRIPT_DIR/5-checkpoint.sh" ] && pass "script is executable" || fail "script is not executable"
+head -1 "$SCRIPT_DIR/5-checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
+
+# Test: checkpoint filters .claude/CLAUDE.md
+grep -q "learned per project" "$EX/.claude/CLAUDE.md" && pass "EXAMPLES/.claude/CLAUDE.md has placeholders" || fail "EXAMPLES/.claude/CLAUDE.md missing placeholders"
+grep -q "stash.centro.net" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific URLs" || pass "EXAMPLES/.claude/CLAUDE.md has no project URLs"
+grep -q "BP-[0-9]" "$EX/.claude/CLAUDE.md" && fail "EXAMPLES/.claude/CLAUDE.md has project-specific tickets" || pass "EXAMPLES/.claude/CLAUDE.md has no project tickets"
+
+# Test: checkpoint filters CLAUDE.md
+grep -qi "media.strategy.generator\|orchestrator.*8000\|MCP.*8001\|uvicorn\|FastAPI\|LangGraph" "$EX/CLAUDE.md" && fail "EXAMPLES/CLAUDE.md has project-specific content" || pass "EXAMPLES/CLAUDE.md has no project content"
+grep -q "fill in for your project" "$EX/CLAUDE.md" && pass "EXAMPLES/CLAUDE.md has placeholder build commands" || fail "EXAMPLES/CLAUDE.md missing placeholder build commands"
+
+# Test: distilled topic files have no Confluence page IDs
+TOPIC_HAS_CONFLUENCE_ID=0
+for TOPIC in "$EX/memory"/*.md; do
+  NAME=$(basename "$TOPIC")
+  [ "$NAME" = "MEMORY.md" ] && continue
+  [ "$NAME" = "logs.md" ] && continue
+  grep -q "(confluence:[0-9]" "$TOPIC" && TOPIC_HAS_CONFLUENCE_ID=1
+done
+[ "$TOPIC_HAS_CONFLUENCE_ID" -eq 0 ] && pass "distilled topic files have no Confluence IDs" || fail "distilled topic files still have Confluence IDs"
+
+# Test: distilled topic files have no Basis-specific URLs
+TOPIC_HAS_BASIS_URL=0
+for TOPIC in "$EX/memory"/*.md; do
+  NAME=$(basename "$TOPIC")
+  [ "$NAME" = "MEMORY.md" ] && continue
+  [ "$NAME" = "logs.md" ] && continue
+  grep -q "stash.centro.net\|basis.atlassian.net" "$TOPIC" && TOPIC_HAS_BASIS_URL=1
+done
+[ "$TOPIC_HAS_BASIS_URL" -eq 0 ] && pass "distilled topic files have no Basis-specific URLs" || fail "distilled topic files still have Basis-specific URLs"
+
+# Test: no topics/ subfolder in EXAMPLES
+[ -d "$EX/memory/topics" ] && fail "EXAMPLES still has topics/ subfolder" || pass "EXAMPLES has flat topic structure"
+
+# Test: scripts have no topics/ subfolder references
+grep -q "topics/" "$SCRIPT_DIR/4-sync-confluence.sh" && fail "4-sync-confluence.sh still references topics/" || pass "4-sync-confluence.sh has no topics/ refs"
+grep -q "topics/" "$SCRIPT_DIR/5-sync-notion.sh" && fail "5-sync-notion.sh still references topics/" || pass "5-sync-notion.sh has no topics/ refs"
+grep -q 'topics/' "$SCRIPT_DIR/6-bootstrap.sh" && fail "6-bootstrap.sh still references topics/" || pass "6-bootstrap.sh has no topics/ refs"
+
 # ----------------------------
 echo ""
 echo "## Local integration checks (skipped in CI)"

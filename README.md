@@ -45,7 +45,7 @@ When you `cd` into a new repo and start Claude Code:
 | `.claude/CLAUDE.md` | No | Gitignored, lives only in that repo |
 | `.claude/settings.local.json` | No | Gitignored, lives only in that repo |
 | `.claude/commands/` | No | Gitignored, lives only in that repo |
-| `MEMORY.md`, `logs.md`, `topics/` | No | Stored per project path, new repo = empty |
+| `MEMORY.md`, `logs.md`, topic files | No | Stored per project path, new repo = empty |
 
 To bootstrap a new repo with your templates:
 ```bash
@@ -71,9 +71,9 @@ bootstrap
 | Feature | What it does |
 |---------|-------------|
 | `logs.md` | Chronological session history (Claude Code only creates MEMORY.md) |
-| `topics/` | On-demand reference files synced from Confluence |
+| Topic files | On-demand reference files synced from Confluence/Notion |
 | Learning loop | log (1h) -> distill (24h) -> promote (7d) automation scripts |
-| `checkpoint` | Push live workspace files to this repo |
+| `checkpoint` | Filter and push live workspace files to this repo (CLAUDE.md, .claude/CLAUDE.md, MEMORY.md, topic files, logs.md) |
 | `bootstrap` | Pull templates from this repo into a new project |
 
 ### Phase 1: Static Context
@@ -258,7 +258,7 @@ flowchart TD
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](EXAMPLES/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](EXAMPLES/memory/MEMORY.md) |
 | `logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](EXAMPLES/memory/logs.md) |
-| Topic files | `~/.claude/projects/{project}/memory/topics/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/topics/) |
+| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](EXAMPLES/memory/) |
 | `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](EXAMPLES/.claude/commands/review.md) |
 
 ---
@@ -301,7 +301,7 @@ Set up the four core files that give Claude persistent context across sessions.
 
 4. **Memory** -  Claude writes to `MEMORY.md` as it learns about your project. Organize by topic for quick lookup. Keep under 200 lines (content beyond line 200 gets truncated in context).
 
-5. **Topic files** (optional) - Create a `topics/` subfolder in the memory directory. Drop markdown files there for reference material too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Add one-line hints in `MEMORY.md` pointing to `topics/filename.md` so Claude knows they exist and when to read them.
+5. **Topic files** (optional) - Drop markdown files in the memory directory for reference material too large for MEMORY.md: Confluence docs, API specs, runbooks, architecture diagrams, onboarding guides. These are not auto-loaded, so they cost zero tokens until Claude reads them mid-session. Add one-line hints in `MEMORY.md` pointing to `filename.md` so Claude knows they exist and when to read them.
 
    Topic files can be pulled from Confluence via API (`curl` with basic auth). Each team's Confluence space requires separate access, so topic files can cross-pull from other teams' spaces when given permission. This makes it easy to build a shared knowledge base across org boundaries without duplicating docs.
 
@@ -544,31 +544,14 @@ Auto-discovers new Confluence pages and keeps topic files fresh every 24 hours.
 5. **Sync:** Scans MEMORY.md for all `(confluence:PAGE_ID)` entries
 6. Fetches each page via Confluence REST API with basic auth
 7. Converts HTML to markdown using `html2text`, strips Confluence macro artifacts
-8. Writes the result to `memory/topics/` as a topic file
+8. Writes the result to the memory directory as a topic file
 9. Logs results to `output/4-sync-confluence.log`
 
-**Search queries** are configured in the script:
-```bash
-SEARCH_QUERIES=(
-    "BET:claude"
-    "BET:claude code"
-    "BET:AI tools"
-)
-```
-Add more `"SPACE:keyword"` pairs to broaden discovery.
-
-**Relevance filters** are also configured in the script:
-```bash
-# Page title must contain at least one of these (case-insensitive)
-RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
-
-# Page title matching any of these is skipped (case-insensitive)
-EXCLUDE_TERMS="upgrade|hack-ai-thon|hackathon|refactor from|loading indicator|pricing evaluation"
-```
+Search queries and relevance terms are derived dynamically from MEMORY.md and CLAUDE.md content (section headings, bold terms, topic descriptions). No hardcoded queries or filter lists needed.
 
 **To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
-- `topics/my-page.md` - Description of the page (confluence:1597341723)
+- `my-page.md` - Description of the page (confluence:1597341723)
 ```
 
 Existing topic files are refreshed on every run, never deleted.
@@ -610,27 +593,14 @@ Auto-discovers new Notion pages and keeps topic files fresh every 24 hours.
 5. **Sync:** Scans MEMORY.md for all `(notion:PAGE_ID)` entries
 6. Fetches each page's blocks via Notion API with bearer auth
 7. Converts Notion blocks to markdown (headings, lists, code, quotes, etc.)
-8. Writes the result to `memory/topics/` as a topic file
+8. Writes the result to the memory directory as a topic file
 9. Logs results to `output/5-sync-notion.log`
 
-**Search queries** are configured in the script:
-```bash
-SEARCH_QUERIES=(
-    "claude"
-    "AI tools"
-    "prompt"
-)
-```
-
-**Relevance filters** are also configured in the script:
-```bash
-RELEVANT_TERMS="claude code|claude os|ai tool|ai code|ai dev|ai review|ai pr|prompt|llm|plugin|marketplace"
-EXCLUDE_TERMS="upgrade|hackathon|meeting notes|archive"
-```
+Search queries and relevance terms are derived dynamically from MEMORY.md and CLAUDE.md content (same approach as Confluence sync).
 
 **To manually add a page**, add a line to the Topic Files section of your `MEMORY.md`:
 ```markdown
-- `topics/my-page.md` - Description (notion:PAGE_ID)
+- `my-page.md` - Description (notion:PAGE_ID)
 ```
 
 To find a page ID: open the page in Notion, copy the URL. The ID is the 32-character hex string at the end.
@@ -669,10 +639,10 @@ tail -10 ~/claude-os/output/4-sync-confluence.log
 tail -10 ~/claude-os/output/5-sync-notion.log
 
 # List topic files with timestamps to confirm they were created/refreshed
-ls -la ~/.claude/projects/*/memory/topics/
+ls -la ~/.claude/projects/*/memory/*.md
 
 # Preview a topic file
-head -20 ~/.claude/projects/*/memory/topics/claudehub.md
+head -20 ~/.claude/projects/*/memory/claudehub.md
 ```
 
 Each log entry shows the date, status (OK or FAILED), filename, and line count. A healthy run looks like:
@@ -682,10 +652,31 @@ OK use-case-library.md (461 lines)
 Sync complete. 2 synced, 0 failed.
 ```
 
-After syncing, run `checkpoint` to snapshot the new topic files to the `EXAMPLES/` directory in the repo:
+After syncing, run `checkpoint` to snapshot and filter the workspace files to the `EXAMPLES/` directory:
 ```bash
 checkpoint
 ```
+
+### Checkpoint (5-checkpoint.sh)
+
+Snapshots live workspace files into `EXAMPLES/`, filtering project-specific content so templates are reusable across projects.
+
+**What it syncs:**
+
+| Source | Template | Filtering |
+|--------|----------|-----------|
+| `CLAUDE.md` (team) | `EXAMPLES/CLAUDE.md` | Section structure kept, project-specific content replaced with placeholders |
+| `.claude/CLAUDE.md` (personal) | `EXAMPLES/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
+| `MEMORY.md` | `EXAMPLES/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
+| Topic files (`*.md`) | `EXAMPLES/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
+| `logs.md` | `EXAMPLES/memory/logs.md` | Copied as-is |
+
+**Filtering rules:**
+- Universal sections (PR Comment Style, Behavior Rules, Memory, Claude OS) are kept verbatim
+- Project-specific values (Bitbucket URLs, branch patterns, API endpoints) are replaced with `(learned per project)`
+- Confluence/Notion source IDs are stripped from the topic index
+- Topic files are distilled: internal URLs become `(internal URL)`, project names become `(project-name)`
+- CLAUDE.md (team) is regenerated from the live file to pick up structural changes
 
 ### Option A: Local (macOS launchd)
 
@@ -781,10 +772,9 @@ client = anthropic.Anthropic()
 - `~/.claude/projects/{project}/memory/`
   - `MEMORY.md` - Topical patterns (auto-loaded)
   - `logs.md` - Session history (on demand)
-  - `topics/` - On-demand reference files (zero tokens until read)
-    - `claudehub.md` - Synced from Confluence
-    - `use-case-library.md` - Synced from Confluence
-    - `api-specs.md` - Manual or synced
+  - `claudehub.md` - Topic file, synced from Confluence (on demand)
+  - `use-case-library.md` - Topic file, synced from Confluence (on demand)
+  - `api-specs.md` - Topic file, manual or synced (on demand)
   - `archive/YYYY-MM.md` - Rolled-off old logs
 
 **This repo (Phase 3 automation):**
@@ -837,7 +827,7 @@ client = anthropic.Anthropic()
 > Additional markdown files in the memory directory alongside MEMORY.md. They're loaded on demand (zero tokens until read). Use them for Confluence docs, API specs, runbooks, or any reference material too large for MEMORY.md. Add one-line hints in MEMORY.md so Claude knows they exist.
 
 **How do I add a Confluence page as a topic file?**
-> Add the page ID and filename to the `PAGES` array in `scripts/4-sync-confluence.sh`. The page ID is in the Confluence URL (e.g., `1597341723` from `.../pages/1597341723/ClaudeHub`). The sync script will fetch it on the next run.
+> Add a line to the Topic Files section of your `MEMORY.md`: `` - `my-page.md` -- Description (confluence:1597341723) ``. The page ID is in the Confluence URL (e.g., `1597341723` from `.../pages/1597341723/ClaudeHub`). The sync script will fetch it on the next run.
 
 **Can I pull from other teams' Confluence spaces?**
 > Yes, if you have read access. The sync script works with any Confluence space. Request access from the team, then add their page IDs to the registry.

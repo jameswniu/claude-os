@@ -12,7 +12,7 @@ echo "Project: $PROJECT"
 echo ""
 
 # Phase 1: Static context
-mkdir -p .claude "$MEM/topics"
+mkdir -p .claude "$MEM"
 
 [ ! -f CLAUDE.md ] && cp "$EX/CLAUDE.md" ./CLAUDE.md && echo "  CREATED  CLAUDE.md" || echo "  EXISTS   CLAUDE.md"
 [ ! -f .claude/CLAUDE.md ] && cp "$EX/.claude/CLAUDE.md" .claude/CLAUDE.md && echo "  CREATED  .claude/CLAUDE.md" || echo "  EXISTS   .claude/CLAUDE.md"
@@ -30,11 +30,13 @@ for FILE in "$EX/.claude/commands"/*.md; do
 done
 
 # Topic files (always overwrite with latest)
-for FILE in "$EX/memory/topics"/*.md; do
+for FILE in "$EX/memory"/*.md; do
     [ -f "$FILE" ] || continue
     NAME=$(basename "$FILE")
-    cp "$FILE" "$MEM/topics/$NAME"
-    echo "  SYNCED   topics/$NAME"
+    [ "$NAME" = "MEMORY.md" ] && continue
+    [ "$NAME" = "logs.md" ] && continue
+    cp "$FILE" "$MEM/$NAME"
+    echo "  SYNCED   $NAME"
 done
 
 # Add .claude/ to .gitignore if not already there

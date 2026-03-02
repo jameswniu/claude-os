@@ -66,7 +66,7 @@ if claude_md and os.path.exists(claude_md):
 queries = set()
 
 # 1. Topic descriptions (highest signal, for organic growth)
-for m in re.finditer(r'\x60topics/[^\x60]+\x60\s+.+?\s+(.+?)\s+\([a-z]+:', memory):
+for m in re.finditer(r'\x60[^\x60]+\x60\s+.+?\s+(.+?)\s+\([a-z]+:', memory):
     queries.add(m.group(1))
 
 # 2. Section headings from MEMORY.md
@@ -117,11 +117,11 @@ lines = memory.split('\n')
 # Find insertion point (after last notion entry, or last confluence entry, or after Topic Files header)
 last_idx = -1
 for i, line in enumerate(lines):
-    if '(notion:' in line and '\x60topics/' in line:
+    if '(notion:' in line and '\x60' in line:
         last_idx = i
 if last_idx < 0:
     for i, line in enumerate(lines):
-        if '(confluence:' in line and '\x60topics/' in line:
+        if '(confluence:' in line and '\x60' in line:
             last_idx = i
 if last_idx < 0:
     for i, line in enumerate(lines):
@@ -162,7 +162,7 @@ for query in sorted(queries):
             existing_ids.add(page_id)
 
     if new_pages and last_idx >= 0:
-        new_lines = [f'- \x60topics/{fn}\x60 \u2014 {t} (notion:{pid})' for pid, fn, t in new_pages]
+        new_lines = [f'- \x60{fn}\x60 — {t} (notion:{pid})' for pid, fn, t in new_pages]
         lines = lines[:last_idx + 1] + new_lines + lines[last_idx + 1:]
         last_idx += len(new_lines)
         total_new += len(new_pages)
@@ -182,15 +182,14 @@ SYNCED=0
 FAILED=0
 
 while IFS= read -r LINE; do
-    FILENAME=$(echo "$LINE" | sed -n 's/.*`topics\/\([^`]*\)`.*/\1/p')
+    FILENAME=$(echo "$LINE" | sed -n 's/.*`\([^`]*\.md\)`.*/\1/p')
     PAGE_ID=$(echo "$LINE" | sed -n 's/.*(notion:\([^)]*\)).*/\1/p')
 
     if [ -z "$FILENAME" ] || [ -z "$PAGE_ID" ]; then
         continue
     fi
 
-    mkdir -p "$MEMORY_DIR/topics"
-    OUTFILE="$MEMORY_DIR/topics/$FILENAME"
+    OUTFILE="$MEMORY_DIR/$FILENAME"
 
     # Format page ID with dashes if not already formatted
     FORMATTED_ID=$(echo "$PAGE_ID" | sed 's/^\([a-f0-9]\{8\}\)\([a-f0-9]\{4\}\)\([a-f0-9]\{4\}\)\([a-f0-9]\{4\}\)\([a-f0-9]\{12\}\)$/\1-\2-\3-\4-\5/')
@@ -344,6 +343,6 @@ print(f'# {title}\n\nSource: {source}\n\n{md}')
         echo "$(date): FAILED $FILENAME (parse error)" >> "$LOG_DIR/5-sync-notion.log"
         FAILED=$((FAILED + 1))
     fi
-done < <(grep 'notion:' "$MEMORY_FILE" | grep '`topics/')
+done < <(grep 'notion:' "$MEMORY_FILE" | grep '`[^`]*\.md`')
 
 echo "$(date): Sync complete. $SYNCED synced, $FAILED failed." >> "$LOG_DIR/5-sync-notion.log"
