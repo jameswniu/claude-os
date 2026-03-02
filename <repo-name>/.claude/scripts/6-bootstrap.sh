@@ -176,9 +176,9 @@ if [ -n "$CONFLUENCE_EMAIL" ] && [ -n "$CONFLUENCE_TOKEN" ]; then
         AFTER_COUNT=$(grep -c 'confluence:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
-            echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)"
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics, $NEW_COUNT new)  → $MEM/"
         else
-            echo "  SYNCED   Confluence ($AFTER_COUNT topics)"
+            echo "  SYNCED   Confluence ($AFTER_COUNT topics)  → $MEM/"
         fi
     else
         echo "  FAILED   Confluence sync (check ~/claude-os/output/4-sync-confluence.log)"
@@ -193,9 +193,9 @@ if [ -n "$NOTION_TOKEN" ]; then
         AFTER_COUNT=$(grep -c 'notion:' "$MEM/MEMORY.md" 2>/dev/null || echo 0)
         NEW_COUNT=$((AFTER_COUNT - BEFORE_COUNT))
         if [ "$NEW_COUNT" -gt 0 ]; then
-            echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)"
+            echo "  SYNCED   Notion ($AFTER_COUNT topics, $NEW_COUNT new)  → $MEM/"
         else
-            echo "  SYNCED   Notion ($AFTER_COUNT topics)"
+            echo "  SYNCED   Notion ($AFTER_COUNT topics)  → $MEM/"
         fi
     else
         echo "  FAILED   Notion sync (check ~/claude-os/output/5-sync-notion.log)"
