@@ -1,0 +1,124 @@
+1
+00:00:00,500 --> 00:00:04,000
+Claude Code is powerful out of the box.
+But every session starts fresh.
+
+2
+00:00:04,000 --> 00:00:08,000
+It doesn't remember your team's rules,
+your project's architecture,
+
+3
+00:00:08,000 --> 00:00:11,500
+or the mistakes it made yesterday.
+ClaudeOS fixes that.
+
+4
+00:00:12,000 --> 00:00:16,500
+Four files load into every session automatically.
+Your team's build commands and architecture.
+
+5
+00:00:16,500 --> 00:00:21,000
+Your personal review style and preferences.
+Permission auto-approvals so Claude doesn't
+
+6
+00:00:21,000 --> 00:00:25,000
+ask for confirmation on safe commands.
+And a living memory of patterns learned
+
+7
+00:00:25,000 --> 00:00:29,500
+across hundreds of sessions.
+Plus 22 topic files,
+
+8
+00:00:29,500 --> 00:00:33,000
+auto-synced from Confluence every 24 hours.
+
+9
+00:00:33,500 --> 00:00:37,500
+Claude learns from its mistakes.
+When it tries to use the gh CLI,
+
+10
+00:00:37,500 --> 00:00:41,500
+which isn't installed, that gets logged.
+After multiple occurrences across sessions,
+
+11
+00:00:41,500 --> 00:00:46,000
+the pattern gets recognized
+and promoted to a permanent rule.
+
+12
+00:00:46,000 --> 00:00:50,000
+From that point on,
+Claude never makes that mistake again.
+
+13
+00:00:50,000 --> 00:00:54,500
+The progression is: session log,
+to recognized pattern, to permanent rule.
+
+14
+00:00:55,500 --> 00:00:59,500
+Five scheduled scripts
+replace the manual loop.
+
+15
+00:00:59,500 --> 00:01:03,000
+Logging every hour. Distilling patterns daily.
+Promoting rules weekly.
+
+16
+00:01:03,000 --> 00:01:07,500
+Syncing Confluence and Notion docs automatically.
+All running on launchd, across two repos.
+Ten agents total.
+
+17
+00:01:08,000 --> 00:01:12,000
+Custom slash commands turn
+multi-step workflows into one-liners.
+
+18
+00:01:12,000 --> 00:01:16,000
+Type slash review with a ticket number,
+and Claude fetches the branch,
+
+19
+00:01:16,000 --> 00:01:20,000
+diffs every file, runs regression scans,
+and posts a categorized review
+
+20
+00:01:20,000 --> 00:01:25,000
+directly on the pull request.
+Here's a real review it posted on Bitbucket.
+
+21
+00:01:25,500 --> 00:01:29,500
+Setting up a new repo takes one command.
+Bootstrap copies your templates,
+
+22
+00:01:29,500 --> 00:01:33,500
+slash commands, automation scripts,
+and starter memory.
+
+23
+00:01:33,500 --> 00:01:38,500
+Checkpoint saves changes back.
+Your conventions travel with you across every project.
+
+24
+00:01:39,000 --> 00:01:42,000
+The automation runs for about
+four dollars a week.
+
+25
+00:01:42,000 --> 00:01:44,500
+Each script is budget-capped
+so there are no surprises.

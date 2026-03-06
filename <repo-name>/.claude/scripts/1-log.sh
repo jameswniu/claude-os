@@ -19,7 +19,24 @@ ERRORS=0
 
 while IFS= read -r MEMORY_FILE; do
     MEMORY_DIR=$(dirname "$MEMORY_FILE")
-    PROJECT_DIR=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory||; s|-|/|g; s|^/||')
+    SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
+    PROJECT_DIR=$(python3 -c "
+import json, os
+slug = '$SLUG'
+with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
+    for line in f:
+        try:
+            proj = json.loads(line.strip()).get('project', '')
+            if proj and proj.replace('/', '-').replace('.', '-') == slug:
+                print(proj)
+                break
+        except:
+            pass
+" 2>/dev/null)
+    if [ -z "$PROJECT_DIR" ]; then
+        echo "$(date): [$SLUG] Could not resolve project directory, skipping" >> "$LOG_DIR/1-log.log"
+        continue
+    fi
     LAST_RUN_FILE="$MEMORY_DIR/.last-log-run"
 
     # Check if there are new sessions since last run
@@ -63,11 +80,17 @@ with open('$HISTORY') as f:
 
     echo "$(date): [$PROJECT_DIR] New sessions found, summarizing..." >> "$LOG_DIR/1-log.log"
 
+    # Pre-extract recent logs to avoid agent reading full file (cost cap)
+    RECENT_LOGS=$(tail -50 "$MEMORY_DIR/history/logs.md" 2>/dev/null || echo "")
+
     (
         cd "$PROJECT_DIR" || exit 1
         unset CLAUDECODE
 
-        claude -p "You are a memory logger. Read the file at $MEMORY_DIR/history/logs.md. Then read the recent session history below and append a new timestamped entry to logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
+        claude -p "You are a memory logger. Append a new timestamped entry to $MEMORY_DIR/history/logs.md for today's date ($(date +%Y-%m-%d)). If today's date section already exists, append bullet points to it. If not, create a new section.
+
+Here is the end of the existing logs.md for format reference:
+$RECENT_LOGS
 
 Recent user messages from this project:
 $NEW_ENTRIES
@@ -76,10 +99,11 @@ Rules:
 - Only log meaningful work (PR reviews, code changes, config updates, new learnings)
 - Skip trivial messages (greetings, confirmations)
 - Each bullet should be one concise line
-- Use the existing logs.md format" \
-          --allowedTools "Read,Edit" \
+- Match the existing format shown above
+- Use the Edit tool to append at the end of the file" \
+          --allowedTools "Edit" \
           --permission-mode bypassPermissions \
-          --max-budget-usd 0.15 \
+          --max-budget-usd 0.25 \
           < /dev/null
     ) >> "$LOG_DIR/1-log.log" 2>&1
 

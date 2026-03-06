@@ -1,6 +1,6 @@
 #!/bin/bash
 # 5-sync-notion.sh — Runs every 24 hours
-# 1. Auto-discovers new relevant Notion pages and adds them to MEMORY.md
+# 1. Auto-discovers new relevant Notion pages and adds them to MEMORY.md (30-entry FIFO cap)
 # 2. Syncs all (notion:ID) entries from MEMORY.md to topic files
 # Loops over all projects with a MEMORY.md
 
@@ -25,7 +25,21 @@ ERRORS=0
 
 while IFS= read -r MEMORY_FILE; do
     MEMORY_DIR=$(dirname "$MEMORY_FILE")
-    PROJECT_DIR=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory||; s|-|/|g; s|^/||')
+    SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
+    PROJECT_DIR=$(python3 -c "
+import json, os
+slug = '$SLUG'
+with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
+    for line in f:
+        try:
+            proj = json.loads(line.strip()).get('project', '')
+            if proj and proj.replace('/', '-').replace('.', '-') == slug:
+                print(proj)
+                break
+        except:
+            pass
+" 2>/dev/null)
+    [ -z "$PROJECT_DIR" ] && PROJECT_DIR="$SLUG"
 
     if [ ! -f "$MEMORY_FILE" ]; then
         continue
@@ -165,9 +179,21 @@ for query in sorted(queries):
 
     if new_pages and last_idx >= 0:
         new_lines = [f'- \x60{fn}\x60 — {t} (notion:{pid})' for pid, fn, t in new_pages]
+        # 30-entry FIFO cap: count all topic entries with source IDs
+        topic_count = sum(1 for l in lines if re.match(r'^- \x60[^\x60]+\.md\x60.*\([a-z]+:', l))
+        while topic_count + len(new_lines) > 30:
+            for i, l in enumerate(lines):
+                if re.match(r'^- \x60[^\x60]+\.md\x60.*\([a-z]+:', l):
+                    lines.pop(i)
+                    if i <= last_idx:
+                        last_idx -= 1
+                    topic_count -= 1
+                    break
+            else:
+                break
         lines = lines[:last_idx + 1] + new_lines + lines[last_idx + 1:]
         last_idx += len(new_lines)
-        total_new += len(new_pages)
+        total_new += len(new_lines)
 
 if total_new > 0:
     with open(memory_file, 'w') as f:

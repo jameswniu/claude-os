@@ -48,11 +48,11 @@ When you `cd` into a new repo and start Claude Code:
 
 | | Carries over? | Why |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | Yes | Global file, loads in every project |
+| `~/.claude/CLAUDE.local.md` | Yes | Global file, loads in every project |
 | `CLAUDE.md` | Yes (if in git) | Comes with the clone |
-| `.claude/CLAUDE.md` | No | Gitignored, lives only in that repo |
+| `.claude/CLAUDE.local.md` | No | Gitignored, lives only in that repo |
 | `.claude/settings.local.json` | No | Gitignored, lives only in that repo |
-| `.claude/commands/` | No | Gitignored, lives only in that repo |
+| `~/.claude/commands/` | Yes | User-level, available in every project |
 | `MEMORY.md`, `history/logs.md`, topic files | No | Stored per project path, new repo = empty |
 
 To bootstrap a new repo with your templates:
@@ -68,10 +68,10 @@ bootstrap
 | File | Location | Behavior |
 |------|----------|----------|
 | `CLAUDE.md` | Repo root | Auto-loaded at session start |
-| `.claude/CLAUDE.md` | Inside repo | Auto-loaded at session start |
+| `.claude/CLAUDE.local.md` | Inside repo | Auto-loaded at session start |
 | `.claude/settings.local.json` | Inside repo | Auto-loaded, client-side only |
-| `.claude/commands/` | Inside repo | Indexed at session start |
-| `~/.claude/CLAUDE.md` | Home directory | Global, auto-loaded in every project |
+| `~/.claude/commands/` | Home directory | Indexed at session start, available in every project |
+| `~/.claude/CLAUDE.local.md` | Home directory | Global, auto-loaded in every project |
 | `MEMORY.md` | `~/.claude/projects/{slug}/memory/` | Auto-loaded (first 200 lines) |
 
 **This repo adds** (custom layer on top):
@@ -81,7 +81,7 @@ bootstrap
 | `history/logs.md` | Chronological session history (Claude Code only creates MEMORY.md) |
 | Topic files | On-demand reference files synced from Confluence/Notion |
 | Learning loop | log (1h) -> distill (24h) -> promote (7d) automation scripts |
-| `checkpoint` | Filter and push live workspace files to this repo (CLAUDE.md, .claude/CLAUDE.md, MEMORY.md, topic files, history/logs.md) |
+| `checkpoint` | Filter and push live workspace files to this repo (CLAUDE.md, .claude/CLAUDE.local.md, MEMORY.md, topic files, history/logs.md) |
 | `bootstrap` | Pull templates from this repo into a new project |
 
 ### Phase 1: Static Context
@@ -95,7 +95,7 @@ bootstrap
 
 Then edit the files for your project:
 - `CLAUDE.md` - add your build commands, architecture, and test instructions
-- `.claude/CLAUDE.md` - add your personal preferences (review style, behavior rules, etc.)
+- `.claude/CLAUDE.local.md` - add your personal preferences (review style, behavior rules, etc.)
 - `MEMORY.md` - add your project's architecture and patterns
 
 Verify: start a new Claude Code session and ask "What do you know about this project?" Claude should reference content from CLAUDE.md and MEMORY.md.
@@ -108,7 +108,7 @@ No setup needed. Just follow this rhythm as you work:
 |------|--------|
 | After each session | Tell Claude: "Log what we did to logs.md" |
 | End of day | Tell Claude: "Distill today's logs into MEMORY.md" |
-| End of week | Tell Claude: "Promote stable patterns to .claude/CLAUDE.md" |
+| End of week | Tell Claude: "Promote stable patterns to .claude/CLAUDE.local.md" |
 | End of sprint | Team promotes shared patterns to CLAUDE.md (git tracked) |
 
 ### Phase 3: Automation
@@ -181,7 +181,7 @@ Four files loaded into every Claude Code session automatically.
 ```mermaid
 flowchart TD
     A["📄 CLAUDE.md"]
-    B["📄 .claude/CLAUDE.md"]
+    B["📄 .claude/CLAUDE.local.md"]
     C["⚙️ settings.local.json"]
     D["🧠 MEMORY.md"]
     S["🤖 Claude Code Session"]
@@ -206,7 +206,7 @@ Session data flows through three stages: log, distill, promote.
 flowchart TD
     S["Session"] -- "1h" --> L["logs.md"]
     L -- "24h" --> D["MEMORY.md"]
-    D -- "7d" --> R[".claude/CLAUDE.md"]
+    D -- "7d" --> R[".claude/CLAUDE.local.md"]
     R -. "next session" .-> S
 
     style S fill:#212121,color:#fff,stroke:#424242,stroke-width:2px
@@ -233,7 +233,7 @@ flowchart TD
 
     L1 --> LOG["logs.md"]
     L2 --> MEM["MEMORY.md"]
-    L3 --> RUL[".claude/CLAUDE.md"]
+    L3 --> RUL[".claude/CLAUDE.local.md"]
     L45 --> TOP["topic files"]
 
     LOG -. reads .-> L2
@@ -261,12 +261,13 @@ flowchart TD
 
 | File | Location | Purpose | Loaded | Example |
 |------|----------|---------|--------|---------|
-| `.claude/CLAUDE.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](<repo-name>/.claude/CLAUDE.md) |
+| `.claude/CLAUDE.local.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](<repo-name>/.claude/CLAUDE.local.md) |
 | `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](<repo-name>/.claude/settings.local.json) |
 | `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md) |
 | `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md) |
 | Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/) |
-| `commands/review.md` | Repo `.claude/commands/` | Custom slash commands (e.g., /review) | When invoked | [view](<repo-name>/.claude/commands/review.md) |
+| `commands/review.md` | `~/.claude/commands/` (user-level) | Custom slash command for PR reviews | When invoked | [view](<repo-name>/.claude/commands/review.md) |
+| `commands/ticket.md` | `~/.claude/commands/` (user-level) | Custom slash command for ticket branching | When invoked | [view](<repo-name>/.claude/commands/ticket.md) |
 
 ---
 
@@ -279,7 +280,7 @@ Set up the four core files that give Claude persistent context across sessions.
 | File | Scope | Purpose |
 |------|-------|---------|
 | `/CLAUDE.md` | Team (checked into git) | Build commands, architecture, testing rules, code style |
-| `/.claude/CLAUDE.md` | Personal (gitignored) | Your workflow preferences, review style, environment constraints |
+| `/.claude/CLAUDE.local.md` | Personal (gitignored) | Your workflow preferences, review style, environment constraints |
 | `/.claude/settings.local.json` | Personal (gitignored) | Which commands auto-approve without prompting |
 | `~/.claude/projects/{project}/memory/MEMORY.md` | Personal (auto-loaded) | Learned patterns: API endpoints, architecture notes, conventions |
 
@@ -287,7 +288,7 @@ Set up the four core files that give Claude persistent context across sessions.
 
 1. **Team CLAUDE.md** -  should already exist in your repo root. If not, create one with build commands, architecture overview, testing requirements, and code style rules.
 
-2. **Personal CLAUDE.md** -  create `/.claude/CLAUDE.md` for your own rules. Examples:
+2. **Personal CLAUDE.md** -  create `/.claude/CLAUDE.local.md` for your own rules. Examples:
    - PR review workflow preferences
    - Comment style (no em dashes, no verdicts, etc.)
    - Environment constraints (missing CLI tools, API endpoints)
@@ -322,7 +323,7 @@ Start a new Claude Code session and ask: "What do you know about this project?" 
 
 Add a session log and manually run distill/promote cycles to build up your memory over time. This phase fits naturally into your existing team workflow.
 
-> **Note:** The loop below is for iteration only. You can manually write to any file at any time (logs.md, MEMORY.md, .claude/CLAUDE.md, or the shared CLAUDE.md). However, it is recommended to leave the automated cadence to Phase 3 and focus here on learning the rhythm.
+> **Note:** The loop below is for iteration only. You can manually write to any file at any time (logs.md, MEMORY.md, .claude/CLAUDE.local.md, or the shared CLAUDE.md). However, it is recommended to leave the automated cadence to Phase 3 and focus here on learning the rhythm.
 
 ### Who Does What
 
@@ -330,7 +331,7 @@ Add a session log and manually run distill/promote cycles to build up your memor
 |--------|-----|------|-------------|
 | Log sessions | Individual developer | After each session | `logs.md` (personal) |
 | Distill patterns | Individual developer | End of day | `MEMORY.md` (personal) |
-| Promote to personal rules | Individual developer | End of week | `.claude/CLAUDE.md` (personal, gitignored) |
+| Promote to personal rules | Individual developer | End of week | `.claude/CLAUDE.local.md` (personal, gitignored) |
 | Promote to team rules | Team together | End of sprint review | `CLAUDE.md` (shared, checked into git) |
 
 The first three steps are personal. The last step is a team activity: during sprint reviews or retros, share patterns that kept coming up across the team and collectively decide which ones belong in the shared `CLAUDE.md`.
@@ -347,7 +348,7 @@ The first three steps are personal. The last step is a team activity: during spr
 |------|--------|--------|
 | After each session | Append entry | `logs.md` |
 | End of day | Distill patterns | `MEMORY.md` |
-| End of week | Promote stable rules | `.claude/CLAUDE.md` |
+| End of week | Promote stable rules | `.claude/CLAUDE.local.md` |
 | End of sprint | Team promotes shared rules | `CLAUDE.md` (git tracked) |
 
 ### Setup
@@ -361,7 +362,7 @@ The first three steps are personal. The last step is a team activity: during spr
    - What you worked on, what you learned, what went wrong
    ```
 
-2. **Add memory rule** to your personal `/.claude/CLAUDE.md`:
+2. **Add memory rule** to your personal `/.claude/CLAUDE.local.md`:
    ```markdown
    ## Memory
 
@@ -379,9 +380,9 @@ The first three steps are personal. The last step is a team activity: during spr
 
 4. **Promote to personal rules (weekly)** -  at the end of each week, tell Claude:
    ```
-   Read memory/MEMORY.md and .claude/CLAUDE.md.
+   Read memory/MEMORY.md and .claude/CLAUDE.local.md.
    If any pattern in MEMORY.md appeared 3+ times and is not yet a rule,
-   add it to .claude/CLAUDE.md under the appropriate section.
+   add it to .claude/CLAUDE.local.md under the appropriate section.
    ```
 
 5. **Promote to team rules (sprint review)** -  during sprint reviews, share friction patterns across the team. If multiple people hit the same issue, add it to the shared `CLAUDE.md` at the repo root. Example: *"Claude keeps trying to use gh CLI." "Same here, three times this sprint."* → Add to CLAUDE.md: `gh CLI is NOT installed. Do not attempt to use it.`
@@ -415,7 +416,7 @@ End of day, she tells Claude to distill. MEMORY.md gets:
 
 By Friday, the same issue came up 3 more times. She promotes to her personal rules:
 
-> **.claude/CLAUDE.md** - `## Code Patterns`
+> **.claude/CLAUDE.local.md** - `## Code Patterns`
 > - Always put validation logic in the service layer, never in controllers.
 > - There is no shared validators module. Each service handles its own validation.
 
@@ -425,7 +426,7 @@ She installs the Phase 3 scripts. The log, distill, and promote cycles now run o
 
 **Week 3+: Hands-off**
 
-The automation handles the loop. Claude no longer puts validation in controllers. When she notices something new mid-session (e.g., a new API pattern), she still writes it directly to MEMORY.md or .claude/CLAUDE.md on the spot. The automation and manual writes coexist.
+The automation handles the loop. Claude no longer puts validation in controllers. When she notices something new mid-session (e.g., a new API pattern), she still writes it directly to MEMORY.md or .claude/CLAUDE.local.md on the spot. The automation and manual writes coexist.
 
 ---
 
@@ -453,7 +454,7 @@ End of day, he distills to MEMORY.md:
 
 By Friday, the naming issue came up in two more RFP sections and a client email. He promotes:
 
-> **.claude/CLAUDE.md** - `## RFP Rules`
+> **.claude/CLAUDE.local.md** - `## RFP Rules`
 > - Use official product names: "Insights Hub" (reporting), "Basis DSP" (buying), "Campaign Manager" (planning).
 > - Never reference roadmap features as current capabilities. Check with Product if unsure.
 > - Use "Basis platform" as the default product reference, not "our system/tool/software."
@@ -492,7 +493,7 @@ End of day, she distills:
 
 By Friday, the terminology issue appeared twice more. She promotes:
 
-> **.claude/CLAUDE.md** - `## Ad Ops`
+> **.claude/CLAUDE.local.md** - `## Ad Ops`
 > - Use Basis terminology: "ad group" (not line item), "placement" (not ad unit), "flight" (not campaign period).
 > - Flight dates are UTC. Always check timezone offset as first troubleshooting step.
 > - Zero-impression triage: timezone > budget > targeting > creative status. Follow this order.
@@ -509,7 +510,7 @@ Claude uses correct Basis terminology and follows the triage order every time. W
 
 ### What Good Looks Like
 
-After a few weeks, your `.claude/CLAUDE.md` should contain rules that were earned through repeated experience, not guessed upfront. Example progression:
+After a few weeks, your `.claude/CLAUDE.local.md` should contain rules that were earned through repeated experience, not guessed upfront. Example progression:
 
 > `logs.md` -"02-18: Claude tried gh CLI, not installed" ... "02-19: again" ... "02-20: a third time"
 >
@@ -519,7 +520,7 @@ After a few weeks, your `.claude/CLAUDE.md` should contain rules that were earne
 >
 > ↓ promote
 >
-> `.claude/CLAUDE.md` -"gh CLI is NOT installed. Do not attempt to use it."
+> `.claude/CLAUDE.local.md` -"gh CLI is NOT installed. Do not attempt to use it."
 
 ---
 
@@ -535,7 +536,7 @@ Automate the loop so it runs without manual intervention.
 | Every 24 hours | `2-distill.sh` | Distill logs.md patterns into MEMORY.md |
 | Every 24 hours | `4-sync-confluence.sh` | Auto-discover + sync Confluence pages to topic files |
 | Every 24 hours | `5-sync-notion.sh` | Auto-discover + sync Notion pages to topic files |
-| Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.md |
+| Every 7 days | `3-promote.sh` | Promote stable patterns to .claude/CLAUDE.local.md |
 
 Scripts 1-3 run headless Claude Code (`claude -p`) to do the reading and writing. Scripts 4-5 sync external pages directly via REST API (no LLM needed).
 
@@ -672,7 +673,7 @@ Snapshots live workspace files into `<repo-name>/.claude/` and `.claude/projects
 
 | Source | Template | Filtering |
 |--------|----------|-----------|
-| `.claude/CLAUDE.md` (personal) | `<repo-name>/.claude/CLAUDE.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
+| `.claude/CLAUDE.local.md` (personal) | `<repo-name>/.claude/CLAUDE.local.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
 | `MEMORY.md` | `.claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
 | Topic files (`*.md`) | `.claude/projects/-Users-<user-name>-<repo-name>/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
 | `history/logs.md` | `.claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md` | Copied as-is |
@@ -784,7 +785,9 @@ client = anthropic.Anthropic()
   - `.claude/`
     - `CLAUDE.md` - Personal rules (gitignored)
     - `settings.local.json` - Permission auto-approvals (gitignored)
-    - `commands/review.md` - Custom slash commands
+- `~/.claude/commands/`
+  - `review.md` - PR review slash command
+  - `ticket.md` - Ticket branching slash command
 - `~/.claude/projects/{project}/memory/`
   - `MEMORY.md` - Topical patterns (auto-loaded)
   - `history/logs.md` - Session history (on demand)
@@ -804,9 +807,10 @@ client = anthropic.Anthropic()
   - `tests/` - Validation tests
   - `<repo-name>/` - Project config template
     - `.claude/`
-      - `CLAUDE.md`, `settings.local.json`, `commands/review.md`
-      - `hooks/pre-push`
+      - `CLAUDE.md`, `settings.local.json`
+      - `commands/review.md`, `commands/ticket.md`
       - `scripts/` - 1-log.sh through 6-bootstrap.sh, update-readme.sh
+    - `hooks/pre-push`
 
 ---
 
@@ -848,5 +852,5 @@ client = anthropic.Anthropic()
 **How do slash commands work with tokens?**
 > Command names and descriptions are indexed at session start (~2% of context window). The full command content only loads when you invoke it (e.g., `/review`). So having many commands registered costs minimal tokens.
 
-**What's the difference between CLAUDE.md and .claude/CLAUDE.md?**
-> `CLAUDE.md` (repo root) is shared, checked into git, visible to the whole team. `.claude/CLAUDE.md` (gitignored) is personal, only you see it. Use the shared one for team rules, the personal one for your own preferences.
+**What's the difference between CLAUDE.md and .claude/CLAUDE.local.md?**
+> `CLAUDE.md` (repo root) is shared, checked into git, visible to the whole team. `.claude/CLAUDE.local.md` (gitignored) is personal, only you see it. Use the shared one for team rules, the personal one for your own preferences.

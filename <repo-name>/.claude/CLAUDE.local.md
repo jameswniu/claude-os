@@ -21,7 +21,7 @@
 ## Behavior Rules
 
 - Do not make unsolicited file edits. Only modify files the user explicitly asks to change — scope changes EXACTLY to what was requested. If ambiguous, ask before proceeding.
-- Personal preferences go in `.claude/CLAUDE.md` (this file, gitignored). Never write personal rules to the root `CLAUDE.md` (shared, checked into git).
+- Personal preferences go in `.claude/CLAUDE.local.md` (this file, gitignored). Never write personal rules to the root `CLAUDE.md` (shared, checked into git).
 
 ## Artifacts & Storage
 

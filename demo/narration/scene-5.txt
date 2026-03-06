@@ -1,0 +1,1 @@
+Custom slash commands turn multi-step workflows... into one-liners. Type slash review with a ticket number... and Claude fetches the branch, diffs every file, runs regression scans, and posts a categorized review... directly on the pull request. Here's a real review it posted on Bitbucket.

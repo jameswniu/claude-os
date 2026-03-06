@@ -41,7 +41,8 @@ grep -q 'alias bootstrap=' "$SHELL_RC" 2>/dev/null && sed -i '' '/alias bootstra
 
 # Install pre-push hook
 CLAUDE_OS="$HOME/claude-os"
-ln -sf "$CLAUDE_OS/<repo-name>/.claude/hooks/pre-push" "$CLAUDE_OS/.git/hooks/pre-push"
+mkdir -p "$CLAUDE_OS/.git/hooks"
+ln -sf "$CLAUDE_OS/<repo-name>/hooks/pre-push" "$CLAUDE_OS/.git/hooks/pre-push"
 
 # Apply immediately
 source "$SHELL_RC" 2>/dev/null

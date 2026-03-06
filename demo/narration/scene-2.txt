@@ -1,0 +1,1 @@
+Four files load into every session... automatically. Your team's build commands and architecture. Your personal review style and preferences. Permission auto-approvals, so Claude doesn't ask for confirmation on safe commands. And a living memory... of patterns learned across hundreds of sessions. Plus twenty-two topic files, auto-synced from Confluence every twenty-four hours.

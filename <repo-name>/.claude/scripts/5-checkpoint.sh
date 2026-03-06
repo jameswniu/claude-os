@@ -3,13 +3,13 @@
 # Usage: bash ~/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh  (run from any project dir)
 #
 # Reads from (running project):
-#   - $PROJECT/.claude/CLAUDE.md            Personal rules with promoted learnings
+#   - $PROJECT/.claude/CLAUDE.local.md         Personal rules with promoted learnings
 #   - $MEM/MEMORY.md                        Accumulated knowledge
 #   - $MEM/history/logs.md                   Session history
 #   - $MEM/*.md (topic files)               Confluence-synced reference docs
 #
 # Writes to (filtered templates):
-#   - <repo-name>/.claude/CLAUDE.md                                      Universal rules, project values replaced
+#   - <repo-name>/.claude/CLAUDE.local.md                                Universal rules, project values replaced
 #   - .claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md    Filtered + situation-based topic index
 #   - .claude/projects/-Users-<user-name>-<repo-name>/memory/*.md          Distilled, 1:1 with source
 #   - .claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md  Copy as-is
@@ -180,13 +180,13 @@ with open(tmpl_path, 'w') as f:
 fi
 
 # ============================================================
-# 2. Filter .claude/CLAUDE.md (personal rules)
+# 2. Filter .claude/CLAUDE.local.md (personal rules)
 # ============================================================
-if [ -f "$PROJECT/.claude/CLAUDE.md" ]; then
+if [ -f "$PROJECT/.claude/CLAUDE.local.md" ]; then
     python3 -c "
 import re
 
-with open('$PROJECT/.claude/CLAUDE.md') as f:
+with open('$PROJECT/.claude/CLAUDE.local.md') as f:
     content = f.read()
 
 # Universal sections to keep verbatim
@@ -236,7 +236,7 @@ out = out.rstrip() + '\n'
 
 # Merge with existing template (accumulate-only)
 import os
-tmpl_path = '$REPO_TMPL/.claude/CLAUDE.md'
+tmpl_path = '$REPO_TMPL/.claude/CLAUDE.local.md'
 
 def parse_sections(text):
     parts = re.split(r'(^## .+$)', text, flags=re.MULTILINE)
@@ -288,9 +288,9 @@ import sys
 sys.exit(0 if out != existing else 2)
 " 2>/dev/null
     if [ $? -eq 0 ]; then
-        echo "  FILTERED  $REPO_TMPL/.claude/CLAUDE.md"
+        echo "  FILTERED  $REPO_TMPL/.claude/CLAUDE.local.md"
     else
-        echo "  SKIPPED   $REPO_TMPL/.claude/CLAUDE.md"
+        echo "  SKIPPED   $REPO_TMPL/.claude/CLAUDE.local.md"
     fi
 fi
 

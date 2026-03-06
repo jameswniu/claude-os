@@ -40,7 +40,7 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 ## Recurring Mistakes (Self-Corrections)
 
 - **Unsolicited edits**: Do not modify files unless user explicitly asks. Flag suggestions in review output instead.
-- **Wrong config file**: Personal preferences go in `.claude/CLAUDE.md` (gitignored), never in root `CLAUDE.md` (shared).
+- **Wrong config file**: Personal preferences go in `.claude/CLAUDE.local.md` (gitignored), never in root `CLAUDE.md` (shared).
 - **Stale files in copy-only sync**: When a script copies files to a target directory, always clean the target first if the source is the single source of truth. Copy-only accumulates stale files. Use delete-then-copy (or rsync --delete).
 - **Flagging theoretical issues**: Don't flag issues that can't happen in practice (e.g., hypothetical future scenarios). Focus on real, actionable findings.
 - **Force-updating git tags**: Orphans the old commit -- files not carried forward are lost. When moving artifacts between refs, verify all linked files exist on the new ref before pushing.
@@ -110,7 +110,7 @@ Reference docs in the memory directory. Zero tokens until read.
 
 - `/CLAUDE.md` — Team instructions, checked into git
 - `/.claude/` — Gitignored as of 02-27 (removed from tracking, added to `.gitignore`)
-- `/.claude/CLAUDE.md` — Personal instructions, gitignored
+- `/.claude/CLAUDE.local.md` — Personal instructions, gitignored
 - `/.claude/commands/review.md` — /review slash command
 - `/.claude/settings.local.json` — Permission auto-approvals
 - `~/.claude/projects/{project}/memory/MEMORY.md` — This file, auto-loaded

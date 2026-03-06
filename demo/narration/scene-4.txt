@@ -1,0 +1,1 @@
+Five scheduled scripts replace the manual loop. Logging every hour. Distilling patterns daily. Promoting rules weekly. Syncing Confluence and Notion docs... automatically. All running on launchd, across two repos. Ten agents total.

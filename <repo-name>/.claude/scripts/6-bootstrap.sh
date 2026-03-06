@@ -11,7 +11,7 @@ if [ "$(basename "$PROJECT")" = ".claude" ]; then
     exit 1
 fi
 
-cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null
+cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null || true
 cd "$PROJECT"
 REPO_TMPL="$CLAUDE_OS/<repo-name>"
 MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-<user-name>-<repo-name>/memory"
@@ -20,11 +20,11 @@ MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 git_cat() {
     local relpath="${1#$CLAUDE_OS/}"
-    git -C "$CLAUDE_OS" show "origin/main:$relpath"
+    git -C "$CLAUDE_OS" show "origin/main:$relpath" 2>/dev/null || cat "$CLAUDE_OS/$relpath" 2>/dev/null
 }
 git_ls() {
     local relpath="${1#$CLAUDE_OS/}"
-    git -C "$CLAUDE_OS" ls-tree --name-only "origin/main" "$relpath/"
+    git -C "$CLAUDE_OS" ls-tree --name-only "origin/main" "$relpath/" 2>/dev/null
 }
 
 file_age() {
@@ -56,31 +56,31 @@ echo ""
 # Phase 1: Sync all files from <repo-name> template
 mkdir -p .claude "$MEM/history"
 
-seed_file .claude/CLAUDE.md "$REPO_TMPL/.claude/CLAUDE.md" .claude/CLAUDE.md
+seed_file .claude/CLAUDE.local.md "$REPO_TMPL/.claude/CLAUDE.local.md" .claude/CLAUDE.local.md
 seed_file .claude/settings.local.json "$REPO_TMPL/.claude/settings.local.json" .claude/settings.local.json
 seed_file "$MEM/MEMORY.md" "$MEM_TMPL/MEMORY.md" MEMORY.md
 # Migrate old logs.md to history/ subfolder
 [ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md  → $MEM/history/logs.md"
 seed_file "$MEM/history/logs.md" "$MEM_TMPL/history/logs.md" history/logs.md
 
-# Slash commands (always overwrite with latest)
+# Slash commands (always overwrite with latest, deployed to user-level)
 git_ls "$REPO_TMPL/.claude/commands" | while read RELPATH; do
     NAME=$(basename "$RELPATH")
     [[ "$NAME" == *.md ]] || continue
-    mkdir -p .claude/commands
-    DEST=".claude/commands/$NAME"
+    mkdir -p "$HOME/.claude/commands"
+    DEST="$HOME/.claude/commands/$NAME"
     TMPFILE=$(mktemp)
     git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
     if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
-        echo "  EXISTS   commands/$NAME  → $PROJECT/$DEST"
+        echo "  EXISTS   commands/$NAME  → $DEST"
     else
         CHANGED_LINES=0
         [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
         cp "$TMPFILE" "$DEST"
         if [ "$CHANGED_LINES" -gt 0 ]; then
-            echo "  SYNCED   commands/$NAME (updated, $CHANGED_LINES lines changed)  → $PROJECT/$DEST"
+            echo "  SYNCED   commands/$NAME (updated, $CHANGED_LINES lines changed)  → $DEST"
         else
-            echo "  SYNCED   commands/$NAME (new)  → $PROJECT/$DEST"
+            echo "  SYNCED   commands/$NAME (new)  → $DEST"
         fi
     fi
     rm -f "$TMPFILE"
@@ -109,6 +109,31 @@ git_ls "$REPO_TMPL/.claude/scripts" | while read RELPATH; do
     fi
     rm -f "$TMPFILE"
 done
+
+# Hooks (deploy to .git/hooks/ if this is a git repo)
+if [ -d "$PROJECT/.git" ]; then
+    git_ls "$REPO_TMPL/hooks" | while read RELPATH; do
+        NAME=$(basename "$RELPATH")
+        mkdir -p "$PROJECT/.git/hooks"
+        DEST="$PROJECT/.git/hooks/$NAME"
+        TMPFILE=$(mktemp)
+        git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
+        if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
+            echo "  EXISTS   hooks/$NAME  → $DEST"
+        else
+            CHANGED_LINES=0
+            [ -f "$DEST" ] && CHANGED_LINES=$(diff "$DEST" "$TMPFILE" | grep -c '^[<>]')
+            cp "$TMPFILE" "$DEST"
+            chmod +x "$DEST"
+            if [ "$CHANGED_LINES" -gt 0 ]; then
+                echo "  SYNCED   hooks/$NAME (updated, $CHANGED_LINES lines changed)  → $DEST"
+            else
+                echo "  SYNCED   hooks/$NAME (new)  → $DEST"
+            fi
+        fi
+        rm -f "$TMPFILE"
+    done
+fi
 
 # Topic files (seed only from origin/main templates, don't overwrite — sync scripts fetch raw content)
 git_ls "$MEM_TMPL" | while read RELPATH; do

@@ -1,0 +1,44 @@
+#!/bin/bash
+# pre-push hook - runs checks before allowing push to remote
+# Deployed by claude-os bootstrap to all repos
+
+# Load asdf for correct Ruby/Node versions
+# Support both standard install and Homebrew locations
+if [ -f "$HOME/.asdf/asdf.sh" ]; then
+    . "$HOME/.asdf/asdf.sh"
+elif [ -f "/opt/homebrew/opt/asdf/libexec/asdf.sh" ]; then
+    . "/opt/homebrew/opt/asdf/libexec/asdf.sh"
+elif [ -f "/usr/local/opt/asdf/libexec/asdf.sh" ]; then
+    . "/usr/local/opt/asdf/libexec/asdf.sh"
+fi
+
+FAILED=0
+
+# 1. Claude OS tests
+echo "Running claude-os tests..."
+bash "$HOME/claude-os/tests/test.sh" || FAILED=1
+
+# 2. RuboCop (if Gemfile has rubocop)
+if [ $FAILED -eq 0 ] && grep -q 'rubocop' Gemfile 2>/dev/null; then
+    if git rev-parse --verify origin/dev >/dev/null 2>&1; then
+        BASE="origin/dev"
+    elif git rev-parse --verify origin/main >/dev/null 2>&1; then
+        BASE="origin/main"
+    else
+        BASE="HEAD~1"
+    fi
+
+    CHANGED_RB=$(git diff --name-only "$BASE"...HEAD -- '*.rb' 2>/dev/null | grep -v '^vendor/')
+    if [ -n "$CHANGED_RB" ]; then
+        COUNT=$(echo "$CHANGED_RB" | wc -l | tr -d ' ')
+        echo ""
+        echo "Running RuboCop on $COUNT changed Ruby file(s)..."
+        echo "$CHANGED_RB" | xargs bundle exec rubocop --parallel || FAILED=1
+    fi
+fi
+
+if [ $FAILED -ne 0 ]; then
+    echo ""
+    echo "Push blocked: checks failed. Fix the issues and try again."
+    exit 1
+fi

@@ -23,13 +23,15 @@ mkdir -p "$HOME"
 # Fake claude-os git repo with <repo-name> template + scripts
 CO="$HOME/claude-os"
 MEM_TMPL_DIR="$CO/.claude/projects/-Users-<user-name>-<repo-name>/memory"
-mkdir -p "$CO/<repo-name>/.claude/commands" "$CO/<repo-name>/.claude/scripts" "$MEM_TMPL_DIR/history" "$CO/output"
+mkdir -p "$CO/<repo-name>/.claude/commands" "$CO/<repo-name>/.claude/scripts" "$CO/<repo-name>/hooks" "$MEM_TMPL_DIR/history" "$CO/output"
 cp -r "$REAL_REPO/<repo-name>/.claude/scripts/"* "$CO/<repo-name>/.claude/scripts/"
 
-echo "# Seed" > "$CO/<repo-name>/.claude/CLAUDE.md"
+echo "# Seed" > "$CO/<repo-name>/.claude/CLAUDE.local.md"
 echo '{}' > "$CO/<repo-name>/.claude/settings.local.json"
 echo "# Seed" > "$MEM_TMPL_DIR/MEMORY.md"
 echo "# Seed" > "$MEM_TMPL_DIR/history/logs.md"
+printf '#!/bin/bash\necho "hook"\n' > "$CO/<repo-name>/hooks/pre-push"
+chmod +x "$CO/<repo-name>/hooks/pre-push"
 
 cd "$CO"
 git init -q
@@ -75,7 +77,7 @@ make test  # run tests
 - pytest with 85% coverage
 EOF
 
-cat > "$PROJECT/.claude/CLAUDE.md" << 'EOF'
+cat > "$PROJECT/.claude/CLAUDE.local.md" << 'EOF'
 ## PR Review Workflow
 
 - Always fetch origin
@@ -152,7 +154,7 @@ AHEAD=$(git rev-list --count "origin/$BRANCH..$BRANCH" 2>/dev/null)
 [ "$AHEAD" -eq 0 ] && pass "push syncs to production" || fail "still ahead after push"
 
 # Verify template filtering
-grep -q "stash.centro.net" "$CO/<repo-name>/.claude/CLAUDE.md" && fail ".claude/CLAUDE.md has project URLs" || pass ".claude/CLAUDE.md filtered"
+grep -q "stash.centro.net" "$CO/<repo-name>/.claude/CLAUDE.local.md" && fail ".claude/CLAUDE.local.md has project URLs" || pass ".claude/CLAUDE.local.md filtered"
 grep -q "learned per project" "$MEM_TMPL_DIR/MEMORY.md" && pass "MEMORY.md has placeholders" || fail "MEMORY.md missing placeholders"
 grep -q "confluence:" "$MEM_TMPL_DIR/MEMORY.md" && fail "MEMORY.md has confluence IDs" || pass "MEMORY.md IDs stripped"
 grep -q "confluence:" "$MEM_TMPL_DIR/code-reviews.md" && fail "topic file has confluence IDs" || pass "topic file IDs stripped"
@@ -166,15 +168,16 @@ echo "## 2. Bootstrap pulls latest"
 
 # Structural check: git pull runs before file copies
 PULL_LINE=$(grep -n "git pull" "$CO/<repo-name>/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
-COPY_LINE=$(grep -n "cp.*CLAUDE.md" "$CO/<repo-name>/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
+COPY_LINE=$(grep -n "seed_file.*CLAUDE" "$CO/<repo-name>/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
 [ "$PULL_LINE" -lt "$COPY_LINE" ] && pass "git pull precedes file copies" || fail "git pull does not precede copies"
 
 # Run bootstrap on fresh project
 BP="$SANDBOX/bootstrap-project"
 mkdir -p "$BP" && cd "$BP" && git init -q
 OUT=$(bash "$CO/<repo-name>/.claude/scripts/6-bootstrap.sh" 2>&1)
-[ -f "$BP/.claude/CLAUDE.md" ] && pass "bootstrap creates .claude/CLAUDE.md" || fail "missing .claude/CLAUDE.md"
-echo "$OUT" | grep -q "CREATED.*CLAUDE.md" && pass "bootstrap creates (not overwrites) files" || fail "bootstrap not creating files"
+[ -f "$BP/.claude/CLAUDE.local.md" ] && pass "bootstrap creates .claude/CLAUDE.local.md" || fail "missing .claude/CLAUDE.local.md"
+echo "$OUT" | grep -q "CREATED.*CLAUDE.local.md" && pass "bootstrap creates (not overwrites) files" || fail "bootstrap not creating files"
+[ -f "$BP/.git/hooks/pre-push" ] && pass "bootstrap deploys pre-push hook" || fail "missing .git/hooks/pre-push"
 
 echo ""
 
@@ -200,7 +203,7 @@ mkdir -p "$CD_TEST" && cd "$CD_TEST" && git init -q
 OUT=$(bash "$CO/<repo-name>/.claude/scripts/6-bootstrap.sh" 2>&1)
 
 echo "$OUT" | grep -q "Project: $CD_TEST" && pass "PROJECT is caller's pwd" || fail "PROJECT is wrong"
-[ -f "$CD_TEST/.claude/CLAUDE.md" ] && pass "files in caller's dir" || fail "files in wrong dir"
+[ -f "$CD_TEST/.claude/CLAUDE.local.md" ] && pass "files in caller's dir" || fail "files in wrong dir"
 
 echo ""
 
