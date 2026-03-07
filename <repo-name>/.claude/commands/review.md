@@ -1,18 +1,34 @@
+---
+description: Review a pull request or repo
+---
 IMPORTANT: You MUST follow every step and the Output Format below EXACTLY. Do not skip steps. Do not freestyle. Do not deviate from this structure.
 
 ## Setup
 
-Format: /review {ticket-number}
+Format: /review {ticket-number}    — default, always a ticket number
+        /review pr {pr-number}     — explicitly review by PR number
+
+The argument is ALWAYS a ticket number unless prefixed with "pr".
 Examples:
-  /review PROJ-123
-  /review PROJ-456
+  /review BP-24826
+  /review 29293
+  /review pr 29710
 
 ### Step 1: Fetch and find the branch
-Run: git fetch origin
-Run: git branch -r | grep {ticket-number}
-This finds the full branch name from just the ticket number.
-If multiple branches match, list them and ask which one to review.
-If no branches match, report "No remote branch found matching {ticket-number}" and stop.
+
+**If prefixed with `pr`:** Go directly to Bitbucket API to get PR #{pr-number} metadata (source branch, target branch, state). Skip branch grep.
+
+**Otherwise (ticket number, the default):**
+
+1. Run: `git fetch origin`
+2. Run: `git branch -r | grep -i {ticket-number}` to find the branch
+3. If multiple branches match, list them and ask which one to review.
+4. If no branch found, fall back to Bitbucket API:
+   - Search PRs: `GET /rest/api/1.0/projects/CEN/repos/centro-media-manager/pull-requests?state=OPEN&limit=25` and grep titles/branches for {ticket-number}
+   - If no open PR found, search `state=MERGED&limit=50` and grep for {ticket-number}
+   - Pick the most recent matching PR (prefer OPEN over MERGED)
+   - Extract source branch, target branch, and commits from the PR metadata
+   - For merged PRs with deleted branches, verify commits exist locally via `git cat-file -t`
 
 ### Step 2: Auto-detect the target branch
 Find what the branch was forked from by checking merge-base against common targets:
@@ -161,3 +177,14 @@ Verdict must include:
 2. **HIGH/MEDIUM issues** (if any): What exactly is broken, which file/line, what the user loses or what degrades in production
 3. **Fix**: Exact code change to resolve each HIGH/MEDIUM issue
 4. **Remaining risk**: After fixes, anything else to watch for in production
+
+### PR Link & Comment
+
+At the very end, ALWAYS:
+
+1. **Look up the PR**: Use the Bitbucket API to find the PR number for the branch.
+2. **Show the link**: Output `**PR**: https://stash.centro.net/projects/CEN/repos/centro-media-manager/pull-requests/{pr-number}`
+3. **Draft a PR comment**: Write a concise review comment following the user's PR comment style preferences (bite-sized, plain human language, no headers/categories/labels/notes sections, only flag issues with a one-liner + before/after fix). Show the comment to the user for approval before posting.
+4. **Post the comment**: After user approval, POST the comment to the Bitbucket PR via API: `POST /rest/api/1.0/projects/CEN/repos/centro-media-manager/pull-requests/{pr-number}/comments` with `{"text": "..."}`.
+
+This is MANDATORY. Never omit the PR link or PR comment.

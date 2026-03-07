@@ -1,9 +1,9 @@
 When the user provides a ticket (XML, screenshot, copy-paste, any format):
 
 ## Step 1: Extract ticket info
-- Extract the ticket ID (e.g., PROJ-123) and title from whatever format was provided
+- Extract the ticket ID (e.g., BP-29293) and title from whatever format was provided
 - Derive branch name: `{TICKET_ID}_{snake_cased_short_title}`
-  - Example: PROJ-123 "Get Line Items Tool" -> `PROJ-123_get_line_items_tool`
+  - Example: BP-29293 "Get Line Items Tool" -> `BP-29293_get_line_items_tool`
 
 ## Step 2: Git setup (run without asking for confirmation)
 1. Check working tree: `git status --porcelain`
