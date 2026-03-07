@@ -2,8 +2,9 @@
 # pre-push hook - runs checks before allowing push to remote
 # Deployed by claude-os bootstrap to all repos
 
+echo "Running pre-push checks..."
+
 # Load asdf for correct Ruby/Node versions
-# Support both standard install and Homebrew locations
 if [ -f "$HOME/.asdf/asdf.sh" ]; then
     . "$HOME/.asdf/asdf.sh"
 elif [ -f "/opt/homebrew/opt/asdf/libexec/asdf.sh" ]; then
@@ -14,11 +15,49 @@ fi
 
 FAILED=0
 
-# 1. Claude OS tests
+# 1. Branch name check (no slashes - breaks Docker tags in Harness CI)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$BRANCH" == *"/"* && "$BRANCH" != "main" && "$BRANCH" != "dev" ]]; then
+    echo "FAIL: Branch name '$BRANCH' contains slashes. Slashes break Docker tag builds in Harness CI."
+    echo "Rename with: git branch -m $(echo $BRANCH | tr '/' '-')"
+    exit 1
+fi
+
+# 2. Claude OS tests
 echo "Running claude-os tests..."
 bash "$HOME/claude-os/tests/test.sh" || FAILED=1
 
-# 2. RuboCop (if Gemfile has rubocop)
+# 3. TypeScript type check (if frontend/ exists)
+if [ $FAILED -eq 0 ] && [ -f frontend/tsconfig.build.json ]; then
+    echo "TypeScript type check..."
+    cd frontend && npx tsc -p tsconfig.build.json --noEmit && cd .. || { echo "FAIL: TypeScript type check"; FAILED=1; }
+fi
+
+# 4. Frontend lint (if frontend/ exists)
+if [ $FAILED -eq 0 ] && [ -d frontend ]; then
+    echo "Frontend lint..."
+    cd frontend && npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 && cd .. || { echo "FAIL: Frontend lint"; FAILED=1; }
+fi
+
+# 5. Unit tests (if frontend/package.json exists)
+if [ $FAILED -eq 0 ] && [ -f frontend/package.json ]; then
+    echo "Unit tests..."
+    cd frontend && npm test && cd .. || { echo "FAIL: Unit tests"; FAILED=1; }
+fi
+
+# 6. Full frontend build (if frontend/ exists)
+if [ $FAILED -eq 0 ] && [ -d frontend ]; then
+    echo "Frontend build..."
+    cd frontend && npm run build && cd .. || { echo "FAIL: Frontend build"; FAILED=1; }
+fi
+
+# 7. Python lint (if Makefile has lint target)
+if [ $FAILED -eq 0 ] && grep -q '^lint:' Makefile 2>/dev/null; then
+    echo "Python lint..."
+    make lint || { echo "FAIL: Python lint"; FAILED=1; }
+fi
+
+# 8. RuboCop (if Gemfile has rubocop)
 if [ $FAILED -eq 0 ] && grep -q 'rubocop' Gemfile 2>/dev/null; then
     if git rev-parse --verify origin/dev >/dev/null 2>&1; then
         BASE="origin/dev"
@@ -31,7 +70,6 @@ if [ $FAILED -eq 0 ] && grep -q 'rubocop' Gemfile 2>/dev/null; then
     CHANGED_RB=$(git diff --name-only "$BASE"...HEAD -- '*.rb' 2>/dev/null | grep -v '^vendor/')
     if [ -n "$CHANGED_RB" ]; then
         COUNT=$(echo "$CHANGED_RB" | wc -l | tr -d ' ')
-        echo ""
         echo "Running RuboCop on $COUNT changed Ruby file(s)..."
         echo "$CHANGED_RB" | xargs bundle exec rubocop --parallel || FAILED=1
     fi
@@ -42,3 +80,6 @@ if [ $FAILED -ne 0 ]; then
     echo "Push blocked: checks failed. Fix the issues and try again."
     exit 1
 fi
+
+echo "All checks passed. Pushing..."
+exit 0
