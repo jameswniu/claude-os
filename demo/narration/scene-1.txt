@@ -1,1 +1,0 @@
-Claude Code is powerful out of the box... But every session starts fresh. It doesn't remember your team's rules. Your project's architecture. Or the mistakes it made yesterday... ClaudeOS fixes that.

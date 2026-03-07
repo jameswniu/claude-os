@@ -1,1 +1,0 @@
-Claude learns from its mistakes. When it tries to use the gh CLI... which isn't installed... that gets logged. After multiple occurrences across sessions, the pattern gets recognized... and promoted to a permanent rule. From that point on... Claude never makes that mistake again. The progression is... session log, to recognized pattern, to permanent rule.
