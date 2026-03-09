@@ -4,16 +4,16 @@ An enterprise standards personalized assistant for Claude Code. A layered contex
 
 ## What Teams Are Asking
 
-| Department | # | Top 3 Pain Points | Evals (Time Saved) |
-|------------|---|-------------------|---------------------|
-| **Engineering** | 42 | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" | Review time (30-50%) / Debug-to-fix time (20-40%) / Refactoring time (25-50%) |
-| **Data & Analytics** | 36 | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" | Time-to-resolution (30-50%) / Query gen time (50-70%) / Test scaffolding time (50-80%) |
-| **Product & Design** | 24 | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" | First-draft time (50-70%) / Impact analysis time (40-60%) / Summarization time (70-85%) |
-| **IT & ProdOps** | 24 | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" | Incident triage time (40-60%) / IaC gen time (40-60%) / Investigation time (50-75%) |
-| **Ad Operations** | 23 | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" | Troubleshooting time (30-50%) / Validation time (50-70%) / Report gen time (50-70%) |
-| **Sales** | 45 | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" | RFP drafting time (50-70%) / Summarization time (60-80%) / Analysis time (50-65%) |
-| **Investment & Buying** | 31 | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" | Calculation time (50-70%) / Audit time (60-80%) / Reconciliation time (60-80%) |
-| **Integrated Planners** | 23 | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" | Plan drafting time (40-60%) / Scenario analysis time (50-70%) / Research time (50-70%) |
+| Department | Top 3 Pain Points | Evals (Time Saved) |
+|------------|-------------------|---------------------|
+| **Engineering** | "Review this 20-file PR for regressions" / "Fix the failing tests in this branch" / "Refactor this service to use the new API pattern" | PR reviews 2-3x faster / Debug-to-fix cycle cut in half / Major time savings on refactors |
+| **Data & Analytics** | "Debug this data pipeline failure" / "Write a query to reconcile these two datasets" / "Generate tests for this BI transformation" | Significant reduction in triage time / Query generation: hours to minutes / Test scaffolding up to 80% faster |
+| **Product & Design** | "Draft acceptance criteria from this Jira epic" / "What's the blast radius of removing this field?" / "Summarize what shipped this sprint from the PR list" | First drafts in minutes instead of hours / Impact analysis up to 60% faster / Sprint summaries: nearly instant |
+| **IT & ProdOps** | "Why is this deployment failing? Here are the logs" / "Generate Terraform for this new service" / "Trace this incident across these three log files" | Incident triage 2-3x faster / IaC generation: hours to minutes / Cross-log investigations significantly shorter |
+| **Ad Operations** | "Why is this campaign showing zero impressions?" / "Validate these tag configs against the spec" / "Generate a report comparing these two ad server outputs" | Major reduction in troubleshooting time / Validation up to 70% faster / Report generation: minutes not hours |
+| **Sales** | "Draft a technical response to this RFP section" / "Summarize this product update for a client meeting" / "Build a competitive comparison from these feature lists" | RFP drafts 2-3x faster / Summarization: nearly instant / Competitive analysis up to 65% faster |
+| **Investment & Buying** | "Calculate pacing for this campaign across these channels" / "Flag any budget overages in this media plan" / "Reconcile this billing report against the insertion order" | Pacing calculations: hours to minutes / Budget audits up to 80% faster / Reconciliation significantly faster |
+| **Integrated Planners** | "Build a media plan template from this brief" / "Compare reach and frequency across these three scenarios" / "Pull performance benchmarks for this vertical" | Plan drafting up to 60% faster / Scenario comparison 2-3x faster / Research: major time savings |
 
 Claude Code can do all of this out of the box. The memory system below makes it do it *consistently*, with your team's rules, patterns, and conventions baked in.
 
