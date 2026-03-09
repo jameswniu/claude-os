@@ -8,7 +8,7 @@ Source: (internal URL)
 **Additional Contributors**|   
 **Informed**|   
 **Objective**|  Build and integrate an AI Code Review solution to enable Apps Engineering to receive automated feedback on pull requests. The solution should ensure high-quality feedback that addresses security, potential bugs, and performance issues, while adhering to the organization's best practices.  
-**Due date**|   
+**Due date**|  TBD  
 **Key outcomes**| 
 
   * Solution is available to all engineers in Apps Engineering
@@ -54,8 +54,4 @@ Set-up Harness Pipeline to run Code Reviewer| | | |
 Align on trigger mechanism (manual vs automated)| | | |   
 Create integration guide for onboarding repositories| | | |   
 Investigate how to enable the agent to acquire context (best practices, API docs, etc.) of dependencies| | | |   
-Analyze previous code reviews to identify best practices to bake into Claude.md| | | |   
-  
-# 📊 Success Metrics
-
-  *
+Analyze previous code reviews to identify best practices to bake into Claude.md| | | |

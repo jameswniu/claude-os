@@ -2,11 +2,17 @@
 
 Source: (internal URL)
 
-**📣 Announcement of the Week**  
-💡 **Tip:** [Using Bash mode]((internal URL)) - Learn the most efficient way to run commands with Claude Code
+💡 **Tips of the Week**
 
-**📣 Announcement of the Week**  
-💡 **Tip:** [Using Bash mode]((internal URL)) - Learn the most efficient way to run commands with Claude Code
+  * [Installing the Atlassian MCP in Claude Code]((internal URL))
+
+  * [Claude Code with Chrome]((internal URL))
+
+💡 **Tips of the Week**
+
+  * [Installing the Atlassian MCP in Claude Code]((internal URL))
+
+  * [Claude Code with Chrome]((internal URL))
 
 Welcome to Basis Applications Engineering ClaudeHub! Your central resource for onboarding to Claude Code. This page provides everything you need to get started, from official documentation to our custom Plugin Marketplace and Quick Start resources.
 
@@ -190,7 +196,7 @@ Structured resources to help you get productive with AI tools quickly:
 
 * * *
 
-## 📖 Official Claude Code Documentation
+## 📖 Claude Code Documentation
 
 **🚀 Getting Started**
 
@@ -280,3 +286,13 @@ Internal Tools
   * [API Wrapper for Planning Service in CMM]((internal URL)) | 
 
 * * *
+
+##  AI Council 
+
+_The Apps Engineering AI Dev Tools Team is a group dedicated to the research and enablement of AI tools and technologies that accelerate development efficiency across the Apps Engineering organization. We serve as the connective tissue between emerging AI capabilities and practical engineering workflows, ensuring our teams are equipped with the knowledge, resources, and best practices to leverage AI tools effectively._
+
+<(internal URL) \- Confluence Space [AEAID]((internal URL))
+
+Curious what the council is working on? Take a look at our in-progress tasks 
+
+<(internal URL))%20and%20status%20in%20(%22In%20Progress%22)%20ORDER%20BY%20created%20DESC>

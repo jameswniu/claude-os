@@ -293,3 +293,174 @@
   - Keep comments bite-sized, plain human language
   - Only flag issues with one-liner + before/after fix
   - No headers, categories, impact labels, regression dumps, or notes sections
+
+## 2026-03-03 — BP-29293 GetLineItemsTool PR Work
+
+- Working on PR #30694 in centro-media-manager (`BP-29293_get_line_items_tool` branch) — adding GetLineItemsTool to MCP server
+- Confusion about fix location: initially suggested changes in wrong repo (media-strategy-generator #212), corrected to keep changes scoped to CMM PR #30694
+- Updated PR title and description to follow Problem/Fix/Tests format, scoped strictly to ticket
+- Discovered Compass UI lag in CMM while testing MCP tools — suspected performance issue when MCP runs within CMM (works fine standalone)
+- Posted Slack message to team about the lag issue, tagged Kyle and Robin, linked PR #30694 as context
+- Added 6 PR reviewers including Kyle
+- Added lag observations as PR comments with relevant links, separate from main PR scope
+- Ran tests to verify no regression on existing MCP tools before updating PR
+- Decision: lag fix should land first in media-strategy-generator repo before this PR merges
+- Reviewed BP-29710 and BP-29291 via /review command
+- Posted PR comments with links for MCP-related findings
+- Drafted concise Slack message for Lavender Tangerine channel about lag issue
+- New rule added: no double dashes (`--`) in any outgoing human communication (PR comments, Slack, etc.)
+- Clarification: `/review <number>` always refers to ticket number (BP-XXXXX), not the PR number
+- Hit rate limits multiple times during session, switched accounts to continue
+- Investigated stashed git changes and Harness CI build failure on BP-29293 PR (build was passing before, needed to diagnose regression)
+- Provided PR link for BP-29293 GetLineItemsTool work
+- Fixed RuboCop Style/SymbolProc offense in spec (commit ab04f43)
+- Added lint check (RuboCop) to git pre-push hook to catch style offenses before pushing
+- Reviewed BP-29710 and BP-29461 PRs via /review command
+- Multiple PR comment iterations following plain-language style rules
+- Continued scoping BP-29293 PR work, confirmed PR #30694 title/description
+
+## 2026-03-04 — BP-29293 Session Logging & Continued PR Work
+
+- Appended session log entry for 03-03 work (BP-29293 GetLineItemsTool PR, reviews, RuboCop fix, pre-push hook)
+- Continued work on BP-29293 GetLineItemsTool branch (clean git status, last commit ab04f43 fixing RuboCop SymbolProc offense)
+- Fixed flaky TaskManagement::Task#due_not_in_past spec (commit 2d80a2b)
+- Traced CI build failure to unrelated flaky spec, not BP-29293 changes
+- Used git blame to identify origin of flaky spec, posted PR comment tagging Jacob Merick to take a look
+- Added Jacob Merick as PR reviewer
+- Learned: Bitbucket PUT on PR title/description wipes reviewers if not included in payload. Must GET full PR first and carry forward all fields.
+- Rule added to MEMORY.md and .claude/CLAUDE.md: always include `reviewers` in PUT payload when updating PRs
+- Hit rate limits repeatedly, used /rate-limit-options to manage
+- Applied Julian's PR comment: removed Search execution strategy entries from EXECUTION_STRATEGY_TO_CHANNEL hash in get_line_items_tool.rb (Search::GoogleAds::ExecutionStrategy and Search::ExecutionStrategy no longer mapped)
+- Quick scoped change to PR #30694 without full re-test, per user request
+- Discussed running skaffold dev for local Kubernetes services but didn't proceed
+- Copied /ui, /review, /vid slash commands and automation .sh scripts to Downloads for sharing
+- Copied plist files for this repo to Downloads
+- Managed UI smoke test artifacts: replaced with -latest suffixed copies for easy access
+- Attached claude-os artifacts (commands, scripts, plists) to Confluence ClaudeOS Beta page (1656062195)
+- Added disclaimers to Confluence page for claude-os documentation
+- Spun up CMM UI on :3001 for smoke testing
+- Investigated lag issue: confirmed caused by spinning up both :3001 and MCP server simultaneously
+- Noticed MCP prefix not stripped from basis_core MCP server tool names
+- Latest PR failing on Harness CI, investigated build failure
+- Copied claude-os local repo to Downloads
+- Discussed publishing claude-os as a branch on the repo (team wanted it as a branch, not standalone)
+- Iterated on Confluence ClaudeOS Beta page: made attached scripts/artifacts more visible and explicit, added Q&A entry ("How can I have the repo? DM James")
+- Added prompt template personalization guidance to Confluence page (run once, tailor to team/repo, ask Claude to update)
+- Reviewed BP-29619 via /review command, posted PR comment
+- Reviewed BP-29856 via /review command
+- Moved ClaudeOS Confluence page to be in line with ClaudeHub (sibling, not child)
+- Discussion on approval language in PR comments: "should I approve" vs "should we approve" (individual vs collective)
+- Edited PR comment and checked test plan boxes in PR description
+- Created second ClaudeOS Confluence page with polished, beginner-friendly layout and visuals
+- Discussed Datadog dashboards to add for monitoring
+- Connected Datadog APM via browser for observability setup
+- Connected PagerDuty access per Julian's guidance
+- Iterated on Confluence page visual appeal and impact-first presentation
+- Drafted ProdOps ticket (POS-16839) for Datadog APM/Logs access: title, description, access level, permission granters (Kyle, Julian), email to prodops@basis.com CC Kyle and Julian
+- Linked POS-16839 ticket in documentation
+- Explored Datadog APM service page for media-strategy-generator production
+- Wrote Datadog crash course and saved as topic file (`datadog-crash-course.md`): APM traces, Logs, dashboards, debugging flow
+- Clarified Datadog dashboards vs APM/Logs distinction for user's on-call use case
+- Reformatted Datadog crash course: closed margins, frontloaded impact, hit all neurons
+- Discussed Confluence table rendering (why only tables increase in width)
+- Confirmed Confluence script attachments are still present and scrapable via API with Claude Code
+- Drafted vivid, human-sounding comment on a post as James
+- Explained `.claude/projects/{project}/memory/` scope to colleague: per-user, per-repo, with auto memory example
+- Explored Claude Code settings.json scoping: enterprise (`/Library/Application Support/ClaudeCode/`), user (`~/.claude/settings.json`), project (`.claude/settings.json`), local (`.claude/settings.local.json`)
+- Tested settings.json auto-approve behavior across scopes: confirmed `.claude/settings.json` works, repo-root `settings.json` does not
+- Attempted placing settings.json at repo root level (outside `.claude/`) — confirmed it is not recognized by Claude Code
+- Investigated `.claude/worktrees/` folder purpose: used by EnterWorktree tool for parallel git worktree sessions
+- Discussed why `.claude/` is the required location for settings vs repo root (Claude Code convention, not configurable)
+- Identified unapproved tool commands for testing settings auto-approve behavior
+- Tested permission auto-approve behavior with touch, rm, ls, whoami across settings scopes (root settings.json, .claude/settings.json, .claude/settings.local.json)
+- Discovered some shell commands (whoami) auto-run regardless of allowlist configuration
+- Systematic testing: added/removed specific commands (touch, rm, ls) from different settings files to verify which scope controls auto-approve
+- Confirmed root-level settings.json (outside .claude/) is not recognized by Claude Code for permission auto-approve
+- Investigated which Bash tool permissions require explicit allowlisting vs always auto-approve
+
+## 2026-03-05 — Settings.json Scoping Deep Dive (cont.)
+
+- Continued systematic testing of Claude Code settings.json permission auto-approve across scopes
+- Removed `ls` from allowlists to test whether auto-approve still triggers (confirmed it does not auto-approve without allowlist entry)
+- Tested `cp` command: always prompts regardless of allowlist, identified as a command that may need explicit allowlisting
+- Added `cp` to allowlist, confirmed it then auto-approves
+- Tested `echo` and `bundle exec ruby` commands across different settings scopes
+- Tested placing settings.json at repo root (inline with `.claude/` folder, not inside it) — confirmed it is NOT recognized by Claude Code
+- Removed allowlist from all other locations, placed only in `.claude/settings.json` — confirmed it works (auto-approves)
+- Moved allowlist from `.claude/settings.local.json` to `.claude/settings.json` to test project-level (checked-in) vs local (gitignored) scoping
+- Key finding: both `.claude/settings.json` and `.claude/settings.local.json` work for auto-approve; repo-root `settings.json` does not
+- Tested `~/.claude/settings.local.json` (user-level local) — confirmed NOT recognized by Claude Code
+- Confirmed settings.json recognized in exactly 3+1 locations: `.claude/settings.json` (project), `.claude/settings.local.json` (project local), `~/.claude/settings.json` (user), enterprise managed-settings.json
+- Confirmed CLAUDE.md can exist in infinite locations (any subdirectory, loaded on demand); settings.json is fixed 3+1 locations only
+- Researched LinkedIn post showing CLAUDE.md in multiple directories — validated infinite placement is supported by Claude Code architecture
+- Cleaned up test settings files: removed allowlists from all locations, deleted unused settings files
+- Confirmed `/init` generates `.claude/settings.local.json` (inside `.claude/`, not repo root)
+- Tested auto-approve prompt flow: pressing "yes" on a tool prompt auto-saves to `.claude/settings.local.json`
+- Documented `.claude/settings.json` security risk: shared repo-wide CLI execution permissions that silently auto-run commands
+- Investigated PR #30710 incident: colleague un-ignored `.claude/` directory without asking why it was gitignored, exposing settings.json to shared repo
+- Documented full incident analysis in `claude-code-settings-security-incident.md` topic file: every PR comment, technical analysis of CLAUDE.md (low risk AI context) vs settings.json (high risk CLI execution)
+- Key distinction: CLAUDE.md = AI orchestration layer (low risk, context only); settings.json = CLI execution/tool permissions layer (high risk, silently runs commands)
+- Posted public comments calling out the security risk of shared settings.json and lack of communication before making repo-wide changes
+- Sent direct DM about the incident with constructive framing (flag risk, ask for process)
+- Renamed Confluence pages: ClaudeOS (Beta) → ClaudeOS (Draft), ClaudeOS → ClaudeOS (Preview), reorganized under ClaudeHub
+- Investigated PR #30710 merge timing (when colleague merged the .claude/ un-ignore change)
+- Researched Claude Code auto-gitignore behavior: confirmed `*.local.*` files (settings.local.json, CLAUDE.local.md) are auto-ignored when created; `settings.json` is NOT auto-ignored (intended to be shared)
+- Expanded `claude-code-settings-security-incident.md` topic file with full PR comment thread, CLAUDE.md infinite placement vs settings.json fixed locations, and note that CLAUDE.md has been at repo root (not inside .claude/) due to `/init` command behavior
+- Set up `rm -i` alias guard across all shell contexts (zsh, bash) for safe deletion prompts
+- Tested rm guard with file creation/deletion flow
+- Iterated on rm guard prompt format: added explicit (y/n) suffix, required typing "y" explicitly
+- Reverted rm guard changes after testing
+- Reviewed BP-29292 via /review command
+- Generated standalone HTML security incident report from `claude-code-settings-security-incident.md` for sharing
+- Iterated on HTML report layout: side-by-side comparison panels (settings.json vs CLAUDE.md), visual styling matching ClaudeHub aesthetics
+- Discussed making HTML report publicly accessible
+- Considered posting security incident articles as PR #30710 comments
+- Discussed dropping incident report in team Slack chat to Ryan and Arturo
+- Planning next PR to reverse the .claude/ un-ignore change from PR #30710
+- Iterated on HTML report column width: fixed narrow columns on remaining page sections
+- Continued work on BP-29293 GetLineItemsTool branch: removed unused Search ExecutionStrategies, fixed flaky spec, fixed RuboCop offense, added tool to MCP server
+- Discussed adding visual architecture diagrams to claude-os GitHub repo (https://github.com/jameswniu/claude-os)
+- Discovered colleague deleted orphan tags and moved UI test evidence to a branch (BP-29293-ui-test-evidence) instead
+- Investigated whether orphan branches can host artifact tags — confirmed tags can point to any commit, but colleague chose branch over tags
+- Discussed consensus for uploading artifacts to cloud and linking them (colleague's Confluence approach vs git-based artifacts)
+- Investigated why Harness CI pipeline passed unexpectedly on BP-29293 branch
+
+## 2026-03-06 — BP-29704 Prompt Migration & Evals Collaboration
+
+- Coordinated with Mitravasu Prakash on BP-29704: move hardcoded intent classification prompt to Langfuse
+- Agreed on scope split: James ships PR for prompt migration, evals follow-up after Mitravasu/John align on approach
+- Discussed prompt consumption pattern: use `utils/prompts.py` functions to fetch from Langfuse (matching existing prompt workflow)
+- Volunteered to help with prompt injection eval dataset on Langfuse (Harmful Action Prevention, Instruction Override Resistance, Prompt Disclosure Prevention evaluators)
+- Asked Mitravasu about lm-evaluation-harness (EleutherAI) usage and human evals — clarified it's for base model benchmarking not agent tasks, and manual QA (Amity) / Product (Dalyn) serve as human evaluators
+- Investigated learning loop scripts: confirmed scripts should run within their own repos only (CMM scripts for CMM, MSG scripts for MSG), not cross-repo from claude-os
+- Debugged learning script execution scope issue
+- Continued work on BP-29293 GetLineItemsTool branch (on `BP-29293_get_line_items_tool`)
+- Discussed reinforcement learning in Claude Code — clarified it uses logged conversation context via learning loop scripts (distill/promote), not built-in RL
+- Discussed how memory/learning loop system works: dynamic reinforcement through log distillation and MEMORY.md promotion, not static weights
+- Verified all launchd plists are repo-scoped: CMM plists only affect CMM, MSG plists only affect MSG
+- Confirmed claude-os has no running plists and no dependencies on the learning loop automation of the two repos
+- Verified all 10 launchd plists end-to-end: confirmed scripts and plists are fully decoupled from claude-os repo
+- Ran /insights to review conversation patterns and tool usage
+- Investigated missing bootstrap artifacts in MSG repo, cross-checked with claude-os templates and CMM config
+- Fixed bootstrap gaps: missing files that should have been created by earlier bootstrap run
+- Investigated PR #30710 fallout: colleague's change un-ignored `.claude/` folder, assessed impact on CLAUDE.md naming convention
+- Evaluated renaming `.claude/CLAUDE.md` to `CLAUDE.local.md` across CMM, MSG, and claude-os to align with auto-gitignore behavior (`*.local.*` files are auto-ignored by Claude Code)
+- Scoped full dependency chain for the rename: CLAUDE.md references, bootstrap scripts, checkpoint scripts, learning loop scripts, and any hardcoded paths
+- Investigated ClaudeOS Preview Confluence page (1657110687) for editing needs
+- Executed step-by-step edits on ClaudeOS Confluence page content
+- Continued BP-29293 GetLineItemsTool work on `BP-29293_get_line_items_tool` branch
+- Discussed rate limit options and usage for Claude Code session
+- Worked on updating architecture diagrams in claude-os repo after config/rename changes
+- Discussed pushing claude-os repo changes, regenerating GitHub diagrams, then updating Confluence with new diagrams
+- Debugged Claude browser extension connectivity issue
+
+## 2026-03-07
+
+- Reviewed Slack messages and provided suggestions for Kyle
+- Helped Kyle with page-by-page prioritized suggestions, reformatted explanations by priority level
+- Provided full file paths for relevant files under the CMM repo
+
+## 2026-03-08
+
+- Verified plists and learning loop .sh scripts running properly and separately in CMM and MSG repos; confirmed claude-os should only have .sh templates, no plists
+- Continued work on BP-29293 GetLineItemsTool branch (`BP-29293_get_line_items_tool`): modifications to `tool_authenticator.rb`

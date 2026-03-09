@@ -45,6 +45,9 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - **Flagging theoretical issues**: Don't flag issues that can't happen in practice (e.g., hypothetical future scenarios). Focus on real, actionable findings.
 - **Force-updating git tags**: Orphans the old commit -- files not carried forward are lost. When moving artifacts between refs, verify all linked files exist on the new ref before pushing.
 - **PR comment style**: Violated Feb 27 (BP-29423). Iterated 4 times from structured report to plain language. Must keep bite-sized: issue + before/after fix + whether rest looks good. No headers, categories, or impact labels.
+- **Non-semver git tags**: Broke CMM release automation (which expects only semver tags). Arturo deleted the offending tag. Never use tags for artifacts in repos with semver release automation. Use dedicated artifact branches instead.
+- **Wrong-repo scoping**: When multiple repos are involved (e.g., CMM + media-strategy-generator), always confirm which repo a change belongs to before suggesting edits.
+- **Wiping PR reviewers**: Bitbucket PUT replaces the entire PR object. Always GET the full PR first and include `reviewers` (and all other fields) in the PUT payload when updating title/description.
 ## User Preferences
 
 - Hands-off, delegation-oriented. Issues a command and lets Claude run autonomously.
@@ -54,7 +57,8 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - No verdicts in PR comments. No unsolicited edits. No em dashes in comments.
 - PR comments must include direct Bitbucket links when referencing tags, branches, or other repo resources (not just plain text names)
 - Interested in pre-push hooks or CI gates to enforce test runs before pushing
-
+- No verdicts in PR comments. No unsolicited edits. No em dashes in comments. No double dashes (--) in outgoing human communication (PR comments, Slack messages, etc.).
+- Never add `Co-Authored-By` trailers to git commits.
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in the memory directory. Zero tokens until read.
@@ -69,11 +73,19 @@ Reference docs in the memory directory. Zero tokens until read.
 - `apps-engineering-team.md` -- reference material
 - `archived-git-branching-and-pull-request-guidelines.md` -- historical reference for legacy branching rules
 - `claude-code-pricing.md` -- reference material
+- `claude-code-settings-security-incident.md` -- reference material
 - `claudehub.md` -- when onboarding to Claude Code or finding internal resources
+- `claudeos-beta.md` -- reference material
+- `claudeos.md` -- reference material
 - `code-reviews.md` -- when reviewing PRs or discussing review practices
+- `datadog-compass.md` -- reference material
+- `datadog-crash-course.md` -- reference material
+- `git-fundamentals.md` -- reference material
 - `informal-tech-mentorship.md` -- when mentoring or structuring knowledge transfer
 - `plugin-marketplace.md` -- reference material
+- `problem-2-semantic-versioning.md` -- reference material
 - `scalable-applications-and-architecture.md` -- when designing services or making architecture decisions
+- `shell-basics.md` -- reference material
 - `tickets-branching-and-pull-requests-oh-my.md` -- when setting up git workflows or branching strategies
 - `tips-bash-mode.md` -- reference material
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
@@ -97,7 +109,22 @@ Reference docs in the memory directory. Zero tokens until read.
 - EXAMPLES/ files are templatized (placeholders, no project-specific URLs/tickets/architecture); checkpoint only syncs memory + topics, not config templates
 - Sync scripts derive search queries dynamically from MEMORY.md + CLAUDE.md (no hardcoded queries, relevance filters, or exclude terms)
 - Sync scripts exit 2 (not 0) when credentials missing, so callers distinguish skip from success
-
+- **Template/docs repo only — NOT a runtime dependency.** Audited 2026-03-06: all 10 learning loop jobs run with zero references to ~/claude-os.
+- `~/claude-os/scripts/` and `~/claude-os/launchd/` do NOT exist; templates live inside `<repo-name>/.claude/scripts/`
+- `~/claude-os/output/` — 27 stale historical log files, no longer written to
+### Learning Loop (fully decoupled, verified 2026-03-06)
+- 10 scripts (1-5 x 2 projects) live in `<project>/.claude/scripts/`, use `LOG_DIR="$SCRIPT_DIR/../logs"` (project-local)
+- 10 plists at `~/Library/LaunchAgents/com.claude.{centro-media-manager,media-strategy-generator}.{log,distill,promote,sync-confluence,sync-notion}.plist`
+- Plist intervals: log=3600s, distill=86400s, promote=604800s, sync-confluence=86400s, sync-notion=86400s
+- Scripts run in order (1→2→3→4→5); scripts 1-3 need `unset CLAUDECODE` before `claude -p`
+- Sync scripts derive search queries dynamically from MEMORY.md + CLAUDE.md (no hardcoded queries)
+- Conceptual model: dynamic reinforcement through log distillation (1→2→3) and MEMORY.md promotion, not static weights or built-in RL
+- **Dependency**: `html2text` Python module required by 4-sync-confluence.sh (installed via `pip3 install --break-system-packages html2text`)
+### Manual-only utilities (not scheduled)
+- **5-checkpoint.sh** (MSG only) — pushes live config into claude-os templates. Run via `checkpoint` alias.
+- **6-bootstrap.sh** (MSG only) — pulls templates from claude-os into a new project
+### Other
+- Team wants claude-os published as a branch on existing repo, not standalone
 ## UI Smoke Testing
 
 - Automated UI smoke tests via browser extension on localhost
@@ -128,6 +155,21 @@ Reference docs in the memory directory. Zero tokens until read.
 - `scalable-applications-and-architecture.md` -- reference material
 - `tips-bash-mode.md` -- reference material
 - `code-reviews.md` -- reference material
+- `/.claude/` — Partially gitignored (scripts/, logs/, commands/, worktrees/ ignored; settings.json tracked)
+- `/.claude/CLAUDE.local.md` — Personal instructions, auto-gitignored by Claude Code (`*.local.*` pattern)
+- `/.claude/worktrees/` — Used by EnterWorktree tool for parallel git worktree sessions
+- `~/.claude/commands/review.md` — /review slash command (user-level, available across repos)
+- `~/.claude/commands/ticket.md` — /ticket slash command (user-level, available across repos)
+- Settings scoping (highest to lowest priority): `.claude/settings.local.json` (personal, gitignored) > `.claude/settings.json` (project, checked in) > `~/.claude/settings.json` (user-level) > `/Library/Application Support/ClaudeCode/managed-settings.json` (enterprise)
+- Root-level `settings.json` (outside `.claude/`) is NOT recognized by Claude Code
+- `~/.claude/settings.local.json` is NOT recognized by Claude Code (verified by testing)
+- Claude Code auto-gitignores `*.local.*` files (`settings.local.json`, `CLAUDE.local.md`) when created; `settings.json` is NOT auto-ignored (intended to be shared)
+- `/init` generates `.claude/settings.local.json`; pressing "yes" on a tool prompt also auto-saves the allowlist entry there
+- Some shell commands (e.g., `echo`, `cat`, `whoami`) auto-approve regardless of allowlist configuration; `ls` does NOT (requires explicit allowlisting)
+- Commands with `$()` substitution always prompt regardless of allowlist
+- CLAUDE.md can exist in any subdirectory (infinite locations, loaded on demand); settings.json is 3 fixed locations only
+- **Security**: CLAUDE.md = AI context (low risk); settings.json = CLI execution permissions (high risk, silently auto-runs commands)
+- PR #30710 incident: Jon un-ignored `.claude/` without asking why it was ignored. See `claude-code-settings-security-incident.md`
 ## Artifact Management
 
 - Never store test artifacts, GIFs, or demo recordings on PR branches (merges into main)
