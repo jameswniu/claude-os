@@ -1,6 +1,6 @@
 #!/bin/bash
-# 5-checkpoint.sh — Snapshot live config/memory files into claude-os <repo-name>
-# Usage: bash ~/claude-os/<repo-name>/.claude/scripts/5-checkpoint.sh  (run from any project dir)
+# 5-checkpoint.sh — Snapshot live config/memory files into claude-os {<repo-name>}
+# Usage: bash ~/claude-os/{<repo-name>}/.claude/scripts/5-checkpoint.sh  (run from any project dir)
 #
 # Reads from (running project):
 #   - $PROJECT/.claude/CLAUDE.local.md         Personal rules with promoted learnings
@@ -9,14 +9,14 @@
 #   - $MEM/*.md (topic files)               Confluence-synced reference docs
 #
 # Writes to (filtered templates):
-#   - <repo-name>/.claude/CLAUDE.local.md                                Universal rules, project values replaced
-#   - .claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md    Filtered + situation-based topic index
-#   - .claude/projects/-Users-<user-name>-<repo-name>/memory/*.md          Distilled, 1:1 with source
-#   - .claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md  Copy as-is
+#   - {<repo-name>}/.claude/CLAUDE.local.md                                Universal rules, project values replaced
+#   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/MEMORY.md    Filtered + situation-based topic index
+#   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/*.md          Distilled, 1:1 with source
+#   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/history/logs.md  Copy as-is
 
 CLAUDE_OS="$HOME/claude-os"
-REPO_TMPL="$CLAUDE_OS/<repo-name>"
-MEM_TMPL="$CLAUDE_OS/.claude/projects/-Users-<user-name>-<repo-name>/memory"
+REPO_TMPL="$CLAUDE_OS/{<repo-name>}"
+MEM_TMPL="$CLAUDE_OS/{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory"
 PROJECT=$(pwd)
 SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
@@ -381,7 +381,7 @@ topic_hints = {
     'claudehub.md': 'when onboarding to Claude Code or finding internal resources',
 }
 
-# Get actual topic files in <repo-name>
+# Get actual topic files in {<repo-name>}
 topic_files = sorted([
     f for f in os.listdir(ex_memory)
     if f.endswith('.md') and f != 'MEMORY.md'
@@ -468,7 +468,7 @@ fi
 # 7. Commit and push
 # ============================================================
 cd "$CLAUDE_OS"
-git add '<repo-name>/' '.claude/'
+git add '{<repo-name>}/' '{.claude}/'
 git diff --cached --quiet && echo "No changes." && exit 0
 git commit -m "Checkpoint from $(basename "$PROJECT") ($(date +%Y-%m-%d))"
 echo ""

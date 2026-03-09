@@ -107,7 +107,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - `tickets-branching-and-pull-requests-oh-my.md` -- when setting up git workflows or branching strategies
 - `tips-bash-mode.md` -- reference material
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
-- `agent-dx-patterns.md` — Agent DX design patterns for CLIs/APIs consumed by AI (structured output, schema introspection, input hardening). Future implementation ideas for MSG QA.
+
 ## Claude OS Repo
 
 - Location: `~/claude-os` (GitHub: `jameswniu/claude-os`)
@@ -128,7 +128,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - Sync scripts derive search queries dynamically from MEMORY.md + CLAUDE.md (no hardcoded queries, relevance filters, or exclude terms)
 - Sync scripts exit 2 (not 0) when credentials missing, so callers distinguish skip from success
 - **Template/docs repo only — NOT a runtime dependency.** Audited 2026-03-06: all 10 learning loop jobs run with zero references to ~/claude-os.
-- `~/claude-os/scripts/` and `~/claude-os/launchd/` do NOT exist; templates live inside `<repo-name>/.claude/scripts/`
+- `~/claude-os/scripts/` and `~/claude-os/launchd/` do NOT exist; templates live inside `{<repo-name>}/.claude/scripts/`
 - `~/claude-os/output/` — 27 stale historical log files, no longer written to
 ### Learning Loop (fully decoupled, verified 2026-03-06)
 - 10 scripts (1-5 x 2 projects) live in `<project>/.claude/scripts/`, use `LOG_DIR="$SCRIPT_DIR/../logs"` (project-local)
@@ -191,6 +191,13 @@ Reference docs in the memory directory. Zero tokens until read.
 - `/.claude/commands/review.md` - /review slash command (project-level)
 - `~/.claude/commands/` - User-level slash commands (vid, ui) shared across projects
 - `/ui` vs `/ui1`: `/ui1` is newer with multi-turn flow and mid-generation refresh support
+- `03-05-2026-claude-code-with-chrome.md` -- reference material
+- `agent-dx-patterns.md` -- reference material
+- `basis-environments-overview.md` -- reference material
+- `demo-recording.md` -- reference material
+- `how-to-write-a-self-review-for-developers.md` -- reference material
+- `team-values.md` -- reference material
+- `team.md` -- reference material
 ## Artifact Management
 
 - Never store test artifacts, GIFs, or demo recordings on PR branches (merges into main)
@@ -225,7 +232,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - Cost scaling: linear with log size; distill/promote summarize and compress
 - Distill (24h): compresses older logs.md entries + updates MEMORY.md. Promote (7d): updates topic files from accumulated knowledge.
 - `history.jsonl`: Claude Code session telemetry, consumed by learning loop scripts
-- Repo uses `<repo-name>/.claude/` template directories mirroring real deployment paths; checkpoint splits `$REPO_TMPL` (config) + `$MEM_TMPL` (memory)
+- Repo uses `{<repo-name>}/.claude/` template directories mirroring real deployment paths; checkpoint splits `$REPO_TMPL` (config) + `$MEM_TMPL` (memory)
 - Team rollout planned via 3-phase bootcamp (Microsoft Forms for signup)
 - **3-layer config for coaching**: persona in `~/.claude/CLAUDE.md`, team rules in repo `CLAUDE.md`, on-demand knowledge in `MEMORY.md`. Key message: "outsource communication to AI, keep the thinking."
 

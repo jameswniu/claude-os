@@ -16,18 +16,18 @@ check_file() {
 }
 
 check_file "install.sh"
-check_file "<repo-name>/.claude/scripts/1-log.sh"
-check_file "<repo-name>/.claude/scripts/2-distill.sh"
-check_file "<repo-name>/.claude/scripts/3-promote.sh"
-check_file "<repo-name>/.claude/scripts/4-sync-confluence.sh"
-check_file "<repo-name>/.claude/scripts/5-checkpoint.sh"
-check_file "<repo-name>/.claude/scripts/6-bootstrap.sh"
-check_file "<repo-name>/.claude/scripts/update-readme.sh"
+check_file "{<repo-name>}/.claude/scripts/1-log.sh"
+check_file "{<repo-name>}/.claude/scripts/2-distill.sh"
+check_file "{<repo-name>}/.claude/scripts/3-promote.sh"
+check_file "{<repo-name>}/.claude/scripts/4-sync-confluence.sh"
+check_file "{<repo-name>}/.claude/scripts/5-checkpoint.sh"
+check_file "{<repo-name>}/.claude/scripts/6-bootstrap.sh"
+check_file "{<repo-name>}/.claude/scripts/update-readme.sh"
 check_file "tests/test.sh"
-check_file "<repo-name>/hooks/pre-push"
-check_file ".claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md"
+check_file "{<repo-name>}/hooks/pre-push"
+check_file "{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/MEMORY.md"
 check_file ".github/workflows/test.yml"
-check_file "<repo-name>"
+check_file "{<repo-name>}"
 
 if [ "$MISSING" -eq 0 ]; then
     echo "All files referenced in README.md exist."

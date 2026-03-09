@@ -278,9 +278,6 @@
 | 02-27 | Checkpoint overwrote generic templates with project-specific files | Checkpoint now only syncs memory + topics, not config templates |
 | 02-27 | Sync scripts wrote to wrong MEMORY.md on multi-project machines | Bootstrap passes MEMORY_FILE env var to sync scripts |
 | 02-27 | Bootstrap aliases missing on new machines | Bootstrap auto-runs install.sh if aliases not found |
-| 03-02 | Dynamic slug-to-path conversion breaks session matching | Commits e03b606/82b3760 replaced hardcoded paths with broken `sed 's|-|/|g'`. Fixed with Python reverse-lookup against history.jsonl |
-| 03-01 | Distill budget too low ($0.25) for growing logs.md | Bumped to $0.50 |
-| 03-03 | Bitbucket PR PUT wiped all 6 reviewers | Must include all existing fields in PUT body, not just version + description |
 
 ## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
 
@@ -297,330 +294,182 @@
   - Only flag issues with one-liner + before/after fix
   - No headers, categories, impact labels, regression dumps, or notes sections
 
----
+## 2026-03-03 — BP-29293 GetLineItemsTool PR Work
 
-## 2026-03-01 (Day 12) — File System Exploration + /vid Command + Intent Classifier Research
+- Working on PR #30694 in centro-media-manager (`BP-29293_get_line_items_tool` branch) — adding GetLineItemsTool to MCP server
+- Confusion about fix location: initially suggested changes in wrong repo (media-strategy-generator #212), corrected to keep changes scoped to CMM PR #30694
+- Updated PR title and description to follow Problem/Fix/Tests format, scoped strictly to ticket
+- Discovered Compass UI lag in CMM while testing MCP tools — suspected performance issue when MCP runs within CMM (works fine standalone)
+- Posted Slack message to team about the lag issue, tagged Kyle and Robin, linked PR #30694 as context
+- Added 6 PR reviewers including Kyle
+- Added lag observations as PR comments with relevant links, separate from main PR scope
+- Ran tests to verify no regression on existing MCP tools before updating PR
+- Decision: lag fix should land first in media-strategy-generator repo before this PR merges
+- Reviewed BP-29710 and BP-29291 via /review command
+- Posted PR comments with links for MCP-related findings
+- Drafted concise Slack message for Lavender Tangerine channel about lag issue
+- New rule added: no double dashes (`--`) in any outgoing human communication (PR comments, Slack, etc.)
+- Clarification: `/review <number>` always refers to ticket number (BP-XXXXX), not the PR number
+- Hit rate limits multiple times during session, switched accounts to continue
+- Investigated stashed git changes and Harness CI build failure on BP-29293 PR (build was passing before, needed to diagnose regression)
+- Provided PR link for BP-29293 GetLineItemsTool work
+- Fixed RuboCop Style/SymbolProc offense in spec (commit ab04f43)
+- Added lint check (RuboCop) to git pre-push hook to catch style offenses before pushing
+- Reviewed BP-29710 and BP-29461 PRs via /review command
+- Multiple PR comment iterations following plain-language style rules
+- Continued scoping BP-29293 PR work, confirmed PR #30694 title/description
 
-- Explored Claude Code file system: which files help Claude, their locations, and purposes
-- Created `/vid.md` slash command for Playwright video recording workflow
-- Researched intent classifier architecture: haiku for chat routing, sonnet for content generation, implemented via LLM (no deterministic rules)
-- Investigated original creation date of intent classifier on Bitbucket (vs local clone date)
-- Explored how MEMORY.md references topic files and how plists tie into the learning loop
+## 2026-03-04 — BP-29293 Session Logging & Continued PR Work
 
----
+- Appended session log entry for 03-03 work (BP-29293 GetLineItemsTool PR, reviews, RuboCop fix, pre-push hook)
+- Continued work on BP-29293 GetLineItemsTool branch (clean git status, last commit ab04f43 fixing RuboCop SymbolProc offense)
+- Fixed flaky TaskManagement::Task#due_not_in_past spec (commit 2d80a2b)
+- Traced CI build failure to unrelated flaky spec, not BP-29293 changes
+- Used git blame to identify origin of flaky spec, posted PR comment tagging Jacob Merick to take a look
+- Added Jacob Merick as PR reviewer
+- Learned: Bitbucket PUT on PR title/description wipes reviewers if not included in payload. Must GET full PR first and carry forward all fields.
+- Rule added to MEMORY.md and .claude/CLAUDE.md: always include `reviewers` in PUT payload when updating PRs
+- Hit rate limits repeatedly, used /rate-limit-options to manage
+- Applied Julian's PR comment: removed Search execution strategy entries from EXECUTION_STRATEGY_TO_CHANNEL hash in get_line_items_tool.rb (Search::GoogleAds::ExecutionStrategy and Search::ExecutionStrategy no longer mapped)
+- Quick scoped change to PR #30694 without full re-test, per user request
+- Discussed running skaffold dev for local Kubernetes services but didn't proceed
+- Copied /ui, /review, /vid slash commands and automation .sh scripts to Downloads for sharing
+- Copied plist files for this repo to Downloads
+- Managed UI smoke test artifacts: replaced with -latest suffixed copies for easy access
+- Attached claude-os artifacts (commands, scripts, plists) to Confluence ClaudeOS Beta page (1656062195)
+- Added disclaimers to Confluence page for claude-os documentation
+- Spun up CMM UI on :3001 for smoke testing
+- Investigated lag issue: confirmed caused by spinning up both :3001 and MCP server simultaneously
+- Noticed MCP prefix not stripped from basis_core MCP server tool names
+- Latest PR failing on Harness CI, investigated build failure
+- Copied claude-os local repo to Downloads
+- Discussed publishing claude-os as a branch on the repo (team wanted it as a branch, not standalone)
+- Iterated on Confluence ClaudeOS Beta page: made attached scripts/artifacts more visible and explicit, added Q&A entry ("How can I have the repo? DM James")
+- Added prompt template personalization guidance to Confluence page (run once, tailor to team/repo, ask Claude to update)
+- Reviewed BP-29619 via /review command, posted PR comment
+- Reviewed BP-29856 via /review command
+- Moved ClaudeOS Confluence page to be in line with ClaudeHub (sibling, not child)
+- Discussion on approval language in PR comments: "should I approve" vs "should we approve" (individual vs collective)
+- Edited PR comment and checked test plan boxes in PR description
+- Created second ClaudeOS Confluence page with polished, beginner-friendly layout and visuals
+- Discussed Datadog dashboards to add for monitoring
+- Connected Datadog APM via browser for observability setup
+- Connected PagerDuty access per Julian's guidance
+- Iterated on Confluence page visual appeal and impact-first presentation
+- Drafted ProdOps ticket (POS-16839) for Datadog APM/Logs access: title, description, access level, permission granters (Kyle, Julian), email to prodops@basis.com CC Kyle and Julian
+- Linked POS-16839 ticket in documentation
+- Explored Datadog APM service page for media-strategy-generator production
+- Wrote Datadog crash course and saved as topic file (`datadog-crash-course.md`): APM traces, Logs, dashboards, debugging flow
+- Clarified Datadog dashboards vs APM/Logs distinction for user's on-call use case
+- Reformatted Datadog crash course: closed margins, frontloaded impact, hit all neurons
+- Discussed Confluence table rendering (why only tables increase in width)
+- Confirmed Confluence script attachments are still present and scrapable via API with Claude Code
+- Drafted vivid, human-sounding comment on a post as James
+- Explained `.claude/projects/{project}/memory/` scope to colleague: per-user, per-repo, with auto memory example
+- Explored Claude Code settings.json scoping: enterprise (`/Library/Application Support/ClaudeCode/`), user (`~/.claude/settings.json`), project (`.claude/settings.json`), local (`.claude/settings.local.json`)
+- Tested settings.json auto-approve behavior across scopes: confirmed `.claude/settings.json` works, repo-root `settings.json` does not
+- Attempted placing settings.json at repo root level (outside `.claude/`) — confirmed it is not recognized by Claude Code
+- Investigated `.claude/worktrees/` folder purpose: used by EnterWorktree tool for parallel git worktree sessions
+- Discussed why `.claude/` is the required location for settings vs repo root (Claude Code convention, not configurable)
+- Identified unapproved tool commands for testing settings auto-approve behavior
+- Tested permission auto-approve behavior with touch, rm, ls, whoami across settings scopes (root settings.json, .claude/settings.json, .claude/settings.local.json)
+- Discovered some shell commands (whoami) auto-run regardless of allowlist configuration
+- Systematic testing: added/removed specific commands (touch, rm, ls) from different settings files to verify which scope controls auto-approve
+- Confirmed root-level settings.json (outside .claude/) is not recognized by Claude Code for permission auto-approve
+- Investigated which Bash tool permissions require explicit allowlisting vs always auto-approve
 
-## 2026-03-02 (Day 13) — Claude-OS Restructure + Per-Project Plists + Team PRs
+## 2026-03-05 — Settings.json Scoping Deep Dive (cont.)
 
-### Claude-OS Repo Restructure
-- Major restructure: replaced top-level `scripts/` and `EXAMPLES/` with `<repo-name>/.claude/` mirroring real deployment paths
-- Created per-project launchd plists (separate learning loops for msg and cmm, no more shared scripts)
-- Renamed placeholders from `{username}/{repo}` to `<user-name>/<repo-name>` with angle brackets
-- Moved hooks into `.claude/` folder structure
-- Bootstrap/checkpoint verification and multiple fix iterations
-- Split checkpoint targets into `$REPO_TMPL` + `$MEM_TMPL` for repo config vs memory
+- Continued systematic testing of Claude Code settings.json permission auto-approve across scopes
+- Removed `ls` from allowlists to test whether auto-approve still triggers (confirmed it does not auto-approve without allowlist entry)
+- Tested `cp` command: always prompts regardless of allowlist, identified as a command that may need explicit allowlisting
+- Added `cp` to allowlist, confirmed it then auto-approves
+- Tested `echo` and `bundle exec ruby` commands across different settings scopes
+- Tested placing settings.json at repo root (inline with `.claude/` folder, not inside it) — confirmed it is NOT recognized by Claude Code
+- Removed allowlist from all other locations, placed only in `.claude/settings.json` — confirmed it works (auto-approves)
+- Moved allowlist from `.claude/settings.local.json` to `.claude/settings.json` to test project-level (checked-in) vs local (gitignored) scoping
+- Key finding: both `.claude/settings.json` and `.claude/settings.local.json` work for auto-approve; repo-root `settings.json` does not
+- Tested `~/.claude/settings.local.json` (user-level local) — confirmed NOT recognized by Claude Code
+- Confirmed settings.json recognized in exactly 3+1 locations: `.claude/settings.json` (project), `.claude/settings.local.json` (project local), `~/.claude/settings.json` (user), enterprise managed-settings.json
+- Confirmed CLAUDE.md can exist in infinite locations (any subdirectory, loaded on demand); settings.json is fixed 3+1 locations only
+- Researched LinkedIn post showing CLAUDE.md in multiple directories — validated infinite placement is supported by Claude Code architecture
+- Cleaned up test settings files: removed allowlists from all locations, deleted unused settings files
+- Confirmed `/init` generates `.claude/settings.local.json` (inside `.claude/`, not repo root)
+- Tested auto-approve prompt flow: pressing "yes" on a tool prompt auto-saves to `.claude/settings.local.json`
+- Documented `.claude/settings.json` security risk: shared repo-wide CLI execution permissions that silently auto-run commands
+- Investigated PR #30710 incident: colleague un-ignored `.claude/` directory without asking why it was gitignored, exposing settings.json to shared repo
+- Documented full incident analysis in `claude-code-settings-security-incident.md` topic file: every PR comment, technical analysis of CLAUDE.md (low risk AI context) vs settings.json (high risk CLI execution)
+- Key distinction: CLAUDE.md = AI orchestration layer (low risk, context only); settings.json = CLI execution/tool permissions layer (high risk, silently runs commands)
+- Posted public comments calling out the security risk of shared settings.json and lack of communication before making repo-wide changes
+- Sent direct DM about the incident with constructive framing (flag risk, ask for process)
+- Renamed Confluence pages: ClaudeOS (Beta) → ClaudeOS (Draft), ClaudeOS → ClaudeOS (Preview), reorganized under ClaudeHub
+- Investigated PR #30710 merge timing (when colleague merged the .claude/ un-ignore change)
+- Researched Claude Code auto-gitignore behavior: confirmed `*.local.*` files (settings.local.json, CLAUDE.local.md) are auto-ignored when created; `settings.json` is NOT auto-ignored (intended to be shared)
+- Expanded `claude-code-settings-security-incident.md` topic file with full PR comment thread, CLAUDE.md infinite placement vs settings.json fixed locations, and note that CLAUDE.md has been at repo root (not inside .claude/) due to `/init` command behavior
+- Set up `rm -i` alias guard across all shell contexts (zsh, bash) for safe deletion prompts
+- Tested rm guard with file creation/deletion flow
+- Iterated on rm guard prompt format: added explicit (y/n) suffix, required typing "y" explicitly
+- Reverted rm guard changes after testing
+- Reviewed BP-29292 via /review command
+- Generated standalone HTML security incident report from `claude-code-settings-security-incident.md` for sharing
+- Iterated on HTML report layout: side-by-side comparison panels (settings.json vs CLAUDE.md), visual styling matching ClaudeHub aesthetics
+- Discussed making HTML report publicly accessible
+- Considered posting security incident articles as PR #30710 comments
+- Discussed dropping incident report in team Slack chat to Ryan and Arturo
+- Planning next PR to reverse the .claude/ un-ignore change from PR #30710
+- Iterated on HTML report column width: fixed narrow columns on remaining page sections
+- Continued work on BP-29293 GetLineItemsTool branch: removed unused Search ExecutionStrategies, fixed flaky spec, fixed RuboCop offense, added tool to MCP server
+- Discussed adding visual architecture diagrams to claude-os GitHub repo (https://github.com/jameswniu/claude-os)
+- Discovered colleague deleted orphan tags and moved UI test evidence to a branch (BP-29293-ui-test-evidence) instead
+- Investigated whether orphan branches can host artifact tags — confirmed tags can point to any commit, but colleague chose branch over tags
+- Discussed consensus for uploading artifacts to cloud and linking them (colleague's Confluence approach vs git-based artifacts)
+- Investigated why Harness CI pipeline passed unexpectedly on BP-29293 branch
 
-### CMM Exploration & Ticket Work
-- Explored CMM repo architecture: what it does, relation to MSG (MSG is embedded via iframe in CMM, the full Basis platform)
-- Reviewed BP-29704 ticket (Langfuse prompt migration), discussed eval measurement (1-10 point scale, thresholds)
-- Discussed Basis customer ICP and competitive positioning vs pure heavyweight DSPs
+## 2026-03-06 — BP-29704 Prompt Migration & Evals Collaboration
 
-### Tooling & Commands
-- Moved `/vid` and `/ui` commands from project-level to user-level (`~/.claude/commands/`)
-- Created `team.md` with team member profiles and roles
-- Discussed Claude's built-in learning mechanisms vs custom memory system
-- Took screenshots of claude-os architecture for sharing with team
-- Explored Electron app automation (Vercel's agent-browser) as alternative to Chrome extension
+- Coordinated with Mitravasu Prakash on BP-29704: move hardcoded intent classification prompt to Langfuse
+- Agreed on scope split: James ships PR for prompt migration, evals follow-up after Mitravasu/John align on approach
+- Discussed prompt consumption pattern: use `utils/prompts.py` functions to fetch from Langfuse (matching existing prompt workflow)
+- Volunteered to help with prompt injection eval dataset on Langfuse (Harmful Action Prevention, Instruction Override Resistance, Prompt Disclosure Prevention evaluators)
+- Asked Mitravasu about lm-evaluation-harness (EleutherAI) usage and human evals — clarified it's for base model benchmarking not agent tasks, and manual QA (Amity) / Product (Dalyn) serve as human evaluators
+- Investigated learning loop scripts: confirmed scripts should run within their own repos only (CMM scripts for CMM, MSG scripts for MSG), not cross-repo from claude-os
+- Debugged learning script execution scope issue
+- Continued work on BP-29293 GetLineItemsTool branch (on `BP-29293_get_line_items_tool`)
+- Discussed reinforcement learning in Claude Code — clarified it uses logged conversation context via learning loop scripts (distill/promote), not built-in RL
+- Discussed how memory/learning loop system works: dynamic reinforcement through log distillation and MEMORY.md promotion, not static weights
+- Verified all launchd plists are repo-scoped: CMM plists only affect CMM, MSG plists only affect MSG
+- Confirmed claude-os has no running plists and no dependencies on the learning loop automation of the two repos
+- Verified all 10 launchd plists end-to-end: confirmed scripts and plists are fully decoupled from claude-os repo
+- Ran /insights to review conversation patterns and tool usage
+- Investigated missing bootstrap artifacts in MSG repo, cross-checked with claude-os templates and CMM config
+- Fixed bootstrap gaps: missing files that should have been created by earlier bootstrap run
+- Investigated PR #30710 fallout: colleague's change un-ignored `.claude/` folder, assessed impact on CLAUDE.md naming convention
+- Evaluated renaming `.claude/CLAUDE.md` to `CLAUDE.local.md` across CMM, MSG, and claude-os to align with auto-gitignore behavior (`*.local.*` files are auto-ignored by Claude Code)
+- Scoped full dependency chain for the rename: CLAUDE.md references, bootstrap scripts, checkpoint scripts, learning loop scripts, and any hardcoded paths
+- Investigated ClaudeOS Preview Confluence page (1657110687) for editing needs
+- Executed step-by-step edits on ClaudeOS Confluence page content
+- Continued BP-29293 GetLineItemsTool work on `BP-29293_get_line_items_tool` branch
+- Discussed rate limit options and usage for Claude Code session
+- Worked on updating architecture diagrams in claude-os repo after config/rename changes
+- Discussed pushing claude-os repo changes, regenerating GitHub diagrams, then updating Confluence with new diagrams
+- Debugged Claude browser extension connectivity issue
 
-### PR Reviews
-- Reviewed multiple team PRs, posted comments with before/after code fixes
-- Detected potential merge conflict between two open PRs, flagged in Slack
-- Discussed potential conflicts introduced by Claude's memory system (config scopes)
+## 2026-03-07
 
----
+- Reviewed Slack messages and provided suggestions for Kyle
+- Helped Kyle with page-by-page prioritized suggestions, reformatted explanations by priority level
+- Provided full file paths for relevant files under the CMM repo
 
-## 2026-03-03 (Day 14) — BP-29577 Continued + SSE Reconnection + Outgoing Message QA
+## 2026-03-08
 
-### BP-29577 Duplicate Tool Outputs Fix (continued from Feb 28)
-- Continued work on BP-29577 branch: orphaned tool output cleanup on generation failure
-- Added `delete_tool_outputs_since` with mypy strict type cast fix (multiple commit iterations to pass CI)
-- Formatted `persistence_utils.py` with ruff
-- Frontend: added `stripToolMarkers` utility with tests to clean raw tool markers from displayed content
-- SSE reconnection hook (`useSSEReconnection.ts`) updated with tests for MCP connection resilience (lag/hang prevention)
-- UI smoke test: verified mid-generation refresh produces no duplicate tool cards after F5 during active generation
-- Stored UI smoke test artifacts on separate commit (not PR branch)
+- Verified plists and learning loop .sh scripts running properly and separately in CMM and MSG repos; confirmed claude-os should only have .sh templates, no plists
+- Continued work on BP-29293 GetLineItemsTool branch (`BP-29293_get_line_items_tool`): modifications to `tool_authenticator.rb`
 
-### PR Review & Slack Communication
-- Reviewed PR #186 (BP-29577), walked team through changes and PR comments
-- Posted Slack messages about PR status, linked PRs for context
-- User flagged: code blocks not properly formatted for `mcp_app.py` in a message, fixed formatting
-- User flagged: @mention tagging verification required after posting any outgoing message (PR comment, Slack, WhatsApp, etc.)
-- New rule added to MEMORY.md: after posting any outgoing message, always verify @mentions rendered as clickable elements, not plain text
+## 2026-03-09
 
-### Bitbucket PR PUT Wipes Fields
-- Sent PUT to update PR #208 description with only `version` + `description`, wiped all 6 reviewers
-- Root cause: Bitbucket PR PUT replaces the entire object, must include all existing fields (reviewers, title, etc.)
-- New rule added to MEMORY.md Recurring Mistakes
-
-### User Preferences Discovered
-- No Co-Authored-By lines in commits (removed from existing commit, saved as permanent rule)
-- @mentions require browser: CLI/API renders as plain text, browser autocomplete needed for proper notifications
-- Always include clickable PR links when presenting reviews or asking for approval
-
-### Claude-OS Learning Loop Diagnosis & Fix
-- Diagnosed why logs.md was 3+ days stale (last automated entry: Feb 27)
-- Root cause: slug-to-path conversion bug in 1-log.sh, 2-distill.sh, 3-promote.sh
-- `sed 's|-|/|g'` turns `-Users-james-niu-media-strategy-generator` into `Users/james/niu/media/strategy/generator` but actual path is `/Users/james.niu/media-strategy-generator`
-- Old working version (pre Feb 27 05:55am) had hardcoded paths; commits `e03b606` and `82b3760` introduced dynamic resolution that broke it
-- Feb 28-Mar 1: distill also hit $0.25 budget cap (separate issue)
-- Fixed all 9 script copies (template + 2 local repos) with Python reverse-lookup against history.jsonl
-- Bumped distill budget from $0.25 to $0.50
-- Patched missing log entries for Mar 1-3
-
-### Key Learnings
-- Always verify @mentions/tags after posting (Bitbucket, Slack, WhatsApp, any platform)
-- Bitbucket mention syntax in editor is `@"username"` (via autocomplete), rendered mentions have `data-mention-id` attribute
-- Slug-to-path reversal is ambiguous (dashes could be from `/`, `.`, or literal `-`). Must match forward (path-to-slug) against known paths from history.jsonl.
-- Bitbucket PR PUT replaces the entire object. Always include all fields.
-
-### Blog Post Engagement & Rate Limit Research (later session)
-- Fixed spelling mistakes in few-shot prompt examples
-- Used browser to read and post comments on a blog post (workaround when API/CLI not available)
-- Investigated rate limit options via `/rate-limit-options` skill
-
-### Claude-OS Script Verification & Budget Tuning (later session)
-- Verified all automation scripts (log, distill, promote, confluence sync, notion sync) running end-to-end
-- Discussed history.jsonl source (Claude Code session telemetry used by learning loop scripts)
-- Raised budget caps across all plist scripts to reasonable levels after log.sh was hitting cap
-- Discussed logs.md growth trajectory (linear, not exponential, bounded by session frequency)
-- Discussed plist script cost scaling: linear with log size, not exponential; distill/promote summarize and compress
-
-### Claude-OS Bootcamp Planning
-- User wants to set up a 3-phase bootcamp for rolling out claude-os to the team
-- Reviewed Microsoft Forms link for internal submission/signup
-- Planned phased rollout structure for team adoption
-
-### PR Reviews (later session)
-- Reviewed BP-29710 via `/review` slash command
-- Reviewed BP-29461 via `/review` slash command
-- Posted PR comment with link for one of the reviews
-
----
-
-## 2026-03-04 (Day 15) — Plist Maintenance + Claude-OS Docs + Memory Architecture
-
-### Claude-OS Plist Refresh & Verification
-- Refreshed all plist scripts across both repos (msg and cmm)
-- Verified last run of all plists (log, distill, promote, confluence sync, notion sync) and confirmed successful execution
-- Checked all affected files and changes from latest refresh
-
-### Claude-OS Documentation Updates
-- Added Claude Code official docs (settings, memory) to claude-os README where appropriate
-- Added examples as templates for various config files
-- Removed team headcount references and internal repo links from public-facing docs
-- Varied evals quantification language for external audience
-
-### Memory Architecture Planning
-- Discussed MEMORY.md 200-line cap approaching, need for intelligent compression
-- Evaluated two approaches: (1) move everything to topic files with hard pointers, (2) keep summary index in MEMORY.md with topic file overflow
-- Analyzed tradeoffs: topic-file-only approach risks Claude missing files; hybrid index approach keeps discoverability but requires careful compression
-- Discussed cross-repo MEMORY.md divergence risk when syncs differ per repo
-- Discussed checkpoint writing to single location (claude-os) from different repos
-
-### Rollback Incident
-- Accidentally modified repo-level CLAUDE.md instead of personal config, user caught and requested rollback
-
-### BP-29577 Branch Work (later session)
-- Continued work on `BP-29577_fix_duplicate_tool_outputs` branch
-- Frontend changes: App.tsx, useSSEReconnection hook (ts + tests), new stripToolMarkers utility (ts + tests)
-- Backend: persistence_utils.py type cast for mypy strict, ruff formatting
-
-### Narrated Video Demo with Playwright + ElevenLabs TTS (later session)
-- Built narrated Playwright video demo of Compass using ElevenLabs TTS voiceover
-- Iterated on voice selection: tried macOS voices, then ElevenLabs Samantha, then most realistic male voice
-- Explored ElevenLabs voice cloning (user recorded own voice samples)
-- Addressed audio quality issues (static, clarity)
-- Tuned narration speed: tried 0.75x, 0.7x, settled on 0.8x
-- Added narration subtitles to the video output
-- Explored `/rate-limit-options` skill multiple times
-
-### Narrated Video Demo Continued (later session)
-- Struggled with follow-up prompts: Playwright script was not typing follow-up prompts into the chat
-- Attempted subtitle sync fixes, subtitles remained out of sync with narration
-- Reduced target video length from 90s to 30s to simplify iteration
-- User cloned own voice via ElevenLabs, switched to cloned voice ID
-- Explored using Claude browser extension for follow-up prompts instead of Playwright typing
-- Iterated on voice speed: tried 0.7x for narration pacing
-
-### Narrated Video Demo Final Iterations (later session)
-- Addressed lag between narration segments, aimed for tighter pacing
-- Requested video capture after artifact generation appears
-- Created multiple video variants: one with cloned voice, one with macOS male voice
-- Ensured subtitles present on both video variants
-- Continued iterating on narration coverage (ensuring narration throughout entire video)
-
-### Narrated Video Demo Recreation Attempts (later session)
-- Attempted to recreate complete start-to-finish videos with both macOS and cloned voice
-- User frustrated with inability to reproduce full video end-to-end
-- Re-provided ElevenLabs API key for voice synthesis access
-- Continued iterating on prompt typing with no lag between follow-up prompts
-- Narration placement bug: narration only appeared at the end of both video variants instead of throughout
-- User flagged the issue, continued debugging narration timing/placement
-
-### BP-29577 Dynamic MCP Prefix Stripping (later session)
-- Discovered `basis_core` as another MCP server needing prefix stripping (missed in initial fix)
-- User frustrated with needing to patch every time a new MCP server is added
-- Pivoted to dynamic solution: strip prefixes based on runtime `mcp_server_names` instead of hardcoded list
-- Branch: `BP-29577_dynamic-mcp-prefix-stripping`
-- Committed: `[BP-29577] Persist all tool outputs for history display regardless of response format`
-- Verified end-to-end flow including page refresh for clean tool names
-
-### PR Reviews & Approvals (later session)
-- Approved PR #207 on Bitbucket
-- Ran `/review` on PR for BP-29856
-- Ran `/ui` smoke test (multiple attempts, fresh tab issues)
-
-### Narrated Video Cleanup
-- Took down previous video demo artifacts per user request
-
-### Demo Command & Reproducibility (later session)
-- Created `/demo` slash command to make narrated Playwright video demo process reproducible
-- Saved ElevenLabs clone voice ID and macOS Daniel voice as defaults in command config
-- User questioned duplicate demo commands, clarified scope differences
-
-### ClaudeOS Demo & UI Smoke Test (later session)
-- Attempted `/demo` for ClaudeOS Confluence page (feasibility assessment of ideas)
-- Ran `/ui` smoke test on Compass AI at localhost:3001
-- Clarified `/ui` vs `/ui1` command differences: `/ui1` is newer with multi-turn flow and mid-generation refresh support
-
----
-
-## 2026-03-05 (Day 16) — PR Review
-
-### PR Reviews
-- Ran `/review` on PR for BP-29619
-- Approved PR after review
-- Searched session history for an email (user request)
-- Continued work on BP-29577 dynamic MCP prefix stripping branch
-
----
-
-## 2026-03-06 (Day 17) — Artifact Branch Investigation
-
-### Bitbucket Artifact Branch URL Research
-- Investigated whether Bitbucket `browse?at=refs/heads/branch` vs `browse?at=branch` URLs differ (user asked after teammate flagged)
-- Researched PR artifact links that may need relinking after branch reference changes
-- Evaluated whether existing PRs in both MSG and CMM repos need artifact URL updates
-- Discussed implementing rules for both CMM and MSG repos to prevent future artifact branch issues
-- Audited all artifact branch links across PR comments, verified which links resolve and which are broken
-- Checked learning loop scripts for both repos (msg and cmm), verified delta learnings flowing correctly
-- Listed all new branches and artifact links created during recent sessions
-
-### BP-29577 Dynamic MCP Prefix Stripping (continued)
-- Continued work on `BP-29577_dynamic-mcp-prefix-stripping` branch
-- Modified `test_chat_history_service.py` tests (uncommitted changes on branch)
-- Added integration tests: committed `[BP-29577] Add integration tests for tool output display_name prefix stripping`
-
-### Narrated Video Demo Iterations (later session)
-- Created narrated demo video with clone voice (ElevenLabs)
-- User flagged Australian accent issue, requested American accent explicitly
-- Iterated on accent/voice settings multiple times to get American English
-- User decided to revert to first version's accent, requested slower pacing instead
-- Focused on frontloading impact and dopamine hit timing in narration
-- Built multiple subtitle versions but failed to save them separately (user flagged)
-- Added output versioning rule to MEMORY.md: never overwrite output files, always version with timestamps
-
-### UI Smoke Test on CMM (later session)
-- Ran `/ui` smoke test targeting CMM (localhost:3000) instead of MSG (localhost:3001)
-- Verified `basis_core` tool prefix stripping fix was tested on CMM
-- Took screenshots/GIFs for verification
-- Investigated port conflicts: :3000 needs to be closed before :3001 to prevent lag
-- Multi-turn flow and mid-generation refresh tested via `/ui1` command
-- Encountered config uncertainty on CMM setup
-
-### Narrated Video Demo Subtitle Fix (later session)
-- User requested original cloned voice version with subtitles added (first ElevenLabs clone, not accent-adjusted versions)
-- Created single versioned output with subtitles on the original clone voice recording
-- Encountered CMM token incompatibility issue during testing
-
-### Narrated Video Demo Voice & Style Iterations (later session)
-- User flagged subtitle font too large on latest video, iterated on sizing
-- Switched narration voice to American accent per user request
-- Then switched to blonde female Australian accent per user request
-- Each voice iteration saved as new versioned file (output versioning rule enforced)
-- User insisted on matching exact subtitle style from earlier successful videos (FontSize=11, Helvetica Neue, white text, dark background box)
-- Saved canonical subtitle style to MEMORY.md for future consistency
-
-### UI Smoke Test Troubleshooting (later session)
-- Tested `basis_core` prefix stripping on both :3001 (MSG) and :3000 (CMM)
-- Multiple `/ui` smoke test attempts hit login/settings issues, required repeated `/login` flows
-- Encountered persistent settings enablement problem ("can you enable the settings or something??")
-- Discussed using Perplexity for research, user confirmed prior usage
-- Verified all code changes pushed to remote branch
-- Continued debugging UI test environment configuration across multiple retries
-
-### CMM Debugging & basis_core Verification (later session)
-- CMM (localhost:3000) stopped working mid-session, previously functional
-- Investigated Chromium browser compatibility (same engine, should work)
-- Resumed `/ui` smoke test after environment stabilized
-- Verified `basis_core` prefix stripping in browser on CMM
-- Reviewed what was edited in the BP-29577 ticket to confirm scope of changes
-
-### Claude-OS Rollout Communication & Learning Loop Architecture (later session)
-- Added calendar event for a meeting (time TBD)
-- Drafted Slack messages to Ryan and Brian about claude-os rollout
-- Ryan message: itemized every file the automation writes to on a schedule (logs.md, MEMORY.md, topic files, CLAUDE.local.md)
-- Brian message: explained Confluence page as a recipe, discussed productionizing at scale with minimal user friction, repo hosting blocker
-- Iterated on message drafts: removed em dashes, added missing files (CLAUDE.local.md), clarified distill vs promote responsibilities
-- Deep-dived learning loop architecture: clarified what distill actually touches (logs.md compression + MEMORY.md updates) vs promote (topic file updates)
-- User questioned why distill modifies raw logs.md (answer: it compresses/summarizes older entries to prevent unbounded growth)
-
----
-
-## 2026-03-07 (Day 18) — ClaudeOS Coaching & Confluence Update
-
-### ClaudeOS Prompt Architecture Coaching
-- User coached a teammate on prompt structure: main `~/.claude/CLAUDE.md` for persona ("You are a software architect..."), repo-level CLAUDE.md for team rules, MEMORY.md for stack/knowledge pulled on demand
-- Provided full file paths for each config layer
-- Key insight shared: outsource communication to AI, keep the thinking; persona + rigor + on-demand knowledge base
-
-### ClaudeOS Confluence Page Update
-- Updated ClaudeOS Preview Confluence page (confluence:1657110687) with accumulated feedback
-
-### CLI Schema Output Research
-- Read blog post on rewriting CLIs for AI agents (justin.poehnelt.com)
-- Concept: enforce output as schema (trades social fluency for machine perfection), useful for QA pipelines
-- Discussed applicability to Claude Code tooling and agent-to-agent communication
-
-### ClaudeOS Confluence Doc Update from Slack Conversations (later session)
-- User received Slack replies from teammates about claude-os setup, forwarded conversations for Confluence doc updates
-- Updated ClaudeOS Confluence page with feedback from Slack threads (no name mentions, teasers OK)
-- User asked to verify file paths for MEMORY.md and CLAUDE.local.md references in memory system
-- Discussed PR comment for `/ui` smoke test, user flagged missing attached artifacts on the PR comment
-- Reminded of rule: always attach test evidence (screenshots/GIFs) to PR comments when available
-
-### UI Smoke Test & PR Review for BP-29577 (later session)
-- Ran `/ui` smoke test with mid-generation refresh checks (refresh after each prompt, mid-generation, and after artifact completes)
-- Attempted basis_core MCP artifact testing to verify prefix stripping end-to-end
-- Multiple `/login` flows required due to session expiration during testing
-- Discovered duplicate `/review1` command, user asked to remove the older one
-- Ran `/review` on BP-29577 branch (dynamic MCP prefix stripping)
-- Checked diff against main to confirm scope of changes
-- User pasted content and requested PR comment be posted
-
-### BP-29577 PR Finalization & Slash Command Updates (later session)
-- Posted PR comment on BP-29577 for approval
-- Discussed whether PR title/description needed editing
-- Posted Slack message asking for PR approval
-- Updated `/review` and `/ui` slash commands
-- Fixed outgoing message formatting: replaced em dashes and double dashes per communication rules (human text only, not code)
-- Corrected placeholder naming in slash commands: changed `project-slug` to `<repo-name>` to match claude-os convention
-
----
-
-## 2026-03-08 (Day 19) — Claude-OS Bootstrap & Checkpoint Audit
-
-### Bootstrap & Checkpoint Validation Across Repos
-- Audited `checkpoint` and `bootstrap` scripts across media-strategy-generator, centro-media-manager, and claude-os repos
-- Verified checkpoint minimizes overwrites and preserves repo-specific signal
-- Reviewed bootstrap flow for new repo onboarding
-- User guidance: checkpoint should preserve signal with minimal overwrite, repo-specific details should be abstracted; bootstrap should kick off everything cleanly in a new repo
+- Investigated dependency chain for templatizing `.claude` folder and `<repo-name>` references across claude-os, MSG, and CMM repos (replacing with `{.claude}` and `{<repo-name>}` placeholders)
+- Scoped impact on bootstrap, checkpoint, and all learning loop scripts (1-log through 5-sync-notion) for the placeholder changes
+- Investigated Anthropic API key configuration: clarified whether changes needed in CMM, MSG, or other repos
+- Scoped API key change to the correct repo
+- Drafted congratulations message for Mike's promotion, summarized 2 weeks of work across CMM and MSG repos (3 bullet points each)
+- Condensed message: framed AI automation work as "AI automation for code review and CI" (Mike doesn't know "Claude OS" branding)

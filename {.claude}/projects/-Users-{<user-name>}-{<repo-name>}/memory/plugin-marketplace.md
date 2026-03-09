@@ -57,18 +57,18 @@ Claude Code Plugin Marketplaces provide a way to create a shared set of AI based
 ---|---|---|---|---  
 Create an [experimental Plugin Marketplace]((internal URL))|  | | complete| [link]((internal URL))  
 Create an official Plugin Marketplace - Dedicated repo|  | | Complete| [link]((internal URL))  
-Create a Contributing and Usage How-to guide for Claude Code|  | | Cancelled|   
+Create a Contributing and Usage How-to guide for Claude Code|  | | not started|   
 ~~Investigate multi-platform feasibility. Using with Copilot (Gemini etc.)~~|  | | Cancelled|   
 ~~Create a How-to guide for Github Copilot~~| | |  Cancelled|   
 Add [AGENTS.md files to centro-media-manager]((internal URL))|  | | Complete| [link]((internal URL))  
 Add a `Create Jira ticket` [Command]((internal URL))|  | | complete| [link]((internal URL))  
 Add a `Code Review` Agent|  | | in progress| [link]((internal URL))  
-Add a Hook example|  | | Cancelled|   
+Add a Hook example|  | | not started|   
 Add a Skill example|  | | complete| [link]((internal URL))  
 Get confirmation of Claude Code org access|  | | complete| Rolled out around   
 Define requirements for submitting PRs to the AI-tools repo| | | in progress|   
 Add ai-council as required-reviewers for the ai-tools repo|  | | complete|   
-Add namespacing to plugin marketplace resources| | | Cancelled|   
+Add namespacing to plugin marketplace resources| | | not started|   
   
 ##  Related links
 
