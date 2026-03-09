@@ -2,7 +2,7 @@
 
 Product: **Compass** (media strategy generator, being renamed from (project-name))
 Channel: `#basis-ai-dev` (Slack, private)
-Repo: `(PROJECT)/(project-name)` on Bitbucket (stash.centro.net)
+Repo: `(PROJECT)/(project-name)` on Bitbucket (internal)
 Team size: 7
 
 ## Members

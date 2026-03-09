@@ -317,10 +317,12 @@ content = original
 content = re.sub(r'\(confluence:\d+\)', '', content)
 # Strip Notion page IDs
 content = re.sub(r'\(notion:[a-f0-9]+\)', '', content)
-# Strip Basis-specific URLs
+# Strip Basis-specific URLs (with or without protocol)
 content = re.sub(r'https?://stash\.centro\.net[^\s\n)]*', '(internal URL)', content)
+content = re.sub(r'(?<!/)stash\.centro\.net[^\s\n)]*', '(internal)', content)
 content = re.sub(r'https?://[a-z]+\.basis\.com[^\s\n)]*', '(internal URL)', content)
 content = re.sub(r'https?://basis\.atlassian\.net[^\s\n)]*', '(internal URL)', content)
+content = re.sub(r'(?<!/)basis\.atlassian\.net[^\s\n)]*', '(internal)', content)
 # Strip internal project/team names that are Basis-specific
 content = re.sub(r'\bCEN\b(?=/)', '(PROJECT)', content)
 content = re.sub(r'media-strategy-generator', '(project-name)', content)

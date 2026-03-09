@@ -107,7 +107,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - `tickets-branching-and-pull-requests-oh-my.md` -- when setting up git workflows or branching strategies
 - `tips-bash-mode.md` -- reference material
 - Synced every 24h. Scripts auto-discover relevant new pages and add them here.
-
+- `agent-dx-patterns.md` — Agent DX design patterns for CLIs/APIs consumed by AI (structured output, schema introspection, input hardening). Future implementation ideas for MSG QA.
 ## Claude OS Repo
 
 - Location: `~/claude-os` (GitHub: `jameswniu/claude-os`)
