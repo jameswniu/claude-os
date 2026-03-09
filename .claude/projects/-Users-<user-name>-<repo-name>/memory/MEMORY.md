@@ -89,7 +89,6 @@ Reference docs in the memory directory. Zero tokens until read.
 - Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo. Run after syncing topic files to push them to EXAMPLES/.
 - Automation scripts must run in order (1→2→3→4); can run from Claude Code terminal now (fixed)
 - Scripts 1-3 need `unset CLAUDECODE` before `claude -p` to avoid nested session error
-- Launchd plists at `~/Library/LaunchAgents/com.claude.memory-*.plist`
 - Launchd PATH must include `~/.local/bin` (where `claude` is installed)
 - `pmset sleep 0` applied to keep Mac awake so launchd jobs run 24/7
 - Company rollout plan: (1) CLAUDE.md, personal CLAUDE.md, memory, settings.local.json (2) add logs.md, manual learning loop (3) local/cloud setup, automatic loop

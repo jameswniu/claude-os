@@ -120,12 +120,9 @@ Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project
 - `~/claude-os/<repo-name>/.claude/scripts/2-distill.sh` - pattern distiller (every 24h)
 - `~/claude-os/<repo-name>/.claude/scripts/3-promote.sh` - rule promoter (every 7d)
 
-Then install and verify:
+Then run bootstrap to generate and load per-project launchd agents:
 ```bash
-cp ~/claude-os/Library/LaunchAgents/com.claude.memory-*.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
+bootstrap
 launchctl list | grep com.claude
 ```
 
@@ -138,9 +135,8 @@ echo 'export CONFLUENCE_TOKEN="<your-api-token>"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
+Then run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
-launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
 bash ~/claude-os/"<repo-name>"/.claude/scripts/4-sync-confluence.sh
 ```
 
@@ -154,9 +150,8 @@ source ~/.zshrc
 
 Share each Notion page with the integration (page `...` menu > "Connections" > add integration).
 
-Then install and run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
+Then run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
-launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
 bash ~/claude-os/"<repo-name>"/.claude/scripts/5-sync-notion.sh
 ```
 
@@ -573,17 +568,7 @@ Existing topic files are refreshed on every run, never deleted.
    echo 'export CONFLUENCE_TOKEN="your-api-token"' >> ~/.zshrc
    source ~/.zshrc
    ```
-3. For automated runs via launchd, add to the sync plist (`com.claude.memory-sync.plist`):
-   ```xml
-   <key>EnvironmentVariables</key>
-   <dict>
-       <key>CONFLUENCE_EMAIL</key>
-       <string>your.email@basis.com</string>
-       <key>CONFLUENCE_TOKEN</key>
-       <string>your-api-token</string>
-   </dict>
-   ```
-4. Test manually: `bash "<repo-name>"/.claude/scripts/4-sync-confluence.sh`
+3. Test manually: `bash "<repo-name>"/.claude/scripts/4-sync-confluence.sh`
 
 The script skips gracefully if credentials are not set. No errors, no data loss.
 
@@ -625,15 +610,7 @@ Existing topic files are refreshed on every run, never deleted.
    source ~/.zshrc
    ```
 4. **Share pages with the integration:** Open each Notion page, click `...` (top right) > "Connections" > add your integration name
-5. For automated runs via launchd, add to the notion plist (`com.claude.memory-notion.plist`):
-   ```xml
-   <key>EnvironmentVariables</key>
-   <dict>
-       <key>NOTION_TOKEN</key>
-       <string>ntn_your-token-here</string>
-   </dict>
-   ```
-6. Test manually: `bash "<repo-name>"/.claude/scripts/5-sync-notion.sh`
+5. Test manually: `bash "<repo-name>"/.claude/scripts/5-sync-notion.sh`
 
 The script skips gracefully if the token is not set. No errors, no data loss.
 
@@ -710,14 +687,9 @@ chmod +x "<repo-name>"/.claude/scripts/*.sh
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project.
 
-Copy plists and load agents:
+Generate and load per-project launchd agents:
 ```bash
-cp Library/LaunchAgents/com.claude.memory-*.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.claude.memory-log.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-distill.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-promote.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-sync.plist
-launchctl load ~/Library/LaunchAgents/com.claude.memory-notion.plist
+bootstrap
 ```
 
 **Verify:**
@@ -732,18 +704,18 @@ cat ~/claude-os/output/*.log
 
 **Stop:**
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.claude.memory-*.plist
+launchctl unload ~/Library/LaunchAgents/com.claude.<repo>.*
 ```
 
 **Schedules (adjustable in plist files):**
 
 | Agent | StartInterval | Frequency |
 |-------|--------------|-----------|
-| `com.claude.memory-log` | 3600 | Every 1 hour |
-| `com.claude.memory-distill` | 86400 | Every 24 hours |
-| `com.claude.memory-sync` | 86400 | Every 24 hours |
-| `com.claude.memory-notion` | 86400 | Every 24 hours |
-| `com.claude.memory-promote` | 604800 | Every 7 days |
+| `com.claude.<repo>.log` | 3600 | Every 1 hour |
+| `com.claude.<repo>.distill` | 86400 | Every 24 hours |
+| `com.claude.<repo>.sync-confluence` | 86400 | Every 24 hours |
+| `com.claude.<repo>.sync-notion` | 86400 | Every 24 hours |
+| `com.claude.<repo>.promote` | 604800 | Every 7 days |
 
 For testing, use 3x speed: 1200 / 28800 / 198720 seconds.
 
@@ -801,7 +773,6 @@ client = anthropic.Anthropic()
 - `claude-os/`
   - `.claude/projects/-Users-<user-name>-<repo-name>/memory/` - Memory templates
   - `.github/workflows/test.yml` - CI test runner
-  - `Library/LaunchAgents/` - macOS scheduler plists (reference templates)
   - `README.md`
   - `install.sh` - Installs `checkpoint` and `bootstrap` commands
   - `tests/` - Validation tests

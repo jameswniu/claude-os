@@ -7,7 +7,6 @@ FAIL=0
 TEST_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$TEST_DIR/.." && pwd)"
 SCRIPT_DIR="$REPO_DIR/<repo-name>/.claude/scripts"
-LAUNCHD_DIR="$REPO_DIR/Library/LaunchAgents"
 
 pass() { echo "  PASS: $1"; PASS=$((PASS + 1)); }
 fail() { echo "  FAIL: $1"; FAIL=$((FAIL + 1)); }
@@ -103,24 +102,6 @@ grep -q "BP-29" "$REPO_TMPL/.claude/commands/review.md" && fail "review.md has p
 grep -q "BP-29" "$REPO_TMPL/.claude/commands/ticket.md" && fail "ticket.md has project-specific tickets" || pass "ticket.md is generic"
 grep -q "REDACTED\|ATATT" "$REPO_TMPL/.claude/settings.local.json" && fail "settings.local.json has secrets" || pass "settings.local.json is clean"
 grep -q "(confluence:" "$MEM_TMPL/MEMORY.md" && fail "memory/MEMORY.md has project-specific topic entries" || pass "memory/MEMORY.md topic entries are clean"
-
-# Test: plist files are valid XML
-for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
-  NAME=$(basename "$PLIST")
-  xmllint --noout "$PLIST" 2>/dev/null && pass "$NAME is valid XML" || fail "$NAME is invalid XML"
-done
-
-# Test: plist source templates have ~/.local/bin in PATH
-for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
-  NAME=$(basename "$PLIST")
-  grep -q "\.local/bin" "$PLIST" && pass "$NAME has ~/.local/bin in PATH" || fail "$NAME missing ~/.local/bin in PATH"
-done
-
-# Test: plist source templates have no real tokens (only placeholders)
-for PLIST in "$LAUNCHD_DIR"/com.claude.memory-*.plist; do
-  NAME=$(basename "$PLIST")
-  grep -q "ATATT\|ntn_" "$PLIST" && fail "$NAME has real token" || pass "$NAME has no real tokens"
-done
 
 # Test: hooks
 HOOK="$REPO_DIR/<repo-name>/hooks/pre-push"
