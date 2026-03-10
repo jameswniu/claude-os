@@ -63,12 +63,12 @@ seed_file "$MEM/MEMORY.md" "$MEM_TMPL/MEMORY.md" MEMORY.md
 [ -f "$MEM/logs.md" ] && mv "$MEM/logs.md" "$MEM/history/logs.md" && echo "  MIGRATED logs.md -> history/logs.md  → $MEM/history/logs.md"
 seed_file "$MEM/history/logs.md" "$MEM_TMPL/history/logs.md" history/logs.md
 
-# Slash commands (always overwrite with latest, deployed to user-level)
+# Slash commands (always overwrite with latest, deployed to project-level)
 git_ls "$REPO_TMPL/.claude/commands" | while read RELPATH; do
     NAME=$(basename "$RELPATH")
     [[ "$NAME" == *.md ]] || continue
-    mkdir -p "$HOME/.claude/commands"
-    DEST="$HOME/.claude/commands/$NAME"
+    mkdir -p "$PROJECT/.claude/commands"
+    DEST="$PROJECT/.claude/commands/$NAME"
     TMPFILE=$(mktemp)
     git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
     if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
@@ -160,22 +160,29 @@ fi
 bash "$CLAUDE_OS/install.sh"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Reconcile orphaned topic files into MEMORY.md
+# Reconcile orphaned topic files into MEMORY.md (only within Topic Files section)
 RECONCILED=0
-LAST_TOPIC_LINE=$(grep -n '`[^`]*\.md`' "$MEM/MEMORY.md" | grep -v 'MEMORY\.md\|CLAUDE\.md\|logs\.md' | tail -1 | cut -d: -f1)
-if [ -n "$LAST_TOPIC_LINE" ]; then
-    for TOPIC_FILE in "$MEM"/*.md; do
-        [ -f "$TOPIC_FILE" ] || continue
-        BASENAME=$(basename "$TOPIC_FILE")
-        [ "$BASENAME" = "MEMORY.md" ] && continue
+TOPIC_SEC_START=$(grep -n '## Topic Files' "$MEM/MEMORY.md" | head -1 | cut -d: -f1)
+TOPIC_SEC_END=$(awk -v start="$TOPIC_SEC_START" 'NR > start && /^## / { print NR; exit }' "$MEM/MEMORY.md" 2>/dev/null)
+[ -z "$TOPIC_SEC_END" ] && TOPIC_SEC_END=$(wc -l < "$MEM/MEMORY.md")
+if [ -n "$TOPIC_SEC_START" ]; then
+    # Find the last topic entry line within the section only
+    LAST_TOPIC_LINE=$(sed -n "${TOPIC_SEC_START},${TOPIC_SEC_END}p" "$MEM/MEMORY.md" | grep -n '`[^`]*\.md`' | tail -1 | cut -d: -f1)
+    [ -n "$LAST_TOPIC_LINE" ] && LAST_TOPIC_LINE=$((TOPIC_SEC_START + LAST_TOPIC_LINE - 1))
+    if [ -n "$LAST_TOPIC_LINE" ]; then
+        for TOPIC_FILE in "$MEM"/*.md; do
+            [ -f "$TOPIC_FILE" ] || continue
+            BASENAME=$(basename "$TOPIC_FILE")
+            [ "$BASENAME" = "MEMORY.md" ] && continue
 
-        if ! grep -q "\`$BASENAME\`" "$MEM/MEMORY.md"; then
-            sed -i '' "${LAST_TOPIC_LINE}a\\
+            if ! grep -q "\`$BASENAME\`" "$MEM/MEMORY.md"; then
+                sed -i '' "${LAST_TOPIC_LINE}a\\
 - \`${BASENAME}\` -- reference material" "$MEM/MEMORY.md"
-            LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
-            RECONCILED=$((RECONCILED + 1))
-        fi
-    done
+                LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
+                RECONCILED=$((RECONCILED + 1))
+            fi
+        done
+    fi
 fi
 if [ "$RECONCILED" -gt 0 ]; then
     echo "  RECONCILED $RECONCILED orphaned topic file(s) into MEMORY.md"
