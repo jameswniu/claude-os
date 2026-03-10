@@ -28,14 +28,14 @@ git clone https://github.com/jameswniu/claude-os.git ~/claude-os
 ```
 
 ```bash
-cd ~/"<repo-name>"
+cd ~/"{<repo-name>}"
 ```
 
 ```bash
-bash ~/claude-os/"<repo-name>"/.claude/scripts/6-bootstrap.sh
+bash ~/claude-os/"{<repo-name>}"/.claude/scripts/6-bootstrap.sh
 ```
 
-> **Note:** `<repo-name>` is a literal directory in the claude-os repo, not a placeholder. Type it exactly as shown (with angle brackets).
+> **Note:** `{<repo-name>}` is a literal directory in the claude-os repo, not a placeholder. Type it exactly as shown (with curly and angle brackets).
 
 Bootstrap auto-runs `install.sh` on first use, which sets up:
 - `checkpoint` and `bootstrap` shell aliases (so next time just type `bootstrap`)
@@ -89,7 +89,7 @@ bootstrap
 Run the init script from any project directory. It copies template files only if they don't already exist.
 
 ```bash
-cd ~/"<repo-name>"
+cd ~/"{<repo-name>}"
 bootstrap
 ```
 
@@ -116,9 +116,9 @@ No setup needed. Just follow this rhythm as you work:
 Replace the manual loop with scheduled scripts.
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project:
-- `~/claude-os/<repo-name>/.claude/scripts/1-log.sh` - session logger (every 1h)
-- `~/claude-os/<repo-name>/.claude/scripts/2-distill.sh` - pattern distiller (every 24h)
-- `~/claude-os/<repo-name>/.claude/scripts/3-promote.sh` - rule promoter (every 7d)
+- `~/claude-os/{<repo-name>}/.claude/scripts/1-log.sh` - session logger (every 1h)
+- `~/claude-os/{<repo-name>}/.claude/scripts/2-distill.sh` - pattern distiller (every 24h)
+- `~/claude-os/{<repo-name>}/.claude/scripts/3-promote.sh` - rule promoter (every 7d)
 
 Then run bootstrap to generate and load per-project launchd agents:
 ```bash
@@ -137,7 +137,7 @@ source ~/.zshrc
 
 Then run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
-bash ~/claude-os/"<repo-name>"/.claude/scripts/4-sync-confluence.sh
+bash ~/claude-os/"{<repo-name>}"/.claude/scripts/4-sync-confluence.sh
 ```
 
 **Notion sync (optional):**
@@ -152,7 +152,7 @@ Share each Notion page with the integration (page `...` menu > "Connections" > a
 
 Then run the first sync. The script auto-discovers relevant pages and adds them to MEMORY.md:
 ```bash
-bash ~/claude-os/"<repo-name>"/.claude/scripts/5-sync-notion.sh
+bash ~/claude-os/"{<repo-name>}"/.claude/scripts/5-sync-notion.sh
 ```
 
 **Verify scripts are running:**
@@ -256,13 +256,13 @@ flowchart TD
 
 | File | Location | Purpose | Loaded | Example |
 |------|----------|---------|--------|---------|
-| `.claude/CLAUDE.local.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view](<repo-name>/.claude/CLAUDE.local.md) |
-| `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view](<repo-name>/.claude/settings.local.json) |
-| `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md) |
-| `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md) |
-| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view](.claude/projects/-Users-<user-name>-<repo-name>/memory/) |
-| `commands/review.md` | `~/.claude/commands/` (user-level) | Custom slash command for PR reviews | When invoked | [view](<repo-name>/.claude/commands/review.md) |
-| `commands/ticket.md` | `~/.claude/commands/` (user-level) | Custom slash command for ticket branching | When invoked | [view](<repo-name>/.claude/commands/ticket.md) |
+| `.claude/CLAUDE.local.md` | Repo `.claude/` (gitignored) | Personal workflow preferences, environment constraints | Auto, every session | [view]({<repo-name>}/.claude/CLAUDE.local.md) |
+| `settings.local.json` | Repo `.claude/` (gitignored) | Tool permissions and auto-approval rules | Client-side only (no tokens) | [view]({<repo-name>}/.claude/settings.local.json) |
+| `MEMORY.md` | `~/.claude/projects/{project}/memory/` | Learned patterns, API notes, project conventions | Auto, every session | [view]({.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/MEMORY.md) |
+| `history/logs.md` | `~/.claude/projects/{project}/memory/` | Append-only chronological session history | On demand | [view]({.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/history/logs.md) |
+| Topic files | `~/.claude/projects/{project}/memory/` | Reference docs: Confluence pages, API specs, runbooks | On demand | [view]({.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/) |
+| `commands/review.md` | `~/.claude/commands/` (user-level) | Custom slash command for PR reviews | When invoked | [view]({<repo-name>}/.claude/commands/review.md) |
+| `commands/ticket.md` | `~/.claude/commands/` (user-level) | Custom slash command for ticket branching | When invoked | [view]({<repo-name>}/.claude/commands/ticket.md) |
 
 ---
 
@@ -568,7 +568,7 @@ Existing topic files are refreshed on every run, never deleted.
    echo 'export CONFLUENCE_TOKEN="your-api-token"' >> ~/.zshrc
    source ~/.zshrc
    ```
-3. Test manually: `bash "<repo-name>"/.claude/scripts/4-sync-confluence.sh`
+3. Test manually: `bash "{<repo-name>}"/.claude/scripts/4-sync-confluence.sh`
 
 The script skips gracefully if credentials are not set. No errors, no data loss.
 
@@ -610,7 +610,7 @@ Existing topic files are refreshed on every run, never deleted.
    source ~/.zshrc
    ```
 4. **Share pages with the integration:** Open each Notion page, click `...` (top right) > "Connections" > add your integration name
-5. Test manually: `bash "<repo-name>"/.claude/scripts/5-sync-notion.sh`
+5. Test manually: `bash "{<repo-name>}"/.claude/scripts/5-sync-notion.sh`
 
 The script skips gracefully if the token is not set. No errors, no data loss.
 
@@ -637,23 +637,23 @@ OK use-case-library.md (461 lines)
 Sync complete. 2 synced, 0 failed.
 ```
 
-After syncing, run `checkpoint` to snapshot and filter the workspace files to the `<repo-name>/` and `.claude/projects/` directories:
+After syncing, run `checkpoint` to snapshot and filter the workspace files to the `{<repo-name>}/` and `{.claude}/projects/` directories:
 ```bash
 checkpoint
 ```
 
 ### Checkpoint (5-checkpoint.sh)
 
-Snapshots live workspace files into `<repo-name>/.claude/` and `.claude/projects/-Users-<user-name>-<repo-name>/memory/`, filtering project-specific content so templates are reusable across projects.
+Snapshots live workspace files into `{<repo-name>}/.claude/` and `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/`, filtering project-specific content so templates are reusable across projects.
 
 **What it syncs:**
 
 | Source | Template | Filtering |
 |--------|----------|-----------|
-| `.claude/CLAUDE.local.md` (personal) | `<repo-name>/.claude/CLAUDE.local.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
-| `MEMORY.md` | `.claude/projects/-Users-<user-name>-<repo-name>/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
-| Topic files (`*.md`) | `.claude/projects/-Users-<user-name>-<repo-name>/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
-| `history/logs.md` | `.claude/projects/-Users-<user-name>-<repo-name>/memory/history/logs.md` | Copied as-is |
+| `.claude/CLAUDE.local.md` (personal) | `{<repo-name>}/.claude/CLAUDE.local.md` | Universal rules kept verbatim, project-specific values (URLs, branch patterns) replaced with `(learned per project)` |
+| `MEMORY.md` | `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/MEMORY.md` | Project-specific sections get placeholders, topic index becomes situation-based (no source IDs) |
+| Topic files (`*.md`) | `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/*.md` | 1:1 distillation: strip Confluence page IDs, internal URLs, project names |
+| `history/logs.md` | `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/history/logs.md` | Copied as-is |
 
 **Filtering rules:**
 - Universal sections (PR Comment Style, Behavior Rules, Memory, Claude OS) are kept verbatim
@@ -682,7 +682,7 @@ cd ~/claude-os && mkdir -p output
 ```
 
 ```bash
-chmod +x "<repo-name>"/.claude/scripts/*.sh
+chmod +x "{<repo-name>}"/.claude/scripts/*.sh
 ```
 
 Edit each script to update `PROJECT_DIR` and `MEMORY_DIR` paths for your project.
@@ -752,7 +752,7 @@ client = anthropic.Anthropic()
 
 **Your repo (Phase 1 & 2):**
 
-- `<repo-name>/`
+- `{<repo-name>}/`
   - `CLAUDE.md` - Team rules (git tracked)
   - `.claude/`
     - `CLAUDE.md` - Personal rules (gitignored)
@@ -771,12 +771,12 @@ client = anthropic.Anthropic()
 **This repo (Phase 3 automation):**
 
 - `claude-os/`
-  - `.claude/projects/-Users-<user-name>-<repo-name>/memory/` - Memory templates
+  - `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/` - Memory templates
   - `.github/workflows/test.yml` - CI test runner
   - `README.md`
   - `install.sh` - Installs `checkpoint` and `bootstrap` commands
   - `tests/` - Validation tests
-  - `<repo-name>/` - Project config template
+  - `{<repo-name>}/` - Project config template
     - `.claude/`
       - `CLAUDE.md`, `settings.local.json`
       - `commands/review.md`, `commands/ticket.md`

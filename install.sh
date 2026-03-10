@@ -14,16 +14,21 @@ fi
 EOF
 chmod +x ~/.local/bin/checkpoint
 
-cat > ~/.local/bin/bootstrap << 'EOF'
+cat > ~/.local/bin/bootstrap << 'OUTER'
 #!/bin/bash
 if [ -f .claude/scripts/6-bootstrap.sh ]; then
     bash .claude/scripts/6-bootstrap.sh
 else
-    echo "Run from a bootstrapped project directory. First-time setup:"
-    echo '  bash ~/claude-os/<repo-name>/.claude/scripts/6-bootstrap.sh'
-    exit 1
+    # First-time bootstrap: run directly from claude-os template
+    TMPL="$HOME/claude-os/{<repo-name>}/.claude/scripts/6-bootstrap.sh"
+    if [ -f "$TMPL" ]; then
+        bash "$TMPL"
+    else
+        echo "claude-os not found at ~/claude-os. Clone it first."
+        exit 1
+    fi
 fi
-EOF
+OUTER
 chmod +x ~/.local/bin/bootstrap
 
 # Set up shell config
@@ -42,7 +47,7 @@ grep -q 'alias bootstrap=' "$SHELL_RC" 2>/dev/null && sed -i '' '/alias bootstra
 # Install pre-push hook
 CLAUDE_OS="$HOME/claude-os"
 mkdir -p "$CLAUDE_OS/.git/hooks"
-ln -sf "$CLAUDE_OS/<repo-name>/hooks/pre-push" "$CLAUDE_OS/.git/hooks/pre-push"
+ln -sf "$CLAUDE_OS/{<repo-name>}/hooks/pre-push" "$CLAUDE_OS/.git/hooks/pre-push"
 
 # Apply immediately
 source "$SHELL_RC" 2>/dev/null

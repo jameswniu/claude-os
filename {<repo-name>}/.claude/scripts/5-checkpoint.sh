@@ -12,7 +12,7 @@
 #   - {<repo-name>}/.claude/CLAUDE.local.md                                Universal rules, project values replaced
 #   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/MEMORY.md    Filtered + situation-based topic index
 #   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/*.md          Distilled, 1:1 with source
-#   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/history/logs.md  Copy as-is
+#   - {.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/history/logs.md  Merged (accumulate-only, 1000-line cap)
 
 CLAUDE_OS="$HOME/claude-os"
 REPO_TMPL="$CLAUDE_OS/{<repo-name>}"
@@ -174,6 +174,11 @@ if os.path.exists(tmpl_path):
     out = re.sub(r'\n{3,}', '\n\n', merged)
     out = out.rstrip() + '\n'
 
+# Enforce 200-line cap (matches distill's limit; overflow lives in topic files)
+lines = out.split('\n')
+if len(lines) > 200:
+    out = '\n'.join(lines[:200]) + '\n'
+
 with open(tmpl_path, 'w') as f:
     f.write(out)
 " 2>/dev/null
@@ -282,6 +287,11 @@ if os.path.exists(tmpl_path):
     out = re.sub(r'\n{3,}', '\n\n', merged)
     out = out.rstrip() + '\n'
 
+# Enforce 150-line cap (prevents unbounded growth from promote accumulations)
+lines = out.split('\n')
+if len(lines) > 150:
+    out = '\n'.join(lines[:150]) + '\n'
+
 with open(tmpl_path, 'w') as f:
     f.write(out)
 import sys
@@ -352,10 +362,129 @@ sys.exit(0 if changed else 2)
 done
 
 # ============================================================
-# 4. Copy logs.md as-is
+# 4. Merge logs.md (accumulate-only, ## date sections)
 # ============================================================
-mkdir -p "$MEM_TMPL/history" && cp "$MEM/history/logs.md" "$MEM_TMPL/history/" 2>/dev/null
-echo "  SKIPPED   $MEM_TMPL/history/logs.md"
+if [ -f "$MEM/history/logs.md" ]; then
+python3 -c "
+import re, os
+
+src_path = '$MEM/history/logs.md'
+tmpl_path = '$MEM_TMPL/history/logs.md'
+
+with open(src_path) as f:
+    src = f.read()
+
+existing = ''
+if os.path.exists(tmpl_path):
+    with open(tmpl_path) as f:
+        existing = f.read()
+
+def parse_sections(text):
+    parts = re.split(r'(^## .+$)', text, flags=re.MULTILINE)
+    preamble = parts[0]
+    secs = []
+    i = 1
+    while i < len(parts):
+        h = parts[i]
+        b = parts[i+1] if i+1 < len(parts) else ''
+        # Use heading text as key (e.g. '2026-02-18 (Day 1 ...)')
+        secs.append((h, b))
+        i += 2
+    return preamble, secs
+
+def merge_body(t_body, f_body):
+    \"\"\"Line-level union: keep all template lines, append new source lines.\"\"\"
+    def norm(line):
+        return line.replace('\u2014', '-').replace('\u2013', '-').lower().strip()
+    t_content = [l for l in t_body.split('\n') if l.strip()]
+    f_content = [l for l in f_body.split('\n') if l.strip()]
+    t_norms = {norm(l) for l in t_content}
+    new = [l for l in f_content if norm(l) not in t_norms]
+    if not new:
+        return t_body
+    return t_body.rstrip('\n') + '\n' + '\n'.join(new) + '\n'
+
+def heading_key(h):
+    \"\"\"Extract sortable date from heading like '## 2026-02-18 (Day 1 ...)'\"\"\"
+    m = re.search(r'(\d{4}-\d{2}-\d{2})', h)
+    return m.group(1) if m else h
+
+if not existing.strip():
+    # No template yet, just use source
+    out = src
+else:
+    t_pre, t_secs = parse_sections(existing)
+    s_pre, s_secs = parse_sections(src)
+    # Index template sections by heading key
+    t_map = {}
+    for h, b in t_secs:
+        t_map[heading_key(h)] = (h, b)
+    # Merge: start with all template sections, merge matching, append new
+    merged_keys = set()
+    merged_secs = []
+    for h, b in t_secs:
+        k = heading_key(h)
+        merged_keys.add(k)
+        merged_secs.append((k, h, b))
+    for h, b in s_secs:
+        k = heading_key(h)
+        if k in merged_keys:
+            # Merge body lines
+            for i, (mk, mh, mb) in enumerate(merged_secs):
+                if mk == k:
+                    merged_secs[i] = (mk, mh, merge_body(mb, b))
+                    break
+        else:
+            merged_keys.add(k)
+            merged_secs.append((k, h, b))
+    # Sort chronologically
+    merged_secs.sort(key=lambda x: x[0])
+    out = t_pre
+    for _, h, b in merged_secs:
+        out += h + b
+
+out = re.sub(r'\n{3,}', '\n\n', out)
+out = out.rstrip() + '\n'
+
+# Enforce 1000-line cap (truncate oldest entries from top)
+lines = out.split('\n')
+if len(lines) > 1000:
+    # Find the first ## heading at or after line 1000 from the end
+    # Keep the preamble (# Session Log), trim oldest ## sections
+    preamble_end = 0
+    for i, l in enumerate(lines):
+        if l.startswith('## '):
+            preamble_end = i
+            break
+    # Keep preamble + last N lines that fit in 1000
+    content_lines = lines[preamble_end:]
+    if len(content_lines) > 1000 - preamble_end:
+        # Walk from end, find section boundary closest to 1000 lines total
+        target = 1000 - preamble_end
+        cut = len(content_lines) - target
+        # Move cut forward to next ## boundary
+        while cut < len(content_lines) and not content_lines[cut].startswith('## '):
+            cut += 1
+        content_lines = content_lines[cut:]
+    out = '\n'.join(lines[:preamble_end] + content_lines)
+    if not out.endswith('\n'):
+        out += '\n'
+
+changed = out != existing
+with open(tmpl_path, 'w') as f:
+    f.write(out)
+
+import sys
+sys.exit(0 if changed else 2)
+" 2>/dev/null
+    if [ $? -eq 0 ]; then
+        echo "  FILTERED  $MEM_TMPL/history/logs.md"
+    else
+        echo "  SKIPPED   $MEM_TMPL/history/logs.md"
+    fi
+else
+    echo "  SKIPPED   $MEM_TMPL/history/logs.md (no source)"
+fi
 
 # ============================================================
 # 5. Update MEMORY.md template with situation-based topic index
