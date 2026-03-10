@@ -109,7 +109,7 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
     for F in "$HOME"/*/CLAUDE.md "$HOME"/*/*/CLAUDE.md; do
         [ -f "$F" ] || continue
         D=$(dirname "$F")
-        if [ "$(echo "$D" | tr '/.' '-')" = "$PROJECT_SLUG" ]; then
+        if [ "$(echo "$D" | tr '/._ ' '-')" = "$PROJECT_SLUG" ]; then
             CLAUDE_MD="$F"
             break
         fi

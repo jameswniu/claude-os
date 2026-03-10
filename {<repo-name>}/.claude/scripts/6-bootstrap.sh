@@ -15,7 +15,7 @@ cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null || true
 cd "$PROJECT"
 REPO_TMPL="$CLAUDE_OS/{<repo-name>}"
 MEM_TMPL="$CLAUDE_OS/{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory"
-SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
+SLUG=$(echo "$PROJECT" | tr '/._ ' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 git_cat() {
@@ -24,7 +24,10 @@ git_cat() {
 }
 git_ls() {
     local relpath="${1#$CLAUDE_OS/}"
-    git -C "$CLAUDE_OS" ls-tree --name-only "origin/main" "$relpath/" 2>/dev/null
+    local branch
+    branch=$(git -C "$CLAUDE_OS" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+    [ -z "$branch" ] && branch="main"
+    git -C "$CLAUDE_OS" ls-tree --name-only "origin/$branch" "$relpath/" 2>/dev/null || ls "$CLAUDE_OS/$relpath" 2>/dev/null
 }
 
 file_age() {

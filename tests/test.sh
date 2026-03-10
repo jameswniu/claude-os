@@ -47,6 +47,7 @@ grep -q "max-budget-usd" "$SCRIPT_DIR/2-distill.sh" && pass "has budget cap" || 
 grep -q "history/logs.md" "$SCRIPT_DIR/2-distill.sh" && pass "reads history/logs.md" || fail "missing history/logs.md reference"
 grep -q "MEMORY.md" "$SCRIPT_DIR/2-distill.sh" && pass "writes MEMORY.md" || fail "missing MEMORY.md reference"
 grep -q "200 lines" "$SCRIPT_DIR/2-distill.sh" && pass "enforces 200 line limit" || fail "missing line limit rule"
+grep -q "150" "$SCRIPT_DIR/2-distill.sh" && pass "enforces 150 line limit for CLAUDE.local.md" || fail "missing CLAUDE.local.md line limit"
 
 echo ""
 

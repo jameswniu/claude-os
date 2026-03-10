@@ -100,6 +100,14 @@ if archive:
         unset CLAUDECODE
 
         MEMORY_LINES=$(wc -l < "$MEMORY_DIR/MEMORY.md")
+        CLAUDE_LOCAL="$PROJECT_DIR/.claude/CLAUDE.local.md"
+        CL_LINES=0
+        [ -f "$CLAUDE_LOCAL" ] && CL_LINES=$(wc -l < "$CLAUDE_LOCAL")
+        CL_WARNING=""
+        if [ "$CL_LINES" -gt 130 ]; then
+            CL_WARNING="
+- CLAUDE.local.md is at $CL_LINES lines (limit: 150). Read $CLAUDE_LOCAL and consolidate redundant rules or trim stale entries. Do not exceed 150 lines."
+        fi
         claude -p "You are a memory distiller. Read the file at $MEMORY_DIR/MEMORY.md (topical patterns).
 
 Here are the recent log entries from the last 3 days:
@@ -113,7 +121,7 @@ Your job:
 - Do NOT add duplicate information
 - The '## Topic Files' section entries are managed by sync scripts. Do not add or remove entries there.
 - MEMORY.md is currently $MEMORY_LINES lines (hard limit: 200). If over 170 lines, move the largest non-essential section to its own topic file in the same directory and replace with a 1-line pointer.
-- Keep MEMORY.md under 200 lines total
+- Keep MEMORY.md under 200 lines total$CL_WARNING
 
 Output what you changed." \
           --allowedTools "Read,Edit" \

@@ -44,6 +44,13 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
         cd "$PROJECT_DIR" || exit 1
         unset CLAUDECODE
 
+        CL_LINES=0
+        [ -f "$CLAUDE_MD" ] && CL_LINES=$(wc -l < "$CLAUDE_MD")
+        CL_CAP_NOTE=""
+        if [ "$CL_LINES" -gt 130 ]; then
+            CL_CAP_NOTE="
+- CLAUDE.local.md is at $CL_LINES lines (limit: 150). Consolidate or merge related rules before adding new entries. Do not exceed 150 lines."
+        fi
         claude -p "You are a rule promoter. Read both files:
 1. $MEMORY_DIR/MEMORY.md (learned patterns)
 2. $CLAUDE_MD (current personal rules)
@@ -55,7 +62,7 @@ Your job:
 - If a pattern contradicts an existing rule, flag it but do NOT change the rule (leave a comment in your output)
 - Do NOT remove existing rules
 - Do NOT add speculative or single-occurrence patterns
-- Keep .claude/CLAUDE.local.md concise and actionable
+- Keep .claude/CLAUDE.local.md concise and actionable$CL_CAP_NOTE
 
 Output what you promoted (or 'No new promotions' if nothing qualified)." \
           --allowedTools "Read,Edit" \

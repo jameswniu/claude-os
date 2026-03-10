@@ -54,7 +54,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # ─── Fake project with memory files ─────────────────────────
 PROJECT="$SANDBOX/my-project"
 mkdir -p "$PROJECT/.claude"
-SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
+SLUG=$(echo "$PROJECT" | tr '/._ ' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 mkdir -p "$MEM"
 
@@ -263,7 +263,7 @@ echo "# Session Log" > "$MEM_TMPL_DIR/history/logs.md"
 # First "repo" has entry A
 PROJ_A="$SANDBOX/repo-a"
 mkdir -p "$PROJ_A/.claude"
-SLUG_A=$(echo "$PROJ_A" | tr '/.' '-' | sed 's/^//')
+SLUG_A=$(echo "$PROJ_A" | tr '/._ ' '-' | sed 's/^//')
 MEM_A="$HOME/.claude/projects/${SLUG_A}/memory/history"
 mkdir -p "$MEM_A"
 echo "# Memory" > "$(dirname "$MEM_A")/MEMORY.md"
@@ -286,7 +286,7 @@ bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" > /dev/null 2>&1
 # Second "repo" has entry B (some overlap, some new)
 PROJ_B="$SANDBOX/repo-b"
 mkdir -p "$PROJ_B/.claude"
-SLUG_B=$(echo "$PROJ_B" | tr '/.' '-' | sed 's/^//')
+SLUG_B=$(echo "$PROJ_B" | tr '/._ ' '-' | sed 's/^//')
 MEM_B="$HOME/.claude/projects/${SLUG_B}/memory/history"
 mkdir -p "$MEM_B"
 # Also need MEMORY.md for the checkpoint script to find the memory dir
@@ -327,7 +327,7 @@ echo "## 9. MEMORY.md respects line cap"
 # Create a project with a huge MEMORY.md (300+ lines)
 PROJ_BIG="$SANDBOX/big-mem"
 mkdir -p "$PROJ_BIG/.claude"
-SLUG_BIG=$(echo "$PROJ_BIG" | tr '/.' '-' | sed 's/^//')
+SLUG_BIG=$(echo "$PROJ_BIG" | tr '/._ ' '-' | sed 's/^//')
 MEM_BIG="$HOME/.claude/projects/${SLUG_BIG}/memory"
 mkdir -p "$MEM_BIG/history"
 echo "# Session Log" > "$MEM_BIG/history/logs.md"
@@ -360,6 +360,45 @@ bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" > /dev/null 2>&1
 TMPL_LINES=$(wc -l < "$MEM_TMPL_DIR/MEMORY.md")
 [ "$TMPL_LINES" -le 200 ] && pass "MEMORY.md capped at 200 lines ($TMPL_LINES)" || fail "MEMORY.md exceeds 200 lines ($TMPL_LINES)"
 [ "$BIG_LINES" -gt 200 ] && pass "source was over 200 lines ($BIG_LINES)" || fail "source was not big enough ($BIG_LINES)"
+
+echo ""
+
+# ═══════════════════════════════════════════════════════════════
+echo "## 10. CLAUDE.local.md respects line cap"
+# ═══════════════════════════════════════════════════════════════
+
+# Create a project with an oversized CLAUDE.local.md (200 lines)
+PROJ_CL="$SANDBOX/big-cl"
+mkdir -p "$PROJ_CL/.claude"
+SLUG_CL=$(echo "$PROJ_CL" | tr '/._ ' '-' | sed 's/^//')
+MEM_CL="$HOME/.claude/projects/${SLUG_CL}/memory"
+mkdir -p "$MEM_CL/history"
+echo "# Session Log" > "$MEM_CL/history/logs.md"
+echo "# Memory" > "$MEM_CL/MEMORY.md"
+
+# Generate a CLAUDE.local.md with 200 lines
+{
+  echo "## Section One"
+  echo ""
+  for i in $(seq 1 95); do echo "- Rule $i of section one"; done
+  echo ""
+  echo "## Section Two"
+  echo ""
+  for i in $(seq 1 100); do echo "- Rule $i of section two"; done
+} > "$PROJ_CL/.claude/CLAUDE.local.md"
+
+CL_SRC_LINES=$(wc -l < "$PROJ_CL/.claude/CLAUDE.local.md")
+
+# Reset template CLAUDE.local.md
+echo "# Seed" > "$CO/{<repo-name>}/.claude/CLAUDE.local.md"
+
+cd "$PROJ_CL"
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" 2>&1)
+
+TMPL_CL_LINES=$(wc -l < "$CO/{<repo-name>}/.claude/CLAUDE.local.md")
+[ "$TMPL_CL_LINES" -le 150 ] && pass "CLAUDE.local.md capped at 150 lines ($TMPL_CL_LINES)" || fail "CLAUDE.local.md exceeds 150 lines ($TMPL_CL_LINES)"
+[ "$CL_SRC_LINES" -gt 150 ] && pass "source was over 150 lines ($CL_SRC_LINES)" || fail "source was not big enough ($CL_SRC_LINES)"
+echo "$OUT" | grep -q "WARNING.*CLAUDE.local.md.*200 lines" && pass "checkpoint warns about CLAUDE.local.md over limit" || fail "missing CLAUDE.local.md over-limit warning"
 
 echo ""
 

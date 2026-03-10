@@ -6,6 +6,10 @@
 - When writing the final review summary, output the complete review in a single response.
 - Two PR types: config-only (version bumps, YAML) and feature PRs (multi-file). Config PRs are low-risk.
 - Git hosting platform and API details: (learned per project)
+## PR Description Format
+
+When creating a PR, always use exactly three headings: **Problem**, **Fix**, **Tests**. No other format. The Tests section uses checkboxes (`- [ ]` / `- [x]`). Only check boxes for tests actually run and passed. Never lie about checks.
+
 ## PR Reviews & Comments
 
 - No em dashes. Use commas, periods, or parentheses instead.

@@ -18,7 +18,7 @@ CLAUDE_OS="$HOME/claude-os"
 REPO_TMPL="$CLAUDE_OS/{<repo-name>}"
 MEM_TMPL="$CLAUDE_OS/{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory"
 PROJECT=$(pwd)
-SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
+SLUG=$(echo "$PROJECT" | tr '/._ ' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 [ ! -d "$MEM" ] && echo "No memory dir for $(basename "$PROJECT")" && exit 1
@@ -591,6 +591,34 @@ if [ "$MEM_TMPL_MD5" != "$MEM_TMPL_MD5_AFTER" ]; then
     echo "  FILTERED  $MEM_TMPL/MEMORY.md"
 else
     echo "  SKIPPED   $MEM_TMPL/MEMORY.md"
+fi
+
+# ============================================================
+# Enforce hard line caps (safety net + source warnings)
+# ============================================================
+TMPL_MEM="$MEM_TMPL/MEMORY.md"
+TMPL_MEM_LINES=$(wc -l < "$TMPL_MEM" 2>/dev/null || echo 0)
+if [ "$TMPL_MEM_LINES" -gt 200 ]; then
+    head -200 "$TMPL_MEM" > "$TMPL_MEM.tmp" && mv "$TMPL_MEM.tmp" "$TMPL_MEM"
+fi
+SRC_MEM_LINES=$(wc -l < "$MEM/MEMORY.md" 2>/dev/null || echo 0)
+if [ "$SRC_MEM_LINES" -gt 200 ]; then
+    echo "  WARNING  MEMORY.md is $SRC_MEM_LINES lines (limit: 200). Review and trim the source."
+fi
+
+TMPL_CL="$REPO_TMPL/.claude/CLAUDE.local.md"
+if [ -f "$TMPL_CL" ]; then
+    CL_LINES=$(wc -l < "$TMPL_CL")
+    if [ "$CL_LINES" -gt 150 ]; then
+        head -150 "$TMPL_CL" > "$TMPL_CL.tmp" && mv "$TMPL_CL.tmp" "$TMPL_CL"
+    fi
+fi
+SRC_CL="$PROJECT/.claude/CLAUDE.local.md"
+if [ -f "$SRC_CL" ]; then
+    SRC_CL_LINES=$(wc -l < "$SRC_CL")
+    if [ "$SRC_CL_LINES" -gt 150 ]; then
+        echo "  WARNING  CLAUDE.local.md is $SRC_CL_LINES lines (limit: 150). Review and trim the source."
+    fi
 fi
 
 # ============================================================
