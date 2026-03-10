@@ -9,6 +9,9 @@ mkdir -p "$LOG_DIR"
 
 # Find all project MEMORY.md files
 MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# Also include global memory if it exists
+[ -f "$HOME/.claude/memory/MEMORY.md" ] && MEMORY_FILES="$HOME/.claude/memory/MEMORY.md
+$MEMORY_FILES"
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/2-distill.log"
     exit 0
@@ -18,8 +21,14 @@ ERRORS=0
 
 while IFS= read -r MEMORY_FILE; do
     MEMORY_DIR=$(dirname "$MEMORY_FILE")
-    SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
-    PROJECT_DIR=$(python3 -c "
+
+    # For global memory (~/.claude/memory/), there's no project dir
+    if [ "$MEMORY_DIR" = "$HOME/.claude/memory" ]; then
+        PROJECT_DIR="$HOME"
+        echo "$(date): [global] Starting distill..." >> "$LOG_DIR/2-distill.log"
+    else
+        SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
+        PROJECT_DIR=$(python3 -c "
 import json, os
 slug = '$SLUG'
 with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
@@ -32,12 +41,13 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
         except:
             pass
 " 2>/dev/null)
-    if [ -z "$PROJECT_DIR" ]; then
-        echo "$(date): [$SLUG] Could not resolve project directory, skipping" >> "$LOG_DIR/2-distill.log"
-        continue
-    fi
+        if [ -z "$PROJECT_DIR" ]; then
+            echo "$(date): [$SLUG] Could not resolve project directory, skipping" >> "$LOG_DIR/2-distill.log"
+            continue
+        fi
 
-    echo "$(date): [$PROJECT_DIR] Starting distill..." >> "$LOG_DIR/2-distill.log"
+        echo "$(date): [$PROJECT_DIR] Starting distill..." >> "$LOG_DIR/2-distill.log"
+    fi
 
     # Archive entries older than 30 days to keep logs.md bounded
     ARCHIVE_DIR="$MEMORY_DIR/history/archive"

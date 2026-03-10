@@ -146,6 +146,41 @@ git_ls "$MEM_TMPL" | while read RELPATH; do
     seed_file "$MEM/$NAME" "$MEM_TMPL/$NAME" "$NAME"
 done
 
+# Phase 1b: Seed user-level configs (create-only)
+USER_TMPL="$CLAUDE_OS/{.claude}"
+
+seed_file "$HOME/.claude/settings.json" "$USER_TMPL/settings.json" "~/.claude/settings.json"
+seed_file "$HOME/.claude/settings.local.json" "$USER_TMPL/settings.local.json" "~/.claude/settings.local.json"
+
+# User-level commands
+git_ls "$USER_TMPL/commands" | while read RELPATH; do
+    NAME=$(basename "$RELPATH")
+    [[ "$NAME" == *.md ]] || continue
+    mkdir -p "$HOME/.claude/commands"
+    seed_file "$HOME/.claude/commands/$NAME" "$USER_TMPL/commands/$NAME" "~/.claude/commands/$NAME"
+done
+
+# User-level hooks (always overwrite with latest, same as project scripts)
+git_ls "$USER_TMPL/hooks" | while read RELPATH; do
+    NAME=$(basename "$RELPATH")
+    [[ "$NAME" == *.sh ]] || continue
+    mkdir -p "$HOME/.claude/hooks"
+    DEST="$HOME/.claude/hooks/$NAME"
+    TMPFILE=$(mktemp)
+    git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
+    if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
+        echo "  EXISTS   ~/.claude/hooks/$NAME  → $DEST"
+    else
+        cp "$TMPFILE" "$DEST" && chmod +x "$DEST"
+        echo "  SYNCED   ~/.claude/hooks/$NAME  → $DEST"
+    fi
+    rm -f "$TMPFILE"
+done
+
+# Global memory
+mkdir -p "$HOME/.claude/memory"
+seed_file "$HOME/.claude/memory/MEMORY.md" "$USER_TMPL/memory/MEMORY.md" "~/.claude/memory/MEMORY.md"
+
 # Add .claude/ to .gitignore if not already there
 if [ -f .gitignore ]; then
     if ! grep -q "^\.claude/$" .gitignore; then

@@ -54,6 +54,7 @@ When user says "no X" or "remove X", interpret it as "delete X entirely", not "d
 - At the end of each session, append a dated entry to `history/logs.md` summarizing what was done and learned.
 - Update `MEMORY.md` topics only when stable new patterns or facts are confirmed.
 - Before writing to MEMORY.md, check line count (`wc -l`). If over 180 lines, move content to topic files or trim stale entries instead of appending. Hard limit: 200 lines (content past 200 is silently dropped from context).
+- Before writing to CLAUDE.local.md, check line count (`wc -l`). If over 130 lines, consolidate or trim stale entries instead of appending. Hard limit: 150 lines (content past 150 is wasted context).
 ## Claude OS
 
 - Repo: `~/claude-os` (GitHub: `jameswniu/claude-os`)

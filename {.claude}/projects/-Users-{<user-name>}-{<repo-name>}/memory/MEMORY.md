@@ -29,7 +29,7 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - Only flag issues with one-liner + before/after fix
 - No headers, categories, impact labels, regression dumps, or notes sections
 - When PR comments reference supporting evidence (GIF recordings, screenshots, artifact tags, etc.), always include direct links to the specific files, not just the parent folder or tag page.
-
+- Scope and constrain: only flag real problems with actionable fixes. Don't add "notes," observations, or FYI callouts that invite bikeshedding. If it's not worth fixing, don't mention it.
 ## PR Review Patterns
 
 - Two PR types: config-only (version bumps, YAML changes) and feature PRs (multi-file, complex)
@@ -52,6 +52,7 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - **Bitbucket PR PUT wipes fields**: Mar 3 (BP-29577). Sent only `version` + `description`, wiped all 6 reviewers. Must always include all existing fields in PUT body.
 - **@mention verification**: After posting any outgoing message (PR comment, Slack, WhatsApp, etc.), always verify that @mentions/tags rendered as clickable elements (links or `data-mention-id` spans), not plain text. If plain text, edit and fix immediately. Bitbucket mention syntax in editor is `@"username"` (inserted via autocomplete Enter key, not click). Rendered mentions have `data-mention-id` attribute on parent span.
 - **Learning loop slug-to-path**: `sed 's|-|/|g'` cannot reverse Claude project slugs (ambiguous: `-` could be from `/`, `.`, or literal `-`). Must match forward (path-to-slug via `replace('/','-').replace('.','-')`) against known paths in `history.jsonl`. Fixed Mar 3.
+- **Skipped merge-dev before PR**: Always merge dev into the feature branch before creating a PR to catch conflicts early. Also run `bundle install` if Gemfile.lock changed.
 ## User Preferences
 
 - Hands-off, delegation-oriented. Issues a command and lets Claude run autonomously.
@@ -70,6 +71,10 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - **Always verify sends.** After sending any outgoing message (Slack, PR comment, etc.), take a screenshot to confirm it was delivered and check for typos/formatting issues before reporting success.
 - **@mentions require browser.** When user asks to tag someone, use browser (Chrome automation) to post -- Bitbucket REST API renders @mentions as plain text without notifications. CLI/API is fine for comments that don't tag anyone. Applies to all platforms (Bitbucket, Slack, WhatsApp, etc.). If CLI is later verified to support proper mentions on a platform, can switch back to CLI for that platform.
 - **Always attach test evidence.** PR comments about UI/smoke tests must include screenshots/GIFs as proof. Don't post test results without attached artifacts.
+- In all human-facing communication (PR comments, Slack, etc.): scope and constrain. Only raise real problems. Don't add "notes," FYI observations, or tangential callouts that invite unnecessary discussion.
+- PR description format and test checkbox rules: see global `~/.claude/memory/MEMORY.md`
+- Slash command backup rule: see global `~/.claude/memory/MEMORY.md`
+- When saving to memory or config files, always show the full absolute file path (starting from `/Users/james.niu/`) so the user can click it
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in the memory directory. Zero tokens until read.
@@ -187,15 +192,3 @@ Reference docs in the memory directory. Zero tokens until read.
 - Commands with `$()` substitution always prompt regardless of allowlist
 - CLAUDE.md can exist in any subdirectory (infinite locations, loaded on demand); settings.json is 3 fixed locations only
 - **Security**: CLAUDE.md = AI context (low risk); settings.json = CLI execution permissions (high risk, silently auto-runs commands)
-- PR #30710 incident: Jon un-ignored `.claude/` without asking why it was ignored. See `claude-code-settings-security-incident.md`
-- `/.claude/commands/review.md` - /review slash command (project-level)
-- `~/.claude/commands/` - User-level slash commands (vid, ui) shared across projects
-- `/ui` vs `/ui1`: `/ui1` is newer with multi-turn flow and mid-generation refresh support
-- `03-05-2026-claude-code-with-chrome.md` -- reference material
-- `agent-dx-patterns.md` -- reference material
-- `basis-environments-overview.md` -- reference material
-- `demo-recording.md` -- reference material
-- `how-to-write-a-self-review-for-developers.md` -- reference material
-- `team-values.md` -- reference material
-- `team.md` -- reference material
-

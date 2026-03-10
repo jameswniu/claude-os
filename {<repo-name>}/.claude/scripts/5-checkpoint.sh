@@ -622,7 +622,36 @@ if [ -f "$SRC_CL" ]; then
 fi
 
 # ============================================================
-# 7. Commit and push
+# 8. Snapshot user-level configs
+# ============================================================
+USER_TMPL="$CLAUDE_OS/{.claude}"
+
+# settings.json (as-is, no personal info)
+[ -f "$HOME/.claude/settings.json" ] && cp "$HOME/.claude/settings.json" "$USER_TMPL/settings.json"
+
+# settings.local.json (as-is, just permissions)
+[ -f "$HOME/.claude/settings.local.json" ] && cp "$HOME/.claude/settings.local.json" "$USER_TMPL/settings.local.json"
+
+# commands/ (all .md files)
+if ls "$HOME/.claude/commands/"*.md >/dev/null 2>&1; then
+    mkdir -p "$USER_TMPL/commands"
+    cp "$HOME/.claude/commands/"*.md "$USER_TMPL/commands/"
+fi
+
+# hooks/ (all .sh files)
+if ls "$HOME/.claude/hooks/"*.sh >/dev/null 2>&1; then
+    mkdir -p "$USER_TMPL/hooks"
+    cp "$HOME/.claude/hooks/"*.sh "$USER_TMPL/hooks/"
+fi
+
+# memory/MEMORY.md (templatize: strip personal URLs)
+if [ -f "$HOME/.claude/memory/MEMORY.md" ]; then
+    mkdir -p "$USER_TMPL/memory"
+    sed '/^- LinkedIn:/d' "$HOME/.claude/memory/MEMORY.md" > "$USER_TMPL/memory/MEMORY.md"
+fi
+
+# ============================================================
+# 9. Commit and push
 # ============================================================
 cd "$CLAUDE_OS"
 git add '{<repo-name>}/' '{.claude}/'
