@@ -7,11 +7,13 @@ LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 
-# Find all project MEMORY.md files
-MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
-# Also include global memory if it exists
-[ -f "$HOME/.claude/memory/MEMORY.md" ] && MEMORY_FILES="$HOME/.claude/memory/MEMORY.md
-$MEMORY_FILES"
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES="$MEMORY_FILE"
+else
+    # Manual run: process all projects
+    MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/2-distill.log"
     exit 0
@@ -21,14 +23,8 @@ ERRORS=0
 
 while IFS= read -r MEMORY_FILE; do
     MEMORY_DIR=$(dirname "$MEMORY_FILE")
-
-    # For global memory (~/.claude/memory/), there's no project dir
-    if [ "$MEMORY_DIR" = "$HOME/.claude/memory" ]; then
-        PROJECT_DIR="$HOME"
-        echo "$(date): [global] Starting distill..." >> "$LOG_DIR/2-distill.log"
-    else
-        SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
-        PROJECT_DIR=$(python3 -c "
+    SLUG=$(echo "$MEMORY_DIR" | sed 's|.*/projects/||; s|/memory.*||')
+    PROJECT_DIR=$(python3 -c "
 import json, os
 slug = '$SLUG'
 with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
@@ -41,13 +37,12 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
         except:
             pass
 " 2>/dev/null)
-        if [ -z "$PROJECT_DIR" ]; then
-            echo "$(date): [$SLUG] Could not resolve project directory, skipping" >> "$LOG_DIR/2-distill.log"
-            continue
-        fi
-
-        echo "$(date): [$PROJECT_DIR] Starting distill..." >> "$LOG_DIR/2-distill.log"
+    if [ -z "$PROJECT_DIR" ]; then
+        echo "$(date): [$SLUG] Could not resolve project directory, skipping" >> "$LOG_DIR/2-distill.log"
+        continue
     fi
+
+    echo "$(date): [$PROJECT_DIR] Starting distill..." >> "$LOG_DIR/2-distill.log"
 
     # Archive entries older than 30 days to keep logs.md bounded
     ARCHIVE_DIR="$MEMORY_DIR/history/archive"
@@ -110,14 +105,6 @@ if archive:
         unset CLAUDECODE
 
         MEMORY_LINES=$(wc -l < "$MEMORY_DIR/MEMORY.md")
-        CLAUDE_LOCAL="$PROJECT_DIR/.claude/CLAUDE.local.md"
-        CL_LINES=0
-        [ -f "$CLAUDE_LOCAL" ] && CL_LINES=$(wc -l < "$CLAUDE_LOCAL")
-        CL_WARNING=""
-        if [ "$CL_LINES" -gt 130 ]; then
-            CL_WARNING="
-- CLAUDE.local.md is at $CL_LINES lines (limit: 150). Read $CLAUDE_LOCAL and consolidate redundant rules or trim stale entries. Do not exceed 150 lines."
-        fi
         claude -p "You are a memory distiller. Read the file at $MEMORY_DIR/MEMORY.md (topical patterns).
 
 Here are the recent log entries from the last 3 days:
@@ -131,7 +118,8 @@ Your job:
 - Do NOT add duplicate information
 - The '## Topic Files' section entries are managed by sync scripts. Do not add or remove entries there.
 - MEMORY.md is currently $MEMORY_LINES lines (hard limit: 200). If over 170 lines, move the largest non-essential section to its own topic file in the same directory and replace with a 1-line pointer.
-- Keep MEMORY.md under 200 lines total$CL_WARNING
+- Keep MEMORY.md under 200 lines total
+- Note: CLAUDE.local.md has a 150 line hard limit (enforced by checkpoint/promote)
 
 Output what you changed." \
           --allowedTools "Read,Edit" \
@@ -147,6 +135,27 @@ Output what you changed." \
     fi
 
     echo "$(date): [$PROJECT_DIR] Distill complete" >> "$LOG_DIR/2-distill.log"
+
+    # Overflow early warning: if MEMORY.md > 180 lines, log top 5 archival candidates
+    MEMORY_LINES=$(wc -l < "$MEMORY_FILE" 2>/dev/null || echo 0)
+    if [ "$MEMORY_LINES" -gt 180 ]; then
+        echo "$(date): [$PROJECT_DIR] WARNING: MEMORY.md at $MEMORY_LINES/200 lines" >> "$LOG_DIR/2-distill.log"
+        GC_META="$MEMORY_DIR/.gc-metadata.json"
+        if [ -f "$GC_META" ]; then
+            python3 -c "
+import json
+with open('$GC_META') as f:
+    meta = json.load(f)
+scored = [(k, v.get('score', 100)) for k, v in meta.items() if isinstance(v, dict) and 'score' in v]
+scored.sort(key=lambda x: x[1])
+print('  Top 5 archival candidates:')
+for name, score in scored[:5]:
+    print(f'    {name} (score={score})')
+" >> "$LOG_DIR/2-distill.log" 2>/dev/null
+        else
+            echo "  (run 7-gc.sh first to generate scoring data)" >> "$LOG_DIR/2-distill.log"
+        fi
+    fi
 
 done <<< "$MEMORY_FILES"
 

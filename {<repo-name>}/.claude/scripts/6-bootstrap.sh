@@ -15,7 +15,7 @@ cd "$CLAUDE_OS" && git pull --ff-only 2>/dev/null || true
 cd "$PROJECT"
 REPO_TMPL="$CLAUDE_OS/{<repo-name>}"
 MEM_TMPL="$CLAUDE_OS/{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory"
-SLUG=$(echo "$PROJECT" | tr '/._ ' '-' | sed 's/^//')
+SLUG=$(echo "$PROJECT" | tr '/.' '-' | sed 's/^//')
 MEM="$HOME/.claude/projects/${SLUG}/memory"
 
 git_cat() {
@@ -24,10 +24,7 @@ git_cat() {
 }
 git_ls() {
     local relpath="${1#$CLAUDE_OS/}"
-    local branch
-    branch=$(git -C "$CLAUDE_OS" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
-    [ -z "$branch" ] && branch="main"
-    git -C "$CLAUDE_OS" ls-tree --name-only "origin/$branch" "$relpath/" 2>/dev/null || ls "$CLAUDE_OS/$relpath" 2>/dev/null
+    git -C "$CLAUDE_OS" ls-tree --name-only "origin/main" "$relpath/" 2>/dev/null
 }
 
 file_age() {
@@ -55,6 +52,41 @@ seed_file() {
 
 echo "Project: $PROJECT"
 echo ""
+
+# Phase 0: Seed user-level configs from {.claude} template
+USER_TMPL="$CLAUDE_OS/{.claude}"
+if [ -d "$USER_TMPL" ]; then
+    mkdir -p "$HOME/.claude/commands" "$HOME/.claude/hooks" "$HOME/.claude/memory"
+
+    # settings.json
+    [ -f "$USER_TMPL/settings.json" ] && [ ! -f "$HOME/.claude/settings.json" ] && \
+        cp "$USER_TMPL/settings.json" "$HOME/.claude/settings.json" && \
+        echo "  CREATED  ~/.claude/settings.json"
+
+    # commands/*.md
+    for CMD in "$USER_TMPL"/commands/*.md; do
+        [ -f "$CMD" ] || continue
+        NAME=$(basename "$CMD")
+        [ ! -f "$HOME/.claude/commands/$NAME" ] && \
+            cp "$CMD" "$HOME/.claude/commands/$NAME" && \
+            echo "  CREATED  ~/.claude/commands/$NAME"
+    done
+
+    # hooks/*.sh (preserve +x)
+    for HOOK in "$USER_TMPL"/hooks/*.sh; do
+        [ -f "$HOOK" ] || continue
+        NAME=$(basename "$HOOK")
+        [ ! -f "$HOME/.claude/hooks/$NAME" ] && \
+            cp "$HOOK" "$HOME/.claude/hooks/$NAME" && \
+            chmod +x "$HOME/.claude/hooks/$NAME" && \
+            echo "  CREATED  ~/.claude/hooks/$NAME"
+    done
+
+    # memory/MEMORY.md
+    [ -f "$USER_TMPL/memory/MEMORY.md" ] && [ ! -f "$HOME/.claude/memory/MEMORY.md" ] && \
+        cp "$USER_TMPL/memory/MEMORY.md" "$HOME/.claude/memory/MEMORY.md" && \
+        echo "  CREATED  ~/.claude/memory/MEMORY.md"
+fi
 
 # Phase 1: Sync all files from {<repo-name>} template
 mkdir -p .claude "$MEM/history"
@@ -146,41 +178,6 @@ git_ls "$MEM_TMPL" | while read RELPATH; do
     seed_file "$MEM/$NAME" "$MEM_TMPL/$NAME" "$NAME"
 done
 
-# Phase 1b: Seed user-level configs (create-only)
-USER_TMPL="$CLAUDE_OS/{.claude}"
-
-seed_file "$HOME/.claude/settings.json" "$USER_TMPL/settings.json" "~/.claude/settings.json"
-seed_file "$HOME/.claude/settings.local.json" "$USER_TMPL/settings.local.json" "~/.claude/settings.local.json"
-
-# User-level commands
-git_ls "$USER_TMPL/commands" | while read RELPATH; do
-    NAME=$(basename "$RELPATH")
-    [[ "$NAME" == *.md ]] || continue
-    mkdir -p "$HOME/.claude/commands"
-    seed_file "$HOME/.claude/commands/$NAME" "$USER_TMPL/commands/$NAME" "~/.claude/commands/$NAME"
-done
-
-# User-level hooks (always overwrite with latest, same as project scripts)
-git_ls "$USER_TMPL/hooks" | while read RELPATH; do
-    NAME=$(basename "$RELPATH")
-    [[ "$NAME" == *.sh ]] || continue
-    mkdir -p "$HOME/.claude/hooks"
-    DEST="$HOME/.claude/hooks/$NAME"
-    TMPFILE=$(mktemp)
-    git_cat "$CLAUDE_OS/$RELPATH" > "$TMPFILE"
-    if [ -f "$DEST" ] && cmp -s "$TMPFILE" "$DEST"; then
-        echo "  EXISTS   ~/.claude/hooks/$NAME  → $DEST"
-    else
-        cp "$TMPFILE" "$DEST" && chmod +x "$DEST"
-        echo "  SYNCED   ~/.claude/hooks/$NAME  → $DEST"
-    fi
-    rm -f "$TMPFILE"
-done
-
-# Global memory
-mkdir -p "$HOME/.claude/memory"
-seed_file "$HOME/.claude/memory/MEMORY.md" "$USER_TMPL/memory/MEMORY.md" "~/.claude/memory/MEMORY.md"
-
 # Add .claude/ to .gitignore if not already there
 if [ -f .gitignore ]; then
     if ! grep -q "^\.claude/$" .gitignore; then
@@ -198,29 +195,22 @@ fi
 bash "$CLAUDE_OS/install.sh"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Reconcile orphaned topic files into MEMORY.md (only within Topic Files section)
+# Reconcile orphaned topic files into MEMORY.md
 RECONCILED=0
-TOPIC_SEC_START=$(grep -n '## Topic Files' "$MEM/MEMORY.md" | head -1 | cut -d: -f1)
-TOPIC_SEC_END=$(awk -v start="$TOPIC_SEC_START" 'NR > start && /^## / { print NR; exit }' "$MEM/MEMORY.md" 2>/dev/null)
-[ -z "$TOPIC_SEC_END" ] && TOPIC_SEC_END=$(wc -l < "$MEM/MEMORY.md")
-if [ -n "$TOPIC_SEC_START" ]; then
-    # Find the last topic entry line within the section only
-    LAST_TOPIC_LINE=$(sed -n "${TOPIC_SEC_START},${TOPIC_SEC_END}p" "$MEM/MEMORY.md" | grep -n '`[^`]*\.md`' | tail -1 | cut -d: -f1)
-    [ -n "$LAST_TOPIC_LINE" ] && LAST_TOPIC_LINE=$((TOPIC_SEC_START + LAST_TOPIC_LINE - 1))
-    if [ -n "$LAST_TOPIC_LINE" ]; then
-        for TOPIC_FILE in "$MEM"/*.md; do
-            [ -f "$TOPIC_FILE" ] || continue
-            BASENAME=$(basename "$TOPIC_FILE")
-            [ "$BASENAME" = "MEMORY.md" ] && continue
+LAST_TOPIC_LINE=$(grep -n '`[^`]*\.md`' "$MEM/MEMORY.md" | grep -v 'MEMORY\.md\|CLAUDE\.md\|logs\.md' | tail -1 | cut -d: -f1)
+if [ -n "$LAST_TOPIC_LINE" ]; then
+    for TOPIC_FILE in "$MEM"/*.md; do
+        [ -f "$TOPIC_FILE" ] || continue
+        BASENAME=$(basename "$TOPIC_FILE")
+        [ "$BASENAME" = "MEMORY.md" ] && continue
 
-            if ! grep -q "\`$BASENAME\`" "$MEM/MEMORY.md"; then
-                sed -i '' "${LAST_TOPIC_LINE}a\\
+        if ! grep -q "\`$BASENAME\`" "$MEM/MEMORY.md"; then
+            sed -i '' "${LAST_TOPIC_LINE}a\\
 - \`${BASENAME}\` -- reference material" "$MEM/MEMORY.md"
-                LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
-                RECONCILED=$((RECONCILED + 1))
-            fi
-        done
-    fi
+            LAST_TOPIC_LINE=$((LAST_TOPIC_LINE + 1))
+            RECONCILED=$((RECONCILED + 1))
+        fi
+    done
 fi
 if [ "$RECONCILED" -gt 0 ]; then
     echo "  RECONCILED $RECONCILED orphaned topic file(s) into MEMORY.md"
@@ -368,6 +358,7 @@ PEOF
     generate_plist promote          3-promote.sh          604800
     generate_plist sync-confluence  4-sync-confluence.sh  86400
     generate_plist sync-notion      5-sync-notion.sh      86400
+    generate_plist gc               7-gc.sh               604800
 fi
 
 echo ""
