@@ -10,7 +10,12 @@ CONFLUENCE_BASE="https://basis.atlassian.net/wiki/rest/api/content"
 mkdir -p "$LOG_DIR"
 
 # --- Phase 0: Reconcile orphaned topic files into MEMORY.md ---
-MEMORY_FILES_ALL=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES_ALL="$MEMORY_FILE"
+else
+    MEMORY_FILES_ALL=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 RECONCILED_TOTAL=0
 
 while IFS= read -r MF; do
@@ -66,8 +71,13 @@ if [ -z "$CONFLUENCE_EMAIL" ] || [ -z "$CONFLUENCE_TOKEN" ]; then
     exit 2
 fi
 
-# Find all project MEMORY.md files
-MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES="$MEMORY_FILE"
+else
+    # Manual run: process all projects
+    MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/4-sync-confluence.log"
     exit 0
@@ -109,7 +119,7 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
     for F in "$HOME"/*/CLAUDE.md "$HOME"/*/*/CLAUDE.md; do
         [ -f "$F" ] || continue
         D=$(dirname "$F")
-        if [ "$(echo "$D" | tr '/._ ' '-')" = "$PROJECT_SLUG" ]; then
+        if [ "$(echo "$D" | tr '/.' '-')" = "$PROJECT_SLUG" ]; then
             CLAUDE_MD="$F"
             break
         fi

@@ -85,6 +85,12 @@ Tell the user which profile you picked and why. If unclear, ask.
 
 ### 4a: Send the test prompt and complete the flow
 
+**Profile A prerequisite: recursion limit bump**
+The full strategy flow exceeds LangGraph's default `recursion_limit` of 25 (3+ sequential tool calls with multiple graph steps each). Before running Profile A:
+1. Add `config["recursion_limit"] = 100` in `src/orchestrator/services/agent_execution_service.py`, right before the `astream_events()` call
+2. Wait for hot-reload to pick up the change (orchestrator has `--reload`)
+3. **Revert this change after the test completes** (Step 5)
+
 1. Use the blank tab from Step 1 (returned by `tabs_context_mcp`). If all existing tabs have content, create a new tab via `tabs_create_mcp`.
 2. Navigate to `http://localhost:3001`
 3. Wait for the page to load fully. If it doesn't load within 10 seconds, check:
@@ -138,9 +144,19 @@ NOTE: `form_input` only fills the textarea value -- it does not submit. You must
 17. Press Enter to submit
 18. The AI will begin a longer generation cycle -- typically involving strategy generation tool calls (60-90 seconds each).
 
+#### Mid-generation refresh (Profile A only)
+
+The mid-generation refresh tests SSE stream reconnection. Do this while "Generate Full Strategy From Brief" (or the longest-running tool) is actively running:
+
+18a. Wait ~20 seconds into the generation tool call, then press Cmd+R (Mac) or F5 to refresh
+18b. Wait 5 seconds for the page to reload
+18c. Take a screenshot. The frontend should reconnect to the SSE stream and resume showing "Running..." with a stop button
+18d. If the stop button does NOT reappear after 10 seconds, the reconnection may have failed. Take a screenshot and flag it.
+
 #### Wait for generation to complete
 
 NOTE: The AI may run multiple tool call cycles. The polling loop should wait for ALL cycles to complete (stop button disappears for good), not just the first tool call.
+NOTE: The AI may non-deterministically add extra steps (e.g., "Brief Summary Review") requiring an additional user turn. If the response asks for confirmation before generating, send "yes, proceed" and continue polling.
 
 19. Poll every 15 seconds, up to 20 iterations (300s max):
     - Use `find` tool to search for "stop generation button"
@@ -151,13 +167,17 @@ NOTE: The AI may run multiple tool call cycles. The polling loop should wait for
 
 #### Verify artifact appeared (Profile A only)
 
-NOTE: The artifact may not appear until after the AI finishes streaming its full text response,
-which can be 10-20 seconds AFTER the last tool call completes. After the stop button disappears,
-wait an additional 10 seconds before checking for the artifact panel.
+NOTE: The artifact may not appear until 20-40+ seconds after the AI finishes streaming its full text response.
+The generation completion polling (steps 19-20) confirms the LLM stopped, but the artifact panel renders asynchronously after that.
 
-21. After the response completes, wait 10 seconds, then use `find` tool to search for "artifact panel" or "strategy" on the right side of the screen.
-    - If no artifact panel is visible, scroll down to check if an artifact card appears in the chat
-    - If still no artifact, flag: "WARNING: No artifact generated in the full flow"
+21. Poll for the artifact panel every 5 seconds, up to 24 iterations (120s max):
+    - Use `find` tool to search for "artifact panel" or "strategy" on the right side of the screen
+    - If found, break out of the loop
+    - If not found, scroll down to check if an artifact card appears in the chat
+    - If found in chat, break
+    - If still not found and iterations remain, wait 5 seconds and retry
+    - Take a screenshot every 4th iteration (~20s) to capture progress
+    - If after 120 seconds no artifact is found, flag: "WARNING: No artifact generated after 120s polling"
 
 #### Capture streaming state
 
@@ -174,10 +194,11 @@ repeated as needed until the user's original message is visible.
 
 The streaming state and the persisted state can diverge. SSE events may include cleaned-up fields (like `display_name`) that the `/history` endpoint does not. After the response completes:
 
-25. Refresh the page (press F5)
+25. Refresh the page (press Cmd+R on Mac, F5 on Windows)
 26. Wait 5 seconds for the chat history to reload from the `/history` API
-27. Take a screenshot. This captures the **persisted state**.
-28. Compare the two screenshots (streaming vs persisted). Look for differences in:
+27. **Re-open the artifact panel (Profile A):** After refresh, the artifact panel closes. Scroll to find the artifact card in the chat and click it to re-open the panel. The final GIF frame should show the artifact panel open.
+28. Take a screenshot. This captures the **persisted state**.
+29. Compare the two screenshots (streaming vs persisted). Look for differences in:
     - Tool call card names (prefixes reappearing, formatting changes)
     - Missing or broken tool output cards
     - Duplicate tool outputs (same tool output appearing multiple times)
@@ -261,33 +282,56 @@ Run these checks ONLY if the PR diff touches the relevant area:
 
 Artifacts must NOT be committed to the PR branch (they would get merged into main).
 
+**If Profile A: revert the recursion_limit bump first.**
+Remove the `config["recursion_limit"] = 100` line from `src/orchestrator/services/agent_execution_service.py`.
+
 1. Export the GIF via `gif_creator` with action `export`, download `true`, filename `{ticket}-ui-test.gif`
-2. If issues were found, annotate the page:
+2. **Slow down the GIF** so each frame is readable (~1.5s per frame):
+   ```bash
+   magick ~/Downloads/{ticket}-ui-test.gif -set delay 150 ~/Downloads/{ticket}-ui-test-slow.gif
+   ```
+   Use the slow version for the PR comment. Verify with `magick identify -format "%T\n"` that all frames show 150.
+3. If issues were found, annotate the page:
    - Use `javascript_tool` to inject red borders and labels on problem elements (e.g., `el.style.border = '3px solid red'` and append a label div with red background)
    - Capture the annotated state via GIF creator (start recording, perform one scroll action for a frame, stop, export with `showClickIndicators: false, showActionLabels: false, showProgressBar: false, showWatermark: false`)
    - Export as `{ticket}-annotated-bug.gif`
-3. Handle Downloads filename collisions: check for `{ticket}-ui-test (1).gif` etc. in `~/Downloads/`
+4. Handle Downloads filename collisions: check for `{ticket}-ui-test (1).gif` etc. in `~/Downloads/`
 
-### Store artifacts on a git tag (not the PR branch)
+### Store artifacts on a dedicated branch (not the PR branch, not a tag)
 
-4. Create a temporary branch from main, commit artifacts, tag, delete branch:
+Non-semver git tags break release automation. Always use an orphan branch.
+
+**WARNING: Docker bind mount.** The orchestrator/frontend containers mount the local repo directory. Switching branches changes the source files under the running containers. After switching back to the PR branch, you may need to restart the frontend container.
+
+5. Create an orphan artifact branch, commit the GIF, push, return to original branch:
 ```bash
 git stash  # if needed
-git checkout -b {ticket}-ui-test-artifacts origin/main
-mkdir -p demo-captures
-cp ~/Downloads/{latest-gif-file} demo-captures/{ticket}-ui-test.gif
-cp ~/Downloads/{latest-annotated-file} demo-captures/{ticket}-annotated-bug.gif  # if applicable
-git add demo-captures/
-git commit -m "chore: UI smoke test artifacts for {ticket} (do not merge)"
-git tag {ticket}-ui-test-evidence
-git push origin {ticket}-ui-test-evidence
+git checkout --orphan {ticket}-ui-test-evidence
+git rm -rf . 2>/dev/null
+cp ~/Downloads/{latest-slow-gif-file} {ticket}-ui-test.gif
+cp ~/Downloads/{latest-annotated-file} {ticket}-annotated-bug.gif  # if applicable
+git add *.gif
+git commit --no-verify -m "UI smoke test artifacts for {ticket}"
+git push --no-verify origin {ticket}-ui-test-evidence  # --no-verify: orphan branch has no ESLint config
 git checkout {original-branch}
-git branch -D {ticket}-ui-test-artifacts
+git stash pop 2>/dev/null
 ```
 
-Artifact URLs use tag refs (permanent, won't get merged):
+If the artifact branch already exists, just check it out, add the new file, and push:
+```bash
+git stash  # if needed
+git checkout {ticket}-ui-test-evidence
+cp ~/Downloads/{latest-slow-gif-file} {ticket}-ui-test-v{N}.gif
+git add *.gif
+git commit --no-verify -m "UI smoke test v{N} for {ticket}"
+git push --no-verify origin {ticket}-ui-test-evidence
+git checkout {original-branch}
+git stash pop 2>/dev/null
 ```
-https://stash.centro.net/projects/CEN/repos/media-strategy-generator/browse/demo-captures/{file}?at=refs/tags/{ticket}-ui-test-evidence
+
+Artifact URLs use branch refs (permanent, won't get merged):
+```
+https://stash.centro.net/projects/CEN/repos/{repo-name}/raw/{file}?at=refs/heads/{ticket}-ui-test-evidence
 ```
 
 ---
@@ -324,9 +368,21 @@ Present findings to the user. Always include BOTH states:
 **If non-UI-affecting and both states are consistent:**
 - Report: "Ran smoke test on localhost:3001. Chat renders correctly in both streaming and persisted states. Tool calls display properly, no regressions observed."
 
-Include links to the artifact tag on Bitbucket.
-
 **Test profile used:** State which profile (A/B/C/D) was selected and why.
+
+---
+
+## Step 7: Post PR comment (MANDATORY)
+
+1. Look up the PR number via Bitbucket API for the feature branch.
+2. Draft a concise PR comment. Rules:
+   - Embed the GIF inline: `![smoke-test]({raw-gif-url})`
+   - Add a `[View GIF]({raw-gif-url})` link on the line immediately below the image (Bitbucket may not render inline images, so the direct link is the fallback)
+   - Do NOT mention the artifact branch in the comment. Just link the GIF directly.
+   - Keep it bite-sized: what was verified, the GIF, done.
+3. Show the comment to the user for approval before posting.
+4. POST the comment to Bitbucket.
+5. **Always output the PR comment permalink at the end.**
 
 STOP. Done.
 
@@ -334,8 +390,8 @@ STOP. Done.
 
 ## Cleanup
 
-Tags can be deleted when no longer needed:
+Artifact branches can be deleted when no longer needed:
 ```bash
 git push origin --delete {ticket}-ui-test-evidence
-git tag -d {ticket}-ui-test-evidence
+git branch -D {ticket}-ui-test-evidence
 ```

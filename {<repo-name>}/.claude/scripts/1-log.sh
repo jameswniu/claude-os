@@ -8,8 +8,13 @@ LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 
-# Find all project MEMORY.md files
-MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES="$MEMORY_FILE"
+else
+    # Manual run: process all projects
+    MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/1-log.log"
     exit 0

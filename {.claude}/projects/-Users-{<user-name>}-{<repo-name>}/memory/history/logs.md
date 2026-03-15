@@ -1,35 +1,5 @@
 # Session Log
 
-## Cumulative Friction Log
-
-| Date | Friction | Resolution |
-|------|----------|------------|
-| 02-18 | Claude tried to CREATE a PR instead of reviewing one | Re-clarified instructions, built /review command |
-| 02-18 | `gh` CLI not installed | Added to .claude/CLAUDE.md Environment Constraints |
-| 02-19 | Diffed against local checkout instead of remote branch | Added fetch-first rule to .claude/CLAUDE.md |
-| 02-21 | Sessions timed out mid-review output | Added "complete review in single response" rule |
-| 02-22 | Regression scan hit node_modules | Need to add exclusion (not yet in CLAUDE.md) |
-| 02-22 | Claude made unsolicited YAML edit | User rejected, need "no unsolicited edits" rule |
-| 02-23 | Claude wrote prefs to shared CLAUDE.md | User corrected, personal prefs go in .claude/CLAUDE.md |
-| 02-23 | Verdict posted in PR comment | Added no-verdict rule to .claude/CLAUDE.md |
-| 02-26 | Verdict posted again (this session) | Rule existed but wasn't followed, edited comment |
-| 02-26 | Bitbucket comment version stale on update | Learned: must use current `version` number in PUT |
-| 02-27 | Scripts fail from Claude Code terminal (CLAUDECODE env var) | Added `unset CLAUDECODE` to scripts 1-3 |
-| 02-27 | `claude` not on launchd PATH | Added `~/.local/bin` to PATH in all 4 plists |
-| 02-27 | Script 1 budget too low ($0.05) | Bumped to $0.15 |
-| 02-27 | Confluence token placeholder in plist | Replaced with real token |
-| 02-27 | Mac sleep kills launchd jobs | Applied `pmset sleep 0` to prevent system sleep |
-| 02-27 | Posted PR comment without showing user first | Added "always show before posting" rule |
-| 02-27 | PR comment too long/formal (structured report style) | Added rules: bite-sized, plain language, before/after fix only |
-| 02-27 | Notion sync chicken-and-egg: required existing entries to find MEMORY.md | Added fallback to any MEMORY.md |
-| 02-27 | Dedup bug: same pages discovered by multiple queries | Re-read EXISTING_IDS inside loop |
-| 02-27 | Hardcoded search queries and relevance filters in sync scripts | Rewrote to derive dynamically from MEMORY.md + CLAUDE.md |
-| 02-27 | Stale topic files accumulate in EXAMPLES (copy-only, no delete) | Added rm before cp in checkpoint script |
-| 02-27 | EXAMPLES templates had project-specific content (URLs, tickets, architecture) | Templatized all EXAMPLES files with placeholders, added CI tests |
-| 02-27 | Checkpoint overwrote generic templates with project-specific files | Checkpoint now only syncs memory + topics, not config templates |
-| 02-27 | Sync scripts wrote to wrong MEMORY.md on multi-project machines | Bootstrap passes MEMORY_FILE env var to sync scripts |
-| 02-27 | Bootstrap aliases missing on new machines | Bootstrap auto-runs install.sh if aliases not found |
-
 ## 2026-02-18 (Day 1 — Getting Started)
 
 - First Claude Code sessions on media-strategy-generator repo
@@ -235,32 +205,6 @@
 - Commits: c6bd2b3 through 8b55428
 
 ---
-- Reviewed BP-29423 (artifact streaming phase 2, 28 files, +1378/-191)
-- PR adds proactive artifact streaming, sequential graph execution, page-reload SSE reconnect fix, and moves intent classification into ToolService
-- Found one MEDIUM issue: orphaned empty artifact rows in DB when tool call fails after persist_artifact
-- Attempted to post full structured review (headers, categories, impact labels, regression dump, notes). User rejected it as too long/formal.
-- Iterated 4 times to condense: structured report -> condensed report -> short paragraph -> plain language with before/after code fix
-- User corrected: PR comments should be human-scannable, plain language, just the issue + fix + whether rest looks good
-- Posted final comment on PR #197 (comment ID 599103)
-- New rules saved to .claude/CLAUDE.md:
-  - Always show comment to user before posting (never post blind)
-  - Keep comments bite-sized, plain human language
-  - Only flag issues with one-liner + before/after fix
-  - No headers, categories, impact labels, regression dumps, or notes sections
-## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
-
-- Reviewed BP-29423 (artifact streaming phase 2, 28 files, +1378/-191)
-- PR adds proactive artifact streaming, sequential graph execution, page-reload SSE reconnect fix, and moves intent classification into ToolService
-- Found one MEDIUM issue: orphaned empty artifact rows in DB when tool call fails after persist_artifact
-- Attempted to post full structured review (headers, categories, impact labels, regression dump, notes). User rejected it as too long/formal.
-- Iterated 4 times to condense: structured report -> condensed report -> short paragraph -> plain language with before/after code fix
-- User corrected: PR comments should be human-scannable, plain language, just the issue + fix + whether rest looks good
-- Posted final comment on PR #197 (comment ID 599103)
-- New rules saved to .claude/CLAUDE.md:
-  - Always show comment to user before posting (never post blind)
-  - Keep comments bite-sized, plain human language
-  - Only flag issues with one-liner + before/after fix
-  - No headers, categories, impact labels, regression dumps, or notes sections
 
 ## 2026-02-28 (Day 11) — Bug Fix from PR Review + UI Smoke Test
 
@@ -304,6 +248,51 @@
 - Review should not flag theoretical issues that can't happen in practice (e.g., agent tools getting MCP prefixes)
 
 ---
+
+## Cumulative Friction Log
+
+| Date | Friction | Resolution |
+|------|----------|------------|
+| 02-18 | Claude tried to CREATE a PR instead of reviewing one | Re-clarified instructions, built /review command |
+| 02-18 | `gh` CLI not installed | Added to .claude/CLAUDE.md Environment Constraints |
+| 02-19 | Diffed against local checkout instead of remote branch | Added fetch-first rule to .claude/CLAUDE.md |
+| 02-21 | Sessions timed out mid-review output | Added "complete review in single response" rule |
+| 02-22 | Regression scan hit node_modules | Need to add exclusion (not yet in CLAUDE.md) |
+| 02-22 | Claude made unsolicited YAML edit | User rejected, need "no unsolicited edits" rule |
+| 02-23 | Claude wrote prefs to shared CLAUDE.md | User corrected, personal prefs go in .claude/CLAUDE.md |
+| 02-23 | Verdict posted in PR comment | Added no-verdict rule to .claude/CLAUDE.md |
+| 02-26 | Verdict posted again (this session) | Rule existed but wasn't followed, edited comment |
+| 02-26 | Bitbucket comment version stale on update | Learned: must use current `version` number in PUT |
+| 02-27 | Scripts fail from Claude Code terminal (CLAUDECODE env var) | Added `unset CLAUDECODE` to scripts 1-3 |
+| 02-27 | `claude` not on launchd PATH | Added `~/.local/bin` to PATH in all 4 plists |
+| 02-27 | Script 1 budget too low ($0.05) | Bumped to $0.15 |
+| 02-27 | Confluence token placeholder in plist | Replaced with real token |
+| 02-27 | Mac sleep kills launchd jobs | Applied `pmset sleep 0` to prevent system sleep |
+| 02-27 | Posted PR comment without showing user first | Added "always show before posting" rule |
+| 02-27 | PR comment too long/formal (structured report style) | Added rules: bite-sized, plain language, before/after fix only |
+| 02-27 | Notion sync chicken-and-egg: required existing entries to find MEMORY.md | Added fallback to any MEMORY.md |
+| 02-27 | Dedup bug: same pages discovered by multiple queries | Re-read EXISTING_IDS inside loop |
+| 02-27 | Hardcoded search queries and relevance filters in sync scripts | Rewrote to derive dynamically from MEMORY.md + CLAUDE.md |
+| 02-27 | Stale topic files accumulate in EXAMPLES (copy-only, no delete) | Added rm before cp in checkpoint script |
+| 02-27 | EXAMPLES templates had project-specific content (URLs, tickets, architecture) | Templatized all EXAMPLES files with placeholders, added CI tests |
+| 02-27 | Checkpoint overwrote generic templates with project-specific files | Checkpoint now only syncs memory + topics, not config templates |
+| 02-27 | Sync scripts wrote to wrong MEMORY.md on multi-project machines | Bootstrap passes MEMORY_FILE env var to sync scripts |
+| 02-27 | Bootstrap aliases missing on new machines | Bootstrap auto-runs install.sh if aliases not found |
+
+## 2026-02-27 (Day 10, cont.) — PR Review Style Correction
+
+- Reviewed BP-29423 (artifact streaming phase 2, 28 files, +1378/-191)
+- PR adds proactive artifact streaming, sequential graph execution, page-reload SSE reconnect fix, and moves intent classification into ToolService
+- Found one MEDIUM issue: orphaned empty artifact rows in DB when tool call fails after persist_artifact
+- Attempted to post full structured review (headers, categories, impact labels, regression dump, notes). User rejected it as too long/formal.
+- Iterated 4 times to condense: structured report -> condensed report -> short paragraph -> plain language with before/after code fix
+- User corrected: PR comments should be human-scannable, plain language, just the issue + fix + whether rest looks good
+- Posted final comment on PR #197 (comment ID 599103)
+- New rules saved to .claude/CLAUDE.md:
+  - Always show comment to user before posting (never post blind)
+  - Keep comments bite-sized, plain human language
+  - Only flag issues with one-liner + before/after fix
+  - No headers, categories, impact labels, regression dumps, or notes sections
 
 ## 2026-03-03 — BP-29293 GetLineItemsTool PR Work
 
@@ -536,3 +525,248 @@
 - Discussed enforcement mechanisms for the new rules
 - Reflected claude-os changes and pushed to git
 - Reviewed user-level configs (`~/.claude/`), pushed to claude-os repo as pull-only examples (not affected by git clone)
+
+## 2026-03-10
+
+- Discussed how bootstrap and checkpoint work for main home-level `~/.claude/` files (user-level configs vs project-level)
+- Continued session on `BP-29294_get_line_items_tool` branch in CMM repo
+- Pushed BP-29294 changes and replied to Robin's PR comment, resolved the comment thread
+- Implemented "resolve" rule: when user says "resolve" in PR comment context, resolve the Bitbucket comment thread immediately (all repos)
+- Discussed Robin's comment about MSG repo changes; clarified it relates to a separate repo needing its own PR
+- Sent Slack message to Kyle about whether a new ticket is needed for MSG-related changes
+- Ran /review on PR #30754 (CMM)
+- Ran /review on PR #30757 (CMM)
+- Implemented inline comments for /review: use Bitbucket `anchor` API to pin comments to specific file lines instead of general PR comments
+- Added rule: always ask PR author to confirm tests pass before merging (in review comments)
+- Approved PRs after posting review comments
+- Updated /review slash command and MEMORY.md with inline comment pattern for all repos
+- Edited existing PR review comment on Bitbucket (update in place)
+- Confirmed inline comment posting works via Bitbucket anchor API; troubleshot visibility issue
+- Logged session summary to history/logs.md
+- Ran /review on BP-29292 PR
+- Approved BP-29292 PR after posting review comment (always show comment first, ask about approval)
+- Enforced inline comments for all review findings (Bitbucket anchor API)
+- Discussed MSG repo changes scope: Robin should make MSG changes on his PR (CMM vs MSG repo separation)
+- Fielded recruiter question about NLP clinical trial eligibility screening project (GitHub: jameswniu/nlp-clinical-trial-eligibility-screening)
+- Drafted brief replies asking recruiter to clarify specific understanding gaps and provide concrete use case requirements
+- Loaded BP-29968 (parent: LLM rate limit handling) and BP-29972 (subtask 1: retry with exponential backoff and error classification) tickets
+- Starting work on BP-29972 first subtask in CMM repo: wrap LangChain calls with configurable retry logic, exponential backoff with jitter, typed RateLimitExhausted exception, per-retry notification callback, env config wiring
+- Created branch `BP-29972_retry_with_backoff` from latest dev (stashed/popped dirty working tree)
+- Attempted to create PR on MSG repo (user corrected repo context)
+- Ran /review on BP-28802
+- Discussed whether Robin's PR complaint was related to BP-29968/BP-29972 (rate limit handling tickets); confirmed context overlap
+- Continued work on BP-29972 branch (`BP-29972_retry_with_backoff`) in CMM repo
+- Created PR for BP-29972 (retry with exponential backoff) and shared link with user
+- Discussed Anthropic rate limit docs and whether implementation follows provider-agnostic pattern from BP-29968 parent ticket
+- Refactored BP-29972 retry logic to be provider-agnostic (not LangChain-specific), aligned with Anthropic rate limit article patterns
+- Ran /review on BP-29972 PR
+- Investigated Harness CI failure on BP-29972 branch; identified RuboCop lint offenses caught by pre-push hook
+- Discussed pre-push hook scope: confirmed hook is in MSG repo, not CMM; CMM pushes don't have the same lint gate
+- Fixed RuboCop lint offenses that caused CI failure
+- Patched pre-push hook or CI lint issues to unblock the PR
+- Ran /review on own BP-29972 PR; posted comments (no approval prompt for own PRs)
+- Added inline note on BP-29974 ticket link for frontend handling scope
+- Updated /review workflow rules: own PR = show comments before posting, no approval prompt; verdict goes in general comment, notes/changes go inline
+- Refined inline comment rules: low-risk notes also go inline, not just change requests
+- Ran /ui smoke test on BP-29972 PR
+- Updated /review and /ui slash commands to enforce repo-matching: always use the command from the repo where the PR/branch lives
+- Added rule: slash commands must match the repo context of the PR being reviewed (for all new/future conversations)
+- Ran /review on own BP-29972 PR (continued); posted inline note linking BP-29974 for frontend handling scope
+- Refined PR comment posting: verdict justification in general comment, notes and change requests as inline comments
+- Updated /review workflow: own PR with verdict approve = show comments, ask to comment, skip approval prompt
+- Confirmed inline comment and general comment separation rules across all repos
+- User requested stopping all running servers (session wind-down)
+
+## 2026-03-11
+
+- Reviewed BP-29972 PR feedback; user asked to check reviewer question on the Jira ticket
+- Investigated BP-29968/BP-29972 ticket to identify reviewer's question about retry with backoff implementation
+- Continued on `BP-29972_retry_with_backoff` branch in CMM repo
+- Discussed A2A vs MCP architecture: mapped CMM Compass AI as agent platform, MSG as research AI with MCP tools; provided concrete examples
+- Reviewed AdCP (Ad Context Protocol) docs at adcontextprotocol.org; discussed how it maps to A2A governance/constitution layer
+- Drafted concise follow-up post comparing A2A governance vs MCP tool contracts for user's org chat
+- Researched governance terminology: "constitution" for A2A agent-level compliance, "schema contracts" for MCP tool-level specs
+- Provided official clickable links for A2A, MCP, and AdCP specifications
+- Wrote research article on governance/compliance layers: constitution (A2A), schema contracts (MCP), AdCP as industry-specific governance
+- Saved org chart context to memory across repos (who to reach out to, domain ownership)
+- Deep dive on AdCP: current state, adoption, open-source status, 1-year and 5-year predictions
+- Continued on `BP-29972_retry_with_backoff` branch; session focused on A2A/MCP research and org knowledge capture
+- Explored memory system structure: reviewed all auto-loaded vs on-demand files, clickable paths, and line limits
+- Reviewed history/archive/ directory structure and rollover mechanics for logs.md
+- Audited all memory/config files: which are auto-loaded, which are on-demand, with full clickable paths and purposes
+- Explored memory system auto-load behavior: MEMORY.md loaded every conversation, topic files read on demand, logs.md rollover at ~500 lines
+- Documented Claude OS dependencies: learning loop, bootstrap, checkpoint, plist agents, and how they interconnect
+- Explored Lucidchart integration options: no official MCP server, but REST API exists; researched available endpoints and auth methods
+- Connected Lucid MCP server; tested search and document listing
+- Created governance research Word doc (Governance_in_the_Agentic_Advertising_Stack.docx) in Google Drive Architecture folder
+- Fixed em dash and double dash violations in outgoing doc content
+- Generated three architecture diagrams (L0 conceptual, L1 logical, L2 physical) from governance doc and Compass questions doc
+- Clarified Claude OS architecture: passive template store only, checkpoint writes to it, bootstrap reads from it
+- Created compass-questions-for-kyle.docx with answered questions and moved to Basis Tech Architecture folder
+- Verified no breakage after file moves (step-by-step validation)
+- Explored Claude.md creator's guidance; compared $20/mo vs premium team plan feature differences and what to cut
+- Reviewed Compass architecture diagrams from Kyle (2026-03-11); saved mapping to memory
+- Iterated on Lucidchart architecture diagrams: improved legend visibility, increased text sizing, step-by-step verification before creating
+- Continued diagram refinements: user flagged legend formatting issues and text too small; adopted step-by-step verify-before-create workflow
+- Created two JIRA tickets under StratGen Phase 2 for TTS capabilities, referencing AWS Bedrock implementation docs (SFO-7556) and company AWS timeline
+- Searched CMM and MSG codebases plus MSG chatbot for relevant context to inform ticket requirements
+- Reviewed AWS Bedrock implementation Confluence page and SFO-7556 ticket for TTS capability scoping
+- Trimmed ticket format to Overview, Requirements, Acceptance Criteria (artifact-based: doc/code/diagram)
+- Used JIRA API directly for ticket creation instead of browser-based workflow
+- Continued Lucidchart diagram iteration: user flagged inconsistent text sizing and small legend text; adopted MCP-create then browser-verify workflow
+- Took localhost screenshots to demonstrate text sizing and legend formatting issues for diagram iteration
+- Confirmed JIRA API usage for ticket creation (no browser needed)
+- Searched CMM, MSG codebases and MSG chatbot plus two AWS docs (SFO-7556, Bedrock implementation) to inform ticket content
+- Refined JIRA ticket formatting: bold for main headings (Overview, Requirements, AC), underlined for subheaders, italic for notes sections
+- Removed Key Files section from JIRA tickets (unnecessary technical detail for non-technical stakeholders)
+- Investigated MSG chatbot via browser screenshots to annotate TTS integration points across both repos (MSG iframe inside CMM)
+- Sent Slack message to Kyle with L0/L1/L2 architecture diagram links and stakeholder breakdown per level
+- Included AdCP deep-dive subsections reference in Kyle Slack message
+- Discussed diagram-to-execution pipeline: Lucidchart MCP diagrams fed to Claude for JIRA tickets, code, and review acceleration
+- Finalized JIRA ticket formatting conventions: bold for main headings (Overview, Requirements, AC), underlined for subheaders (e.g., CMM MCP Server), italic for notes sections
+- User confirmed TTS scope spans both repos (MSG iframe inside CMM); adjusted JIRA tickets accordingly
+- Planned browser evidence gathering workflow: show JIRA ticket links first, then capture annotated screenshots of MSG chatbot for TTS integration points
+- Moved governance doc to Basis Tech > Claude folder in Google Drive
+- Iterated on JIRA ticket content: added screenshots as evidence, fixed acceptance criteria bold formatting
+- Investigated JIRA XML export for embedded screenshot accessibility; confirmed images not inline in XML
+- Attempted JIRA API image fetching for ticket attachments
+- Updated "Hide AI Architecture" ticket with McKinsey Lilli AI breach reference (enumerable MCP tool surface risk)
+- Fixed em dash violations in JIRA ticket content; switched to underlined subheaders
+- Updated /ticket slash command with formatting and style refinements
+- Created pro.md and team-premium.md Claude.md starter files for team distribution
+- Drafted Slack message to #lavender-tangerine-dev with Claude Code setup instructions and starter files
+- Investigated Slack MCP @claude tag injection issue; researched removal options
+- Discovered Slack MCP automatically appends "sent using @claude" tag to messages; no API-level opt-out available
+- Explored workaround: posting via Slack API directly or removing tag post-send
+- Updated global and project memory with new preferences (no @claude tag, Slack MCP limitations)
+- Researched Slack MCP full capabilities and installation details
+- Reviewed Lucid MCP full endpoint catalog: search, fetch, create diagrams, share links, manage collaborators
+- Explored Lucidchart diagram precision capabilities: sizing, colors, shapes, connectors, text formatting across L0/L1/L2 categories
+- Refined Claude Code starter files (pro.md, team.md) for team distribution; made Slack post concise for new users
+- Researched Teams call transcript access for stakeholder feedback loop: explored Microsoft Graph API, Notion MCP, and direct file pass options
+- Investigated daily standup (Lavender 7:45am PT) transcript availability via Teams recording/transcription settings
+- Explored whether Teams recordings with transcription enabled can be passed directly for Claude to read
+- Confirmed Teams MCP server can access call transcripts if recording + transcription is enabled; user discovered feature was available but not actively recording
+- Established feedback loop workflow: record Teams standup, read transcript via MCP, post comments on Lucidchart diagrams for iteration
+
+## 2026-03-12
+
+- Explored Microsoft Graph API capabilities in detail: calendar, mail, Teams, OneDrive, org chart, user profiles
+- Investigated Basis org chart access via Microsoft Graph API (users, manager chains, direct reports)
+- Attempted Microsoft Graph API connection setup for org chart and Teams transcript access
+- Walked through Microsoft Graph API capabilities step-by-step: precise endpoint breakdown for users, calendar, mail, Teams, OneDrive, org chart, presence, and admin features
+- Confirmed Graph API can pull full Basis org chart (users, managers, direct reports, department hierarchy)
+- Initiated Microsoft Graph API connection setup (Azure AD app registration flow)
+- Explored retry-with-backoff implementation on BP-29972 branch
+- Investigated Microsoft Graph API token retrieval via Graph Explorer browser access token
+- Continued Graph API org chart exploration using user-provided access token
+- Hit Azure AD permission wall: Graph API org chart endpoints require IT-approved admin consent for Directory.Read.All
+- Explored alternative approaches to access Basis org chart without IT-granted Graph API permissions
+- Confirmed Graph API org chart access blocked without IT admin consent; pivoted after user recalled prior attempt
+- Revisited Graph API permission blocker; user confirmed IT approval is required (same conclusion as prior session with Graph Explorer token)
+- Continued BP-29972 retry-with-backoff branch work
+- Discussed MCP vs curl for JIRA/Bitbucket/Confluence integrations; evaluated tradeoffs for skill-based workflows
+- Investigated whether Atlassian offers a unified MCP server for JIRA/Bitbucket/Confluence; user recalled they have one
+- Connected Atlassian MCP server; explored full capabilities: JIRA (search, get issues), Bitbucket (list/get/create PRs, comments, approvals), Confluence (future)
+- Tested Atlassian MCP bb_list_prs on MSG and CMM repos
+- Discovered Atlassian MCP supports JIRA ticket creation via jira_search and jira_get_issue endpoints
+- Evaluated Atlassian MCP vs existing curl-based slash commands; MCP provides structured API but curl offers more flexibility for custom workflows
+- Investigated colleague MCP server requirements: teammates need their own Atlassian MCP server config with personal credentials; slash commands that use MCP tools require the MCP server installed
+- Confirmed fallback behavior: commands using MCP tools will fail without the server; curl-based commands work independently
+- Clarified which system handles PR formatting (memories/preferences) vs JIRA ticket creation (MCP server); discussed user-agnostic MCP server design
+- Evaluated custom vs official Atlassian MCP server tradeoffs (token count, performance, flexibility)
+- Helped Brian troubleshoot Lucid MCP server setup via Slack
+- Verified CMM PR merge requirements: minimum 2 approvals needed (not all reviewers); saved to memory for future conversations
+- Updated PR list display format: only show PRs where user is reviewer, with Mergeable/Commented/Approved columns
+- Saved PR list display preferences to memory (`feedback_pr_list_format.md`)
+- Continued BP-29972 retry-with-backoff branch work
+- Scored custom vs official Atlassian MCP vs curl approaches on performance, latency, governance, and cost (out of 100)
+- Consolidated duplicate memory files across project and user-level memory directories
+- Implemented memory deduplication: ensured project and global memories are consistent with no redundant entries
+- Explored custom MCP server capabilities and feature comparison
+- Searched Teams transcript for "James + Arturo Sync-Up" meeting via /transcript command
+- Requested Arturo share Teams recording for transcript access
+- Reviewed Claude Code starter files (pro.md, team.md) in CMM repo
+- Scoped BP-29973 (next subtask under BP-29968) after BP-29972 retry-with-backoff merged
+- Read BP-29968 and BP-29973 ticket XMLs to determine repo (MSG vs CMM) for next work
+- Investigated optimistic locking and permalink generation concepts
+- Investigated BP-30222: artifact persistence issues on staging55 (and intermittently on prod)
+- Read Slack thread and JIRA ticket for BP-30222 scoping; reviewed video attachments from reporter
+- Scoped whether BP-30222 requires changes on both production and staging55 environments
+- Investigated artifact persistence failures on staging55; explored whether issue also affects prod intermittently
+- Investigated BP-30222 implementation plan: searched for input file (PDF) referenced in the original prompt
+- Attempted to retrieve the PR that introduced the artifact persistence regression
+- Connected BP-30222 to similar pattern as MCP prefix bug: works on first load but fails to persist after page refresh/navigation
+- Continued BP-29972 retry-with-backoff branch implementation work
+- Discussed Teams recording sharing permissions and UI access workflow with colleague (Arturo)
+- Iterated on Teams transcript access: clarified sharing/visibility settings and what Arturo needs to trigger from Teams UI
+- Investigated OneDrive "Shared with me" folder and programmatic access via Graph API
+- Created demo VTT file in OneDrive for end-to-end transcript retrieval testing
+- Tested end-to-end Graph API workflow for downloading shared VTT transcripts from OneDrive
+- Debugged Graph API access to "Shared with me" items: permissions vs sharing settings discrepancies
+- Attempted programmatic retrieval of transcripts shared by Arturo and Jonah via OneDrive
+- Investigated difference between OneDrive sharing settings (link-based vs direct sharing) and Graph API access implications
+- Continued debugging Graph API access to shared OneDrive items: tested multiple approaches to retrieve transcripts shared by colleagues
+- Explored OneDrive "Shared with me" visibility vs programmatic access gap; items visible in browser but blocked via Graph API
+- Attempted self-invitation workaround for OneDrive shared items access
+- Applied /transcript to Arturo's sync-up meeting; discovered speaker labels were reversed in VTT transcript
+- Corrected speaker inference (swapped James/Arturo labels based on conversational context) and re-summarized Arturo call
+- Processed Jonah's meeting transcript via /transcript command
+
+## 2026-03-12
+
+- Discussed transcript retrieval methodology; confirmed Graph API workaround succeeded without browser UI access
+- Evaluated whether /transcript command or other processes need updates based on transcript access learnings
+- Investigated official Atlassian MCP server capabilities; confirmed community version includes Bitbucket support (official does not)
+- Explored MCP server distribution strategy for teammates: single repo vs multi-MCP repo, one-line install considerations
+- Discussed creating a shared repo to host custom MCP servers for team distribution
+- Explored one-line install approach for sharing custom MCP server with colleagues (npx/pip package vs clone-and-run)
+- Attempted to create shared MCP server repo for team; discussed hosting options (Bitbucket org repo vs personal)
+- Continued BP-29972 retry-with-backoff branch work
+
+## 2026-03-13
+
+- Continued Atlassian MCP server setup and distribution work for teammates
+- Iterated on one-line install UX: HTTP access token setup instructions, tab navigation clarity
+- Verified Confluence API endpoints work with same Atlassian MCP credentials (broader access than expected)
+- Added Confluence API endpoint verification to shared MCP server setup/docs
+- Improved install instructions: clarified HTTPS token URL, explained single token covers both Bitbucket and Confluence
+- Enhanced setup UX: added guidance for non-obvious UI elements (e.g., tab navigation for HTTP access tokens)
+- Verified hyperlink formatting in setup docs; fixed HTTP→HTTPS URL for access token management page
+- Explored update workflow: confirmed users can re-run one-line install to pick up MCP server updates
+- Reviewed full list of available Atlassian MCP tool endpoints (JIRA, Bitbucket, Confluence)
+- Verified all MCP servers working (Atlassian, Lucid) after setup changes
+- Discussed smart garbage collection strategy for memory system: training on advice given to others, avoiding bloat
+- Replied to Brian's Bitbucket thread explaining rationale for custom MCP server over official Atlassian MCP (missing Bitbucket support, curl-first iteration, then productized into shared repo)
+- Discussed remembering advice given to colleagues for future self-training and mistake pattern detection
+- Investigated Bitbucket Server (Stash) vs Bitbucket Cloud distinction for MCP server compatibility
+- Clarified shared MCP server targets Stash (on-prem) not Cloud; official Atlassian MCP only supports Cloud
+- Discussed Compass product context (Atlassian service catalog vs CMM Compass AI feature)
+- Iterated on Bitbucket thread reply structure: what→how→why sequence for engineer audience
+- Refined Bitbucket thread reply tone and framing: "I built..." opening, included repo link
+- Verified one-line install/update UX: users run single command from Claude Code terminal, no git clone needed
+- Investigated why one-line install works without git clone (npx/pip-style fetch vs local clone)
+- Explored consolidation of topic files; confirmed original topic files are Confluence-synced, no duplication
+- Verified GC script dependencies against all other scripts and processes
+- Verified learning loop, checkpoint, bootstrap, and GC interactions across repos and user-level configs
+- Confirmed GC should also clean user-level configs (MEMORY.md, CLAUDE.md) with line limits (200/150)
+- Validated one-line install and update workflow end-to-end for MCP server distribution
+- Explored Perplexity integration options: MCP server (sonar models), Sonar REST API, Agent API, and Computer product
+- Evaluated treating Perplexity Computer as a dispatchable node in multi-agent setup (browser automation via chrome MCP)
+- Discussed multi-agent A2A vision: dispatching web research prompts to Perplexity Computer from Claude Code
+- Explored Gmail multi-account connectivity via Claude Code (Google OAuth limitations, 5-account feasibility)
+- Discussed real-time email/messaging dashboard concept (Gmail, iMessage, WhatsApp aggregation)
+- Defined four-layer agent pipeline: RadarOS (Grok) → ResearchOS (Perplexity) → CommunicateOS (OpenClaw+GPT) → BuildOS (Claude Code)
+- Mapped Grok's strengths (social media data, real-time) vs Perplexity (deep research, immigration/stock/agentic topics)
+- Discussed topic routing across RadarOS and ResearchOS for immigration news, stock market, agentic developments
+- Exported multi-agent architecture doc to Downloads folder for sharing
+- Audited launchd plists across repos (CMM, claude-os); verified claude-os not running any scheduled tasks
+- Debugged sudden MCP connection failure; investigated root cause of Atlassian MCP server disconnect
+- Verified all MCP connections (Atlassian, Lucid) restored and working end-to-end
+- Explored rate limit handling options for API retry-with-backoff implementation (BP-29972)
+- Iterated on AGI thesis document: orchestrator as sequencer (not controller), invisible shared ledger concept
+- Discussed visibility model for shared ledger: invisible to most, like a constitution yet to be drafted
+- Investigated running a local app alongside existing Docker containers and services on ports 3000/3001
+- Spun up and configured a local app instance on an alternate port to avoid conflicts
+- Debugged background task wrapper exit issues during local app startup
+- Verified MCP server connections after app spin-up

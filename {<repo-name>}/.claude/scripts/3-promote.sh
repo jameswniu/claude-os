@@ -7,8 +7,13 @@ LOG_DIR="$HOME/claude-os/output"
 
 mkdir -p "$LOG_DIR"
 
-# Find all project MEMORY.md files
-MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES="$MEMORY_FILE"
+else
+    # Manual run: process all projects
+    MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/3-promote.log"
     exit 0
@@ -44,13 +49,6 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
         cd "$PROJECT_DIR" || exit 1
         unset CLAUDECODE
 
-        CL_LINES=0
-        [ -f "$CLAUDE_MD" ] && CL_LINES=$(wc -l < "$CLAUDE_MD")
-        CL_CAP_NOTE=""
-        if [ "$CL_LINES" -gt 130 ]; then
-            CL_CAP_NOTE="
-- CLAUDE.local.md is at $CL_LINES lines (limit: 150). Consolidate or merge related rules before adding new entries. Do not exceed 150 lines."
-        fi
         claude -p "You are a rule promoter. Read both files:
 1. $MEMORY_DIR/MEMORY.md (learned patterns)
 2. $CLAUDE_MD (current personal rules)
@@ -62,7 +60,7 @@ Your job:
 - If a pattern contradicts an existing rule, flag it but do NOT change the rule (leave a comment in your output)
 - Do NOT remove existing rules
 - Do NOT add speculative or single-occurrence patterns
-- Keep .claude/CLAUDE.local.md concise and actionable$CL_CAP_NOTE
+- Keep .claude/CLAUDE.local.md concise and actionable
 
 Output what you promoted (or 'No new promotions' if nothing qualified)." \
           --allowedTools "Read,Edit" \

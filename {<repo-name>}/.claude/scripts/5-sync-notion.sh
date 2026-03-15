@@ -14,8 +14,13 @@ if [ -z "$NOTION_TOKEN" ]; then
     exit 2
 fi
 
-# Find all project MEMORY.md files
-MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+# If MEMORY_FILE is set (launchd per-project mode), scope to that project only
+if [ -n "$MEMORY_FILE" ] && [ -f "$MEMORY_FILE" ]; then
+    MEMORY_FILES="$MEMORY_FILE"
+else
+    # Manual run: process all projects
+    MEMORY_FILES=$(find "$HOME/.claude/projects" -maxdepth 3 -name "MEMORY.md" 2>/dev/null)
+fi
 if [ -z "$MEMORY_FILES" ]; then
     echo "$(date): No MEMORY.md files found, skipping" >> "$LOG_DIR/5-sync-notion.log"
     exit 0
@@ -55,7 +60,7 @@ with open(os.path.expanduser('~/.claude/history.jsonl')) as f:
     for F in "$HOME"/*/CLAUDE.md "$HOME"/*/*/CLAUDE.md; do
         [ -f "$F" ] || continue
         D=$(dirname "$F")
-        if [ "$(echo "$D" | tr '/._ ' '-')" = "$PROJECT_SLUG" ]; then
+        if [ "$(echo "$D" | tr '/.' '-')" = "$PROJECT_SLUG" ]; then
             CLAUDE_MD="$F"
             break
         fi

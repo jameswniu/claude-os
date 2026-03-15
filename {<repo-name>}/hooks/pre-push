@@ -52,7 +52,7 @@ if [ $FAILED -eq 0 ] && [ -d frontend ]; then
 fi
 
 # 7. Python lint (if Makefile has lint target)
-if [ $FAILED -eq 0 ] && grep -q '^lint:' Makefile 2>/dev/null; then
+if [ $FAILED -eq 0 ] && grep -qE '^lint[: ]' Makefile 2>/dev/null; then
     echo "Python lint..."
     make lint || { echo "FAIL: Python lint"; FAILED=1; }
 fi

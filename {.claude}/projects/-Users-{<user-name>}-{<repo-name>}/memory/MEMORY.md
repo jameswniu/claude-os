@@ -53,6 +53,7 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - **@mention verification**: After posting any outgoing message (PR comment, Slack, WhatsApp, etc.), always verify that @mentions/tags rendered as clickable elements (links or `data-mention-id` spans), not plain text. If plain text, edit and fix immediately. Bitbucket mention syntax in editor is `@"username"` (inserted via autocomplete Enter key, not click). Rendered mentions have `data-mention-id` attribute on parent span.
 - **Learning loop slug-to-path**: `sed 's|-|/|g'` cannot reverse Claude project slugs (ambiguous: `-` could be from `/`, `.`, or literal `-`). Must match forward (path-to-slug via `replace('/','-').replace('.','-')`) against known paths in `history.jsonl`. Fixed Mar 3.
 - **Skipped merge-dev before PR**: Always merge dev into the feature branch before creating a PR to catch conflicts early. Also run `bundle install` if Gemfile.lock changed.
+- See `recurring-mistakes.md` for full list (unsolicited edits, wrong config file, wiped reviewers, wrong-repo scoping, etc.)
 ## User Preferences
 
 - Hands-off, delegation-oriented. Issues a command and lets Claude run autonomously.
@@ -75,36 +76,61 @@ Topical reference for quick lookup. See `history/logs.md` for chronological sess
 - PR description format and test checkbox rules: see global `~/.claude/memory/MEMORY.md`
 - Slash command backup rule: see global `~/.claude/memory/MEMORY.md`
 - When saving to memory or config files, always show the full absolute file path (starting from `/Users/james.niu/`) so the user can click it
+- No `@claude` tag in Slack messages; avoid Slack MCP's auto-appended tag when possible
 ## Topic Files (on demand, read when relevant)
 
 Reference docs in the memory directory. Zero tokens until read.
+- `01-26-2026-using-bash-mode.md` -- reference material
 - `03-05-2026-claude-code-with-chrome.md` -- reference material
+- `03-05-2026-installing-the-atlassian-mcp-in-claude-code.md` -- reference material
+- `advice-patterns.md` -- reference material
+- `advice_lucid-mcp-setup.md` -- reference material
 - `agent-dx-patterns.md` -- reference material
 - `ai-code-reviewer-project.md` -- when planning AI code review integrations
 - `ai-development-tools-use-case-library.md` -- when exploring AI tool use cases or writing prompts
 - `ai-pr-summaries.md` -- reference material
 - `ai-tools-quickstart.md` -- reference material
 - `ai-updates-q4-2025.md` -- reference material
+- `apps-eng-onboarding-task-board.md` -- reference material
+- `apps-engineering-ai-updates-q4-2025.md` -- reference material
 - `apps-engineering-growth-framework.md` -- reference material
 - `apps-engineering-pad-skills-assessment-supplement.md` -- reference material
 - `apps-engineering-resource-library-formerly-onboarding.md` -- reference material
 - `apps-engineering-team.md` -- reference material
 - `archived-git-branching-and-pull-request-guidelines.md` -- historical reference for legacy branching rules
+- `basis-apprenticeship.md` -- reference material
 - `basis-environments-overview.md` -- reference material
+- `basis-hack-ai-thon-october-2023.md` -- reference material
+- `basis-intern.md` -- reference material
+- `basis-platform-monitoring-guide.md` -- reference material
+- `basis-recruiting.md` -- reference material
+- `claude-code-filesystem.md` -- reference material
+- `claude-code-pricing-evaluation-week-of-11-24-2025.md` -- reference material
 - `claude-code-pricing.md` -- reference material
 - `claude-code-settings-security-incident.md` -- reference material
+- `claude-os-details.md` -- reference material
 - `claudehub.md` -- when onboarding to Claude Code or finding internal resources
 - `claudeos-beta.md` -- reference material
 - `claudeos.md` -- reference material
 - `code-reviews.md` -- when reviewing PRs or discussing review practices
+- `compass-architecture.md` -- reference material
+- `compass-roadmap-context.md` -- reference material
 - `datadog-compass.md` -- reference material
 - `datadog-crash-course.md` -- reference material
 - `demo-recording.md` -- reference material
+- `early-jira-ticket-criteria-for-new-hires.md` -- reference material
+- `feedback_ms365_mcp_broken.md` -- reference material
 - `git-fundamentals.md` -- reference material
+- `graph-transcript-workflow.md` -- reference material
 - `how-to-write-a-self-review-for-developers.md` -- reference material
 - `informal-tech-mentorship.md` -- when mentoring or structuring knowledge transfer
+- `modular-cognition.md` -- reference material
+- `perplexity-integration.md` -- reference material
 - `plugin-marketplace.md` -- reference material
+- `pr-workflow-patterns.md` -- reference material
 - `problem-2-semantic-versioning.md` -- reference material
+- `recurring-mistakes.md` -- reference material
+- `rubocop-todo-yml-agent-cleanup.md` -- reference material
 - `scalable-applications-and-architecture.md` -- when designing services or making architecture decisions
 - `shell-basics.md` -- reference material
 - `team-values.md` -- reference material
@@ -148,6 +174,9 @@ Reference docs in the memory directory. Zero tokens until read.
 - **6-bootstrap.sh** (MSG only) — pulls templates from claude-os into a new project
 ### Other
 - Team wants claude-os published as a branch on existing repo, not standalone
+- See `claude-os-details.md` for details (learning loop, checkpoint/bootstrap, shared state, external deps)
+- `~/claude-os` is a passive template store. Checkpoint writes to it, bootstrap reads from it.
+- Bootstrap only copies repo-level commands; user-level commands (`~/.claude/commands/`) are manual edit only
 ## UI Smoke Testing
 
 - Automated UI smoke tests via browser extension on localhost
@@ -192,3 +221,94 @@ Reference docs in the memory directory. Zero tokens until read.
 - Commands with `$()` substitution always prompt regardless of allowlist
 - CLAUDE.md can exist in any subdirectory (infinite locations, loaded on demand); settings.json is 3 fixed locations only
 - **Security**: CLAUDE.md = AI context (low risk); settings.json = CLI execution permissions (high risk, silently auto-runs commands)
+- See `claude-code-filesystem.md` for full details (settings scoping, gitignore behavior, security notes, reference material pointers)
+## Default CMM PR Reviewers
+
+Always add these reviewers when creating or updating a CMM pull request:
+- brendan.white
+- robin.lee
+- kyle.bernstein
+- nafisa.sarowar
+- josh.davison
+- patrick.schwisow
+
+Slack channel for CMM PR discussions: `#lavender-tangerine-dev`
+
+## PR Workflow
+
+- See `pr-workflow-patterns.md` for comment style, merge requirements, review patterns, PR list display format
+
+## Basis Apps Org Chart
+- See global memory: `~/.claude/memory/basis-apps-org-chart.md` - all teams, members, roles, engineering leads
+
+## Teammate Advice
+- See `advice_*.md` files for setup help given to teammates, patterns extracted before archival
+- See `advice-patterns.md` for distilled reusable patterns (promoted to MEMORY.md at 3+ occurrences)
+
+## JIRA Integration
+
+- Use JIRA API directly for ticket creation (no browser needed)
+- Ticket structure: Overview, Requirements, Acceptance Criteria (artifact-based: doc/code/diagram)
+- Formatting: bold for main headings, underlined for subheaders, italic for notes sections
+
+## Lucid MCP
+
+- Connected Lucid MCP server for diagram search, listing, and creation
+- Setup/re-add command: `claude mcp add lucid --transport http https://mcp.lucid.app/mcp -s user`
+- If "Needs authentication", remove and re-add to trigger fresh OAuth flow
+- Diagram workflow: create via MCP, verify in browser, iterate (step-by-step verify-before-create)
+- Diagram-to-execution pipeline: Lucidchart diagrams inform JIRA tickets, code, and review acceleration
+- Supports precise styling: sizing, colors, shapes, connectors, text formatting across L0/L1/L2 diagram levels
+
+## Slack MCP
+
+- Slack MCP auto-appends "sent using @claude" tag to all messages; no API-level opt-out available
+- Workaround: post via Slack API directly or remove tag post-send
+
+## Microsoft Graph / Teams Transcripts
+
+- See `graph-transcript-workflow.md` for full workflow: search, download, parse VTT transcripts via Graph API
+- CLI tool: `~/bin/graph-transcript` (search, download, calendar, recent)
+- Token: `~/.graph-token` (Graph Explorer, ~24h lifetime)
+- Slash command: `/transcript` for interactive search/summarize/action workflow
+- Uses OneDrive/SharePoint file search (OnlineMeetings scope blocked by tenant admin)
+- **VTT speaker labels can be reversed**: infer correct speakers from conversational context, not raw labels
+- **OneDrive "Shared with me" API gap**: items visible in browser but blocked via Graph API; don't waste time retrying programmatic access
+- **Graph API org chart blocked**: Directory.Read.All requires IT admin consent. Don't re-attempt without IT approval.
+
+## Atlassian MCP
+
+- Connected community Atlassian MCP server: JIRA, Bitbucket, Confluence (all via single HTTP access token)
+- Targets Bitbucket Server (Stash/on-prem), NOT Cloud. Official Atlassian MCP only supports Cloud.
+- Shared MCP server repo with one-line install from Claude Code terminal (no git clone needed); re-run to update
+- Teammates need their own config with personal credentials; commands using MCP tools fail without the server installed
+- Curl-based commands work independently as fallback
+
+## Claude Code Team Distribution
+
+- Starter files in CMM repo: `claude/pro.md` (full Claude Code Pro) and `claude/team.md` (Team Premium plan)
+- Distributed to `#lavender-tangerine-dev` with setup instructions for teammates
+
+## Perplexity Integration
+
+- Perplexity Computer treated as a dispatchable node in multi-agent setup
+- Browser automation path: chrome MCP to `perplexity.ai/computer/tasks` (no API for Computer product)
+- Also available: MCP server (sonar models), Sonar REST API, Agent API (`/v1/agent`)
+- See `perplexity-integration.md` for full details, pricing, setup commands
+
+## Multi-Agent Architecture Vision
+
+- Four-layer pipeline: RadarOS (Grok, social/real-time) → ResearchOS (Perplexity, deep research) → CommunicateOS (OpenClaw+GPT) → BuildOS (Claude Code)
+- Orchestrator role: sequencer, not controller. Invisible shared ledger concept.
+- Architecture doc exported to Downloads folder (2026-03-13)
+
+## MS-365 MCP
+
+- MS-365 MCP device code login flow does NOT work. Never attempt it. See `feedback_ms365_mcp_broken.md`.
+- For Teams/Outlook/Calendar, use Graph API directly (`~/.graph-token`), Slack MCP, or browser automation instead.
+- Other topic files: `03-05-2026-claude-code-with-chrome.md`, `agent-dx-patterns.md`, `basis-environments-overview.md`, `compass-architecture.md`, `compass-roadmap-context.md`, `demo-recording.md`, `team-values.md`, `team.md`, `advice_lucid-mcp-setup.md`
+- `ai-development-tools-use-case-library.md` -- reference material
+- `ai-pr-summaries.md` -- reference material
+- `ai-tools-quickstart.md` -- reference material
+- `modular-cognition.md` -- reference material
+- `tips-bash-mode.md` -- reference material

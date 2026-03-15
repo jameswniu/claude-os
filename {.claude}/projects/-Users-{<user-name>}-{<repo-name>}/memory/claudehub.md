@@ -2,19 +2,19 @@
 
 Source: (internal URL)
 
-💡 **Tips of the Week**
-
-  * [Installing the Atlassian MCP in Claude Code]((internal URL))
-
-  * [Claude Code with Chrome]((internal URL))
-
-💡 **Tips of the Week**
-
-  * [Installing the Atlassian MCP in Claude Code]((internal URL))
-
-  * [Claude Code with Chrome]((internal URL))
-
 Welcome to Basis Applications Engineering ClaudeHub! Your central resource for onboarding to Claude Code. This page provides everything you need to get started, from official documentation to our custom Plugin Marketplace and Quick Start resources.
+
+💡 **Tips of the Week**
+
+  * [Installing the Atlassian MCP in Claude Code]((internal URL))
+
+  * [Claude Code with Chrome]((internal URL))
+
+💡 **Tips of the Week**
+
+  * [Installing the Atlassian MCP in Claude Code]((internal URL))
+
+  * [Claude Code with Chrome]((internal URL))
 
 If you are running into usage limits on the standard seat - [Request upgrade]((internal URL)) to Claude Premium
 

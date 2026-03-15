@@ -61,6 +61,7 @@ When user says "no X" or "remove X", interpret it as "delete X entirely", not "d
 - Checkpoint command: run `checkpoint` from this project to snapshot config/memory to the repo.
 - Automation scripts run on launchd: log (1h), distill (24h), promote (7d), sync-confluence (24h).
 - Automation scripts run on launchd: log (1h), distill (24h), promote (7d), sync-confluence (24h), sync-notion (24h).
+- Automation scripts run on launchd: log (1h), distill (24h), promote (7d), sync-confluence (24h), sync-notion (24h), gc (7d).
 ## Output Conventions
 
 Always show full file paths in any output, listings, or summaries. Never use relative or abbreviated paths unless explicitly asked.
@@ -122,3 +123,6 @@ NEVER overwrite output files (videos, GIFs, audio, exports, any generated artifa
 ## Common Pitfalls
 
 - When using angle brackets in shell commands, plist XML files, or README markdown, always handle escaping correctly: XML-escape in plists, quote in zsh/bash, and use backticks in markdown.
+## Teammate Advice Auto-Capture
+
+When giving a teammate setup help, troubleshooting steps, or fix instructions (via Slack, PR comments, or conversation), automatically save an `advice_{topic}.md` file to memory. Capture: what the problem was, the exact fix/commands, and the reusable pattern (generalized, teammate-agnostic). Also save when the user relays a teammate's struggle. Includes: MCP setup, dev environment, git/branch, test failures, config, tool onboarding. GC handles cleanup, so save liberally. Cap: 20 advice files, 90-day TTL.
