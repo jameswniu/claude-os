@@ -1,11 +1,11 @@
 #!/bin/bash
-# 7-gc.sh — Runs weekly (launchd) or on-demand via /gc
+# 6-gc.sh — Runs weekly (launchd) or on-demand via /gc
 # Scores memory files, archives stale ones, flags consolidation candidates
 # Pattern: same as 2-distill.sh — loop over projects, claude -p for consolidation
 
 LOG_DIR="$HOME/claude-os/output"
 mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/7-gc.log"
+LOG_FILE="$LOG_DIR/6-gc.log"
 
 echo "$(date): === GC run starting ===" >> "$LOG_FILE"
 

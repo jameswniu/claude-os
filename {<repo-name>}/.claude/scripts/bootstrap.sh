@@ -1,6 +1,6 @@
 #!/bin/bash
-# 6-bootstrap.sh — Pull claude-os repo config into a live workspace
-# Usage: cd ~/some-repo && bash ~/claude-os/{<repo-name>}/.claude/scripts/6-bootstrap.sh
+# bootstrap.sh — Pull claude-os repo config into a live workspace
+# Usage: cd ~/some-repo && bash ~/claude-os/{<repo-name>}/.claude/scripts/bootstrap.sh
 
 CLAUDE_OS="$HOME/claude-os"
 PROJECT=$(pwd)
@@ -358,7 +358,7 @@ PEOF
     generate_plist promote          3-promote.sh          604800
     generate_plist sync-confluence  4-sync-confluence.sh  86400
     generate_plist sync-notion      5-sync-notion.sh      86400
-    generate_plist gc               7-gc.sh               604800
+    generate_plist gc               6-gc.sh               604800
 fi
 
 echo ""

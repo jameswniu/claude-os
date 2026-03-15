@@ -1,5 +1,4 @@
 {
-  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -17,6 +16,10 @@
           {
             "type": "command",
             "command": "bash -c 'INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r \".tool_input.command\"); if echo \"$CMD\" | grep -qE \"gh (pr|issue) create\"; then if printf \"%s\" \"$CMD\" | perl -CSD -ne \"exit 1 if /[\\x{2014}\\x{2013}]/\" 2>/dev/null; then :; else echo \"Blocked: em dash in gh command\" >&2; exit 2; fi; fi; exit 0'"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-rm-claude-dir.sh"
           }
         ]
       }

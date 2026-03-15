@@ -104,6 +104,14 @@ grep -q "BP-29" "$REPO_TMPL/.claude/commands/ticket.md" && fail "ticket.md has p
 grep -q "REDACTED\|ATATT" "$REPO_TMPL/.claude/settings.local.json" && fail "settings.local.json has secrets" || pass "settings.local.json is clean"
 grep -q "(confluence:" "$MEM_TMPL/MEMORY.md" && fail "memory/MEMORY.md has project-specific topic entries" || pass "memory/MEMORY.md topic entries are clean"
 
+# Test: user-level configs
+USER_TMPL="$REPO_DIR/{.claude}"
+[ -f "$USER_TMPL/settings.json" ] && pass "{.claude}/settings.json exists" || fail "{.claude}/settings.json missing"
+[ -f "$USER_TMPL/commands/ticket.md" ] && pass "{.claude}/commands/ticket.md exists" || fail "{.claude}/commands/ticket.md missing"
+[ -f "$USER_TMPL/hooks/block-em-dashes.sh" ] && pass "{.claude}/hooks/block-em-dashes.sh exists" || fail "{.claude}/hooks/block-em-dashes.sh missing"
+[ -f "$USER_TMPL/memory/MEMORY.md" ] && pass "{.claude}/memory/MEMORY.md exists" || fail "{.claude}/memory/MEMORY.md missing"
+grep -q "LinkedIn" "$USER_TMPL/memory/MEMORY.md" && fail "{.claude}/memory/MEMORY.md has LinkedIn URL" || pass "{.claude}/memory/MEMORY.md has no LinkedIn URL"
+
 # Test: hooks
 HOOK="$REPO_DIR/{<repo-name>}/hooks/pre-push"
 [ -x "$HOOK" ] && pass "pre-push hook is executable" || fail "pre-push hook is not executable"
@@ -114,11 +122,11 @@ grep -q "exit 1" "$HOOK" && pass "pre-push exits non-zero on failure" || fail "p
 echo ""
 
 # ----------------------------
-echo "## 5-checkpoint.sh"
+echo "## checkpoint.sh"
 # ----------------------------
 
-[ -x "$SCRIPT_DIR/5-checkpoint.sh" ] && pass "script is executable" || fail "script is not executable"
-head -1 "$SCRIPT_DIR/5-checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
+[ -x "$SCRIPT_DIR/checkpoint.sh" ] && pass "script is executable" || fail "script is not executable"
+head -1 "$SCRIPT_DIR/checkpoint.sh" | grep -q "#!/bin/bash" && pass "has bash shebang" || fail "missing bash shebang"
 
 # Test: checkpoint filters .claude/CLAUDE.local.md
 grep -q "learned per project" "$REPO_TMPL/.claude/CLAUDE.local.md" && pass "{<repo-name>}/.claude/CLAUDE.local.md has placeholders" || fail "{<repo-name>}/.claude/CLAUDE.local.md missing placeholders"
@@ -149,7 +157,7 @@ done
 # Test: scripts have no topics/ subfolder references
 grep -q "topics/" "$SCRIPT_DIR/4-sync-confluence.sh" && fail "4-sync-confluence.sh still references topics/" || pass "4-sync-confluence.sh has no topics/ refs"
 grep -q "topics/" "$SCRIPT_DIR/5-sync-notion.sh" && fail "5-sync-notion.sh still references topics/" || pass "5-sync-notion.sh has no topics/ refs"
-grep -q 'topics/' "$SCRIPT_DIR/6-bootstrap.sh" && fail "6-bootstrap.sh still references topics/" || pass "6-bootstrap.sh has no topics/ refs"
+grep -q 'topics/' "$SCRIPT_DIR/bootstrap.sh" && fail "bootstrap.sh still references topics/" || pass "bootstrap.sh has no topics/ refs"
 
 # ----------------------------
 echo ""

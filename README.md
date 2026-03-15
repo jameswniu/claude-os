@@ -32,7 +32,7 @@ cd ~/"{<repo-name>}"
 ```
 
 ```bash
-bash ~/claude-os/"{<repo-name>}"/.claude/scripts/6-bootstrap.sh
+bash ~/claude-os/"{<repo-name>}"/.claude/scripts/bootstrap.sh
 ```
 
 > **Note:** `{<repo-name>}` is a literal directory in the claude-os repo, not a placeholder. Type it exactly as shown (with curly and angle brackets).
@@ -642,7 +642,7 @@ After syncing, run `checkpoint` to snapshot and filter the workspace files to th
 checkpoint
 ```
 
-### Checkpoint (5-checkpoint.sh)
+### Checkpoint (checkpoint.sh)
 
 Snapshots live workspace files into `{<repo-name>}/.claude/` and `{.claude}/projects/-Users-{<user-name>}-{<repo-name>}/memory/`, filtering project-specific content so templates are reusable across projects.
 
@@ -780,7 +780,7 @@ client = anthropic.Anthropic()
     - `.claude/`
       - `CLAUDE.md`, `settings.local.json`
       - `commands/review.md`, `commands/ticket.md`
-      - `scripts/` - 1-log.sh through 6-bootstrap.sh, update-readme.sh
+      - `scripts/` - 1-log.sh through 6-gc.sh, checkpoint.sh, bootstrap.sh, update-readme.sh
     - `hooks/pre-push`
 
 ---

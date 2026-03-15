@@ -1,6 +1,6 @@
 #!/bin/bash
-# 5-checkpoint.sh — Snapshot live config/memory files into claude-os {<repo-name>}
-# Usage: bash ~/claude-os/{<repo-name>}/.claude/scripts/5-checkpoint.sh  (run from any project dir)
+# checkpoint.sh — Snapshot live config/memory files into claude-os {<repo-name>}
+# Usage: bash ~/claude-os/{<repo-name>}/.claude/scripts/checkpoint.sh  (run from any project dir)
 #
 # Reads from (running project):
 #   - $PROJECT/.claude/CLAUDE.local.md         Personal rules with promoted learnings

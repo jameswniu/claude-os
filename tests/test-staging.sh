@@ -33,6 +33,15 @@ echo "# Seed" > "$MEM_TMPL_DIR/history/logs.md"
 printf '#!/bin/bash\necho "hook"\n' > "$CO/{<repo-name>}/hooks/pre-push"
 chmod +x "$CO/{<repo-name>}/hooks/pre-push"
 
+# User-level template files
+mkdir -p "$CO/{.claude}/commands" "$CO/{.claude}/hooks" "$CO/{.claude}/memory"
+echo '{}' > "$CO/{.claude}/settings.json"
+echo '{}' > "$CO/{.claude}/settings.local.json"
+echo "# ticket" > "$CO/{.claude}/commands/ticket.md"
+printf '#!/bin/bash\nexit 0\n' > "$CO/{.claude}/hooks/block-em-dashes.sh"
+chmod +x "$CO/{.claude}/hooks/block-em-dashes.sh"
+echo "# Global Memory" > "$CO/{.claude}/memory/MEMORY.md"
+
 cd "$CO"
 git init -q
 git add -A && git commit -q -m "Initial"
@@ -133,7 +142,7 @@ echo "## 1. Checkpoint → staging → push → production"
 # ═══════════════════════════════════════════════════════════════
 
 cd "$PROJECT"
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "checkpoint exits 0" || fail "checkpoint exits $RC"
@@ -167,14 +176,14 @@ echo "## 2. Bootstrap pulls latest"
 # ═══════════════════════════════════════════════════════════════
 
 # Structural check: git pull runs before file copies
-PULL_LINE=$(grep -n "git pull" "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
-COPY_LINE=$(grep -n "seed_file.*CLAUDE" "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" | head -1 | cut -d: -f1)
+PULL_LINE=$(grep -n "git pull" "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" | head -1 | cut -d: -f1)
+COPY_LINE=$(grep -n "seed_file.*CLAUDE" "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" | head -1 | cut -d: -f1)
 [ "$PULL_LINE" -lt "$COPY_LINE" ] && pass "git pull precedes file copies" || fail "git pull does not precede copies"
 
 # Run bootstrap on fresh project
 BP="$SANDBOX/bootstrap-project"
 mkdir -p "$BP" && cd "$BP" && git init -q
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" 2>&1)
 [ -f "$BP/.claude/CLAUDE.local.md" ] && pass "bootstrap creates .claude/CLAUDE.local.md" || fail "missing .claude/CLAUDE.local.md"
 echo "$OUT" | grep -q "CREATED.*CLAUDE.local.md" && pass "bootstrap creates (not overwrites) files" || fail "bootstrap not creating files"
 [ -f "$BP/.git/hooks/pre-push" ] && pass "bootstrap deploys pre-push hook" || fail "missing .git/hooks/pre-push"
@@ -186,7 +195,7 @@ echo "## 3. Checkpoint no changes"
 # ═══════════════════════════════════════════════════════════════
 
 cd "$PROJECT"
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "no-change exits 0" || fail "no-change exits $RC"
@@ -200,7 +209,7 @@ echo "## 4. Bootstrap cd handling"
 
 CD_TEST="$SANDBOX/cd-test"
 mkdir -p "$CD_TEST" && cd "$CD_TEST" && git init -q
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" 2>&1)
 
 echo "$OUT" | grep -q "Project: $CD_TEST" && pass "PROJECT is caller's pwd" || fail "PROJECT is wrong"
 [ -f "$CD_TEST/.claude/CLAUDE.local.md" ] && pass "files in caller's dir" || fail "files in wrong dir"
@@ -213,7 +222,7 @@ echo "## 5. Checkpoint from bad dir"
 
 BAD=$(mktemp -d)
 cd "$BAD"
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 1 ] && pass "bad-dir exits 1" || fail "bad-dir exits $RC (expected 1)"
@@ -228,7 +237,7 @@ echo "## 6. Bootstrap git pull already up-to-date"
 
 UP="$SANDBOX/uptodate"
 mkdir -p "$UP" && cd "$UP" && git init -q
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "up-to-date bootstrap exits 0" || fail "exits $RC"
@@ -243,7 +252,7 @@ cd "$CO" && git remote remove origin 2>/dev/null
 
 NR="$SANDBOX/no-remote"
 mkdir -p "$NR" && cd "$NR" && git init -q
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/6-bootstrap.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" 2>&1)
 RC=$?
 
 [ "$RC" -eq 0 ] && pass "no-remote bootstrap exits 0" || fail "exits $RC"
@@ -281,7 +290,7 @@ cat > "$MEM_A/logs.md" << 'EOF'
 EOF
 
 cd "$PROJ_A"
-bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" > /dev/null 2>&1
+bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" > /dev/null 2>&1
 
 # Second "repo" has entry B (some overlap, some new)
 PROJ_B="$SANDBOX/repo-b"
@@ -306,7 +315,7 @@ cat > "$MEM_B/logs.md" << 'EOF'
 EOF
 
 cd "$PROJ_B"
-bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" > /dev/null 2>&1
+bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" > /dev/null 2>&1
 
 # Verify template has entries from both repos
 LOGS="$MEM_TMPL_DIR/history/logs.md"
@@ -355,7 +364,7 @@ BIG_LINES=$(wc -l < "$MEM_BIG/MEMORY.md")
 echo "# Seed" > "$MEM_TMPL_DIR/MEMORY.md"
 
 cd "$PROJ_BIG"
-bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" > /dev/null 2>&1
+bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" > /dev/null 2>&1
 
 TMPL_LINES=$(wc -l < "$MEM_TMPL_DIR/MEMORY.md")
 [ "$TMPL_LINES" -le 200 ] && pass "MEMORY.md capped at 200 lines ($TMPL_LINES)" || fail "MEMORY.md exceeds 200 lines ($TMPL_LINES)"
@@ -393,12 +402,76 @@ CL_SRC_LINES=$(wc -l < "$PROJ_CL/.claude/CLAUDE.local.md")
 echo "# Seed" > "$CO/{<repo-name>}/.claude/CLAUDE.local.md"
 
 cd "$PROJ_CL"
-OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/5-checkpoint.sh" 2>&1)
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" 2>&1)
 
 TMPL_CL_LINES=$(wc -l < "$CO/{<repo-name>}/.claude/CLAUDE.local.md")
 [ "$TMPL_CL_LINES" -le 150 ] && pass "CLAUDE.local.md capped at 150 lines ($TMPL_CL_LINES)" || fail "CLAUDE.local.md exceeds 150 lines ($TMPL_CL_LINES)"
 [ "$CL_SRC_LINES" -gt 150 ] && pass "source was over 150 lines ($CL_SRC_LINES)" || fail "source was not big enough ($CL_SRC_LINES)"
 echo "$OUT" | grep -q "WARNING.*CLAUDE.local.md.*200 lines" && pass "checkpoint warns about CLAUDE.local.md over limit" || fail "missing CLAUDE.local.md over-limit warning"
+
+echo ""
+
+# ═══════════════════════════════════════════════════════════════
+echo "## 11. User-level config round-trip"
+# ═══════════════════════════════════════════════════════════════
+
+# Setup: create user-level files in sandbox HOME
+mkdir -p "$HOME/.claude/commands" "$HOME/.claude/hooks" "$HOME/.claude/memory"
+echo '{"model":"opus"}' > "$HOME/.claude/settings.json"
+echo '{"permissions":{}}' > "$HOME/.claude/settings.local.json"
+echo "# ticket command" > "$HOME/.claude/commands/ticket.md"
+printf '#!/bin/bash\nexit 0\n' > "$HOME/.claude/hooks/block-em-dashes.sh"
+chmod +x "$HOME/.claude/hooks/block-em-dashes.sh"
+cat > "$HOME/.claude/memory/MEMORY.md" << 'EOF'
+# Global Memory
+
+## User profiles
+- LinkedIn: https://www.linkedin.com/in/example
+
+## PR Review Process
+- Standard order: (1) run tests, (2) /review, (3) /ui
+EOF
+
+# Run checkpoint from a project that has memory
+cd "$PROJECT"
+bash "$CO/{<repo-name>}/.claude/scripts/checkpoint.sh" > /dev/null 2>&1
+
+# Verify user-level files were snapshotted
+USER_TMPL="$CO/{.claude}"
+[ -f "$USER_TMPL/settings.json" ] && pass "checkpoint snapshots settings.json" || fail "missing settings.json snapshot"
+[ -f "$USER_TMPL/settings.local.json" ] && pass "checkpoint snapshots settings.local.json" || fail "missing settings.local.json snapshot"
+[ -f "$USER_TMPL/commands/ticket.md" ] && pass "checkpoint snapshots commands/ticket.md" || fail "missing commands/ticket.md snapshot"
+[ -f "$USER_TMPL/hooks/block-em-dashes.sh" ] && pass "checkpoint snapshots hooks/block-em-dashes.sh" || fail "missing hooks snapshot"
+[ -f "$USER_TMPL/memory/MEMORY.md" ] && pass "checkpoint snapshots memory/MEMORY.md" || fail "missing memory/MEMORY.md snapshot"
+grep -q "LinkedIn" "$USER_TMPL/memory/MEMORY.md" && fail "memory/MEMORY.md has LinkedIn URL" || pass "memory/MEMORY.md LinkedIn stripped"
+
+# Now test bootstrap seeds user-level files into a fresh HOME
+FRESH_HOME="$SANDBOX/fresh-home"
+mkdir -p "$FRESH_HOME/.local/bin"
+printf '#!/bin/bash\n' > "$FRESH_HOME/.local/bin/checkpoint"
+chmod +x "$FRESH_HOME/.local/bin/checkpoint"
+# Symlink claude-os so bootstrap finds it at $FRESH_HOME/claude-os
+ln -s "$CO" "$FRESH_HOME/claude-os"
+export HOME="$FRESH_HOME"
+export PATH="$FRESH_HOME/.local/bin:$PATH"
+
+# Commit the checkpoint so bootstrap can read from git
+cd "$CO"
+git add -A && git commit -q -m "Test checkpoint" 2>/dev/null
+
+# Bootstrap into a fresh project
+FRESH_PROJ="$SANDBOX/fresh-proj"
+mkdir -p "$FRESH_PROJ" && cd "$FRESH_PROJ" && git init -q
+OUT=$(bash "$CO/{<repo-name>}/.claude/scripts/bootstrap.sh" 2>&1)
+
+[ -f "$FRESH_HOME/.claude/settings.json" ] && pass "bootstrap seeds settings.json" || fail "bootstrap missing settings.json"
+[ -f "$FRESH_HOME/.claude/commands/ticket.md" ] && pass "bootstrap seeds commands/ticket.md" || fail "bootstrap missing commands/ticket.md"
+[ -f "$FRESH_HOME/.claude/memory/MEMORY.md" ] && pass "bootstrap seeds memory/MEMORY.md" || fail "bootstrap missing memory/MEMORY.md"
+[ -f "$FRESH_HOME/.claude/hooks/block-em-dashes.sh" ] && pass "bootstrap seeds hooks" || fail "bootstrap missing hooks"
+[ -x "$FRESH_HOME/.claude/hooks/block-em-dashes.sh" ] && pass "bootstrap hooks are executable" || fail "bootstrap hooks not executable"
+
+# Restore HOME for cleanup
+export HOME="$ORIG_HOME"
 
 echo ""
 

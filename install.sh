@@ -5,8 +5,8 @@ mkdir -p ~/.local/bin
 
 cat > ~/.local/bin/checkpoint << 'EOF'
 #!/bin/bash
-if [ -f .claude/scripts/5-checkpoint.sh ]; then
-    bash .claude/scripts/5-checkpoint.sh
+if [ -f .claude/scripts/checkpoint.sh ]; then
+    bash .claude/scripts/checkpoint.sh
 else
     echo "Run from a bootstrapped project directory."
     exit 1
@@ -16,11 +16,11 @@ chmod +x ~/.local/bin/checkpoint
 
 cat > ~/.local/bin/bootstrap << 'OUTER'
 #!/bin/bash
-if [ -f .claude/scripts/6-bootstrap.sh ]; then
-    bash .claude/scripts/6-bootstrap.sh
+if [ -f .claude/scripts/bootstrap.sh ]; then
+    bash .claude/scripts/bootstrap.sh
 else
     # First-time bootstrap: run directly from claude-os template
-    TMPL="$HOME/claude-os/{<repo-name>}/.claude/scripts/6-bootstrap.sh"
+    TMPL="$HOME/claude-os/{<repo-name>}/.claude/scripts/bootstrap.sh"
     if [ -f "$TMPL" ]; then
         bash "$TMPL"
     else

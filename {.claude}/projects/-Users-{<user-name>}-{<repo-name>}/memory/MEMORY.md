@@ -144,7 +144,7 @@ Reference docs in the memory directory. Zero tokens until read.
 - Location: `~/claude-os` (GitHub: `jameswniu/claude-os`)
 - Documents the layered context + learning loop system for Claude Code
 - `EXAMPLES/` — Snapshots of live config/memory files (scrubbed of secrets)
-- `scripts/` — Automation: 1-log, 2-distill, 3-promote, 4-sync-confluence, 5-sync-notion, 6-bootstrap (checkpoint is a zsh alias)
+- `scripts/` — Automation: 1-log, 2-distill, 3-promote, 4-sync-confluence, 5-sync-notion, 6-gc, checkpoint, bootstrap
 - `launchd/` — macOS scheduler plists for scripts 1-5
 - `tests/test.sh` — 53 validation tests (includes 6 CI guards against project-specific content leaking into templates)
 - Checkpoint: run `checkpoint` (alias) from any project dir to snapshot files to the repo. Run after syncing topic files to push them to EXAMPLES/.
@@ -170,8 +170,8 @@ Reference docs in the memory directory. Zero tokens until read.
 - Conceptual model: dynamic reinforcement through log distillation (1→2→3) and MEMORY.md promotion, not static weights or built-in RL
 - **Dependency**: `html2text` Python module required by 4-sync-confluence.sh (installed via `pip3 install --break-system-packages html2text`)
 ### Manual-only utilities (not scheduled)
-- **5-checkpoint.sh** (MSG only) — pushes live config into claude-os templates. Run via `checkpoint` alias.
-- **6-bootstrap.sh** (MSG only) — pulls templates from claude-os into a new project
+- **checkpoint.sh** — pushes live config into claude-os templates. Run via `checkpoint` CLI command.
+- **bootstrap.sh** — pulls templates from claude-os into a new project
 ### Other
 - Team wants claude-os published as a branch on existing repo, not standalone
 - See `claude-os-details.md` for details (learning loop, checkpoint/bootstrap, shared state, external deps)

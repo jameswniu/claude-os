@@ -126,7 +126,7 @@ Phases 1 and 2 require no additional tooling beyond Claude Code itself. Follow t
 
 **Attached scripts:** The .sh files attached to this page are the learning loop scripts referenced in Phase 3. You need to run them to schedule the launchd plists on Mac. See the Setup section below for details.
 
-1-log.sh, 2-distill.sh, 3-promote.sh, 4-sync-confluence.sh, 5-sync-notion.sh, 5-checkpoint.sh, 6-bootstrap.sh
+1-log.sh, 2-distill.sh, 3-promote.sh, 4-sync-confluence.sh, 5-sync-notion.sh, checkpoint.sh, bootstrap.sh
 
 ## Switching Repos
 

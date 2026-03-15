@@ -25,10 +25,27 @@ Record a Playwright video demo of Compass and post it as a PR comment.
    - Rename the output to `demo-recordings/compass-demo.webm`
    - Take note of the PASS/FAIL result from the script output.
 
-5. **Commit and push**
-   - `git add demo-recordings/compass-demo.webm demo-recordings/compass-demo-final.png frontend/e2e/record-demo.ts`
-   - Commit with message: `chore: record demo verifying <ticket> <short description>`
-   - Push to origin. Fix any lint errors if the pre-push hook fails.
+5. **Store artifacts on a dedicated branch (not the PR branch)**
+   Uses `git worktree` so the main working tree and `.claude/` are never touched.
+   ```bash
+   ARTIFACT_DIR=$(mktemp -d)
+   if git rev-parse --verify origin/{ticket}-vid-evidence >/dev/null 2>&1; then
+     git worktree add "$ARTIFACT_DIR" origin/{ticket}-vid-evidence
+     cd "$ARTIFACT_DIR"
+   else
+     git worktree add --detach "$ARTIFACT_DIR"
+     cd "$ARTIFACT_DIR"
+     git checkout --orphan {ticket}-vid-evidence
+     git rm -rf . 2>/dev/null
+   fi
+   cp demo-recordings/compass-demo.webm ./{ticket}-demo.webm
+   cp demo-recordings/compass-demo-final.png ./{ticket}-demo-final.png
+   git add .
+   git commit --no-verify -m "Video demo artifacts for {ticket}"
+   git push --no-verify origin {ticket}-vid-evidence
+   cd -
+   git worktree remove "$ARTIFACT_DIR"
+   ```
 
 6. **Post PR comment on Bitbucket**
    - Find the open PR number for this branch via the Bitbucket API.
@@ -36,7 +53,7 @@ Record a Playwright video demo of Compass and post it as a PR comment.
      - Title referencing the ticket
      - What was tested (prompt used, what tool calls or UI elements appeared)
      - PASS/FAIL result
-     - Direct links to the video and screenshot files on the branch (use `?at=refs/heads/<branch>&raw` for download links)
+     - Direct links to the video and screenshot files on the artifact branch (use `?at=refs/heads/{ticket}-vid-evidence&raw` for download links)
    - Show the comment text to the user for approval before posting.
 
 ## Record Script Template

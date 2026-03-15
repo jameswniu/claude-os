@@ -286,11 +286,11 @@ Artifacts must NOT be committed to the PR branch (they would get merged into mai
 Remove the `config["recursion_limit"] = 100` line from `src/orchestrator/services/agent_execution_service.py`.
 
 1. Export the GIF via `gif_creator` with action `export`, download `true`, filename `{ticket}-ui-test.gif`
-2. **Slow down the GIF** so each frame is readable (~1.5s per frame):
+2. **Slow down the GIF** so each frame is readable (~2s per frame):
    ```bash
-   magick ~/Downloads/{ticket}-ui-test.gif -set delay 150 ~/Downloads/{ticket}-ui-test-slow.gif
+   magick ~/Downloads/{ticket}-ui-test.gif -set delay 200 ~/Downloads/{ticket}-ui-test-slow.gif
    ```
-   Use the slow version for the PR comment. Verify with `magick identify -format "%T\n"` that all frames show 150.
+   Use the slow version for the PR comment. Verify with `magick identify -format "%T\n"` that all frames show 200.
 3. If issues were found, annotate the page:
    - Use `javascript_tool` to inject red borders and labels on problem elements (e.g., `el.style.border = '3px solid red'` and append a label div with red background)
    - Capture the annotated state via GIF creator (start recording, perform one scroll action for a frame, stop, export with `showClickIndicators: false, showActionLabels: false, showProgressBar: false, showWatermark: false`)
@@ -300,33 +300,28 @@ Remove the `config["recursion_limit"] = 100` line from `src/orchestrator/service
 ### Store artifacts on a dedicated branch (not the PR branch, not a tag)
 
 Non-semver git tags break release automation. Always use an orphan branch.
+Uses `git worktree` so the main working tree and `.claude/` are never touched.
 
-**WARNING: Docker bind mount.** The orchestrator/frontend containers mount the local repo directory. Switching branches changes the source files under the running containers. After switching back to the PR branch, you may need to restart the frontend container.
-
-5. Create an orphan artifact branch, commit the GIF, push, return to original branch:
+5. Store artifacts via a temporary worktree:
 ```bash
-git stash  # if needed
-git checkout --orphan {ticket}-ui-test-evidence
-git rm -rf . 2>/dev/null
+ARTIFACT_DIR=$(mktemp -d)
+# Create or reuse the artifact branch in an isolated worktree
+if git rev-parse --verify origin/{ticket}-ui-test-evidence >/dev/null 2>&1; then
+  git worktree add "$ARTIFACT_DIR" origin/{ticket}-ui-test-evidence
+  cd "$ARTIFACT_DIR"
+else
+  git worktree add --detach "$ARTIFACT_DIR"
+  cd "$ARTIFACT_DIR"
+  git checkout --orphan {ticket}-ui-test-evidence
+  git rm -rf . 2>/dev/null
+fi
 cp ~/Downloads/{latest-slow-gif-file} {ticket}-ui-test.gif
 cp ~/Downloads/{latest-annotated-file} {ticket}-annotated-bug.gif  # if applicable
 git add *.gif
 git commit --no-verify -m "UI smoke test artifacts for {ticket}"
-git push --no-verify origin {ticket}-ui-test-evidence  # --no-verify: orphan branch has no ESLint config
-git checkout {original-branch}
-git stash pop 2>/dev/null
-```
-
-If the artifact branch already exists, just check it out, add the new file, and push:
-```bash
-git stash  # if needed
-git checkout {ticket}-ui-test-evidence
-cp ~/Downloads/{latest-slow-gif-file} {ticket}-ui-test-v{N}.gif
-git add *.gif
-git commit --no-verify -m "UI smoke test v{N} for {ticket}"
 git push --no-verify origin {ticket}-ui-test-evidence
-git checkout {original-branch}
-git stash pop 2>/dev/null
+cd -
+git worktree remove "$ARTIFACT_DIR"
 ```
 
 Artifact URLs use branch refs (permanent, won't get merged):

@@ -153,7 +153,7 @@ for name, score in scored[:5]:
     print(f'    {name} (score={score})')
 " >> "$LOG_DIR/2-distill.log" 2>/dev/null
         else
-            echo "  (run 7-gc.sh first to generate scoring data)" >> "$LOG_DIR/2-distill.log"
+            echo "  (run 6-gc.sh first to generate scoring data)" >> "$LOG_DIR/2-distill.log"
         fi
     fi
 
